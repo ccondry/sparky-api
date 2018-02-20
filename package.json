@@ -4,7 +4,7 @@
   "description": "Facebook bot using api.ai",
   "main": "webhook.js",
   "scripts": {
-    "start": "node webhook.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,9 +25,10 @@
     "body-parser": "^1.15.2",
     "dotenv": "^4.0.0",
     "express": "^4.14.0",
-    "request": "^2.79.0"
+    "jquery": "^3.3.1",
+    "node-strophe": "^2.0.0",
+    "request": "^2.79.0",
+    "request-promise-native": "^1.0.5"
   },
-  "devDependencies": {
-    
-  }
+  "devDependencies": {}
 }
