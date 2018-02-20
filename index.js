@@ -12,11 +12,12 @@ const request = require('request-promise-native')
 // const apiai = require('apiai')
 const uuidv1 = require('uuid/v1')
 const pkg = require('./package.json')
-
+const cors = require('cors')
 // init express
 const app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(cors())
 
 const server = app.listen(process.env.PORT || 5000, () => {
   console.log('Express server listening on port %d in %s mode', server.address().port, app.settings.env)
@@ -131,7 +132,7 @@ async function processCustomerMessage (session, text) {
       },
       body: {
         sessionId: '8bf7bfc0-167e-11e8-9419-d7112fa40fb8',
-        q: 'Hello',
+        q: text,
         lang: 'en'
       },
       json: true
@@ -332,16 +333,18 @@ function sendAcceptChatAttachmentNotification(attachment){
 
 function escalateIt (session) {
   /* Create the customer object */
-  session.escalated = true
-  customerObject =  new myLibrary.Datatype.CustomerObject();
-  customerObject.SetPrimaryKey(customerObject.PrimaryKeyParams.PRIMARY_KEY_EMAIL, EmailAddress);
-
   var ChatEntryPointId = "1001";
   var PhoneNumber = "2142336226";
   var EmailAddress = "ccondry@cisco.com";
   var FirstName = "Coty";
   var LastName = "Condry";
   var customerObject = null;
+
+  session.escalated = true
+  customerObject =  new myLibrary.Datatype.CustomerObject();
+  customerObject.SetPrimaryKey(customerObject.PrimaryKeyParams.PRIMARY_KEY_EMAIL, EmailAddress);
+
+
 
   var customerFirstName = new myLibrary.Datatype.CustomerParameter();
   customerFirstName.eGainParentObject = "casemgmt";
