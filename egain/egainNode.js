@@ -1,4 +1,4 @@
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -10,7 +10,7 @@ var jquery = require('jquery');
 var $ = jquery;
 var fs = require('fs');
 /**
- * This eGainLibrarySettings defines the settings with which the Library is initialized. 
+ * This eGainLibrarySettings defines the settings with which the Library is initialized.
  *      It can be used run the library in development mode and define CORS host.
  */
  eGainLibrarySettings = function () {
@@ -22,7 +22,7 @@ var fs = require('fs');
 };
 
 
-/* This parameter has been set for cobrowse identification 
+/* This parameter has been set for cobrowse identification
  * No window... need to hack this.
 */
 egChatFrameIdentifier = 2;
@@ -36,7 +36,7 @@ egChatFrameIdentifier = 2;
  */
 eGainLibrary = function (librarySettings) {
     var _this = this;
-     
+
 //    var jquery = require('jQuery');
 //    var $ = jquery;
     /**
@@ -118,7 +118,7 @@ eGainLibrary = function (librarySettings) {
 
     };
     /**
-     * The ConnectionParameters array is used to define array of key,value pairs. 
+     * The ConnectionParameters array is used to define array of key,value pairs.
      * These are additional url parameters which need to be added in url when establishing a connection.
      */
     this.ConnectionParameters = [];
@@ -131,7 +131,7 @@ eGainLibrary = function (librarySettings) {
     };
 
     /*
-     * 
+     *
      * Private variables used by eGainLibrary
      */
     var _egainLib = this;
@@ -176,8 +176,8 @@ eGainLibrary = function (librarySettings) {
     var _onErrorOccured;
 
     /*
-     * 
-     * Private Methods of eGainLibrary object 
+     *
+     * Private Methods of eGainLibrary object
      */
     var eGainLog = function (message) {
         if (typeof _this.logger === 'function') {
@@ -453,12 +453,12 @@ eGainLibrary = function (librarySettings) {
         return true;
     }
     ;
-    
+
     function $msg(attrs) { return new Strophe.Builder("message", attrs); }
-    
+
     /*
-     * 
-     * Public Methods of eGain Library Object 
+     *
+     * Public Methods of eGain Library Object
      */
     /*
      * SetCustomer is used to set customer object in chat/callback session
@@ -511,7 +511,7 @@ eGainLibrary = function (librarySettings) {
     };
 
     /**
-     * The GetQueueCurrentStatus method is used get details of about the current queue load and estimated wait time.  
+     * The GetQueueCurrentStatus method is used get details of about the current queue load and estimated wait time.
      */
     this.GetQueueCurrentStatus = function () {
         var QUEUE_STATUS_URL = _corsHost + "/egain/chat/entrypoint/sessionStatistics";
@@ -552,7 +552,7 @@ eGainLibrary = function (librarySettings) {
 
     };
     /*
-     * 
+     *
      * Masker and Connection objects are private objects inside eGainLibrary
      */
     /*
@@ -831,7 +831,7 @@ eGainLibrary = function (librarySettings) {
 
     this.Masker = new Masker();
     /*
-     * 
+     *
      * Connection object is a private object which has session related variables and methods accessible by both Chat and Callback
      */
     var Connection = function () {
@@ -932,7 +932,7 @@ eGainLibrary = function (librarySettings) {
 
     };
     /*
-     * 
+     *
      * Chat object will have methods specific to Chat
      */
     var Chat = function () {
@@ -2027,11 +2027,11 @@ eGainLibrary = function (librarySettings) {
          });
          };
          */
-        
-        // This is a Facebook specific function as FB won't stream the file from the 
+
+        // This is a Facebook specific function as FB won't stream the file from the
         // customer.. they upload it and save it and send an URL to it. ie: we don't
         // actually get the file data.
-        // Here we are going to intercept it and read from the URL.. save it and then 
+        // Here we are going to intercept it and read from the URL.. save it and then
         // send it to ECE
         function getUrlData(fileURL) {
             $.get( fileURL, function( data ) {
@@ -2047,7 +2047,7 @@ eGainLibrary = function (librarySettings) {
 //                  });
 //                });
 //            }
-        } 
+        }
         // Function to download data to a file
         function saveFileFromURL(data, filename, type) {
             var Blob = require('blob');
@@ -2063,8 +2063,8 @@ eGainLibrary = function (librarySettings) {
                 a.click();
                 setTimeout(function() {
                     document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);  
-                }, 0); 
+                    window.URL.revokeObjectURL(url);
+                }, 0);
             }
         }
         function GetFilename(url)
@@ -2078,7 +2078,7 @@ eGainLibrary = function (librarySettings) {
                 }
             }
             return "";
-        } 
+        }
 //        this.getFileData = function (fileURL)
 //        {
 //            $.get( fileURL, function( data ) {
@@ -2096,7 +2096,7 @@ eGainLibrary = function (librarySettings) {
             var fileData = getUrlData(files);
             var timeStamp = (new Date()).getTime();
             var errorOccured = false;
-            
+
             var file = [files];
             //file = files;
             file.name = GetFilename(files);
@@ -2136,7 +2136,7 @@ eGainLibrary = function (librarySettings) {
                     console.log('Send Attachment Notification Error; ' + eval(error));
                 }
             });
-            
+
         };
 //        this._sendCustomerAttachmentNotification = function (files, customerName) {
 ////            var fileData = getUrlData(files);
@@ -2236,7 +2236,7 @@ eGainLibrary = function (librarySettings) {
             this._loadMessagingProperties(messagingPropertyUrl);
         },
         /**
-         *  Start is used to start the chat after the settings have been configured and the instance of the 
+         *  Start is used to start the chat after the settings have been configured and the instance of the
          *      eGainLibary.Chat object has been created.
          */
         Start: function () {
@@ -2245,7 +2245,7 @@ eGainLibrary = function (librarySettings) {
         /**
          * SendMessageToAgent is used to send the customer messages to the agent.
          * @param {String} htmlMessage is the HTML formatted message sent by customer
-         * @param {boolean} isMessageOffRecord indicates whether or not the current message should be sent but not stored in the transcript. 
+         * @param {boolean} isMessageOffRecord indicates whether or not the current message should be sent but not stored in the transcript.
          *       Also if masking is turned on anym essages sent with a true value for isMessageOffRecord will send the clear text to the agent NOT the masked version of the message.
          * @returns {String - message that was sent to the agent, this will include masking characters if the option is turned on.
          */
@@ -2254,13 +2254,13 @@ eGainLibrary = function (librarySettings) {
 
         },
         /**
-         * SendSystemMessage is used to send "System Messages" to the agent from the customer. These can be any HTML String value and are 
-         *      displayed to the agent as informative messages displayed in grayed text on the agent side. 
-         *      If events occur on the client side that would be useful to inform the agent these can be sent as "System Messages". 
-         *      This is also a method that should be called with text such as "Sensitive data has been masked" 
-         *      when the SendMessageToAgent() method is called with masking enabled. This will store the message in the transcript 
+         * SendSystemMessage is used to send "System Messages" to the agent from the customer. These can be any HTML String value and are
+         *      displayed to the agent as informative messages displayed in grayed text on the agent side.
+         *      If events occur on the client side that would be useful to inform the agent these can be sent as "System Messages".
+         *      This is also a method that should be called with text such as "Sensitive data has been masked"
+         *      when the SendMessageToAgent() method is called with masking enabled. This will store the message in the transcript
          *      allowing the agent to know why the special characters are displayed.
-         * @param {String} htmlMessage is the HTML formatted message 
+         * @param {String} htmlMessage is the HTML formatted message
          */
         SendSystemMessage: function (htmlMessage, cmd) {
             this._sendSystemMessage(htmlMessage, cmd);
@@ -2268,21 +2268,21 @@ eGainLibrary = function (librarySettings) {
         },
         /**
          * The SendCustomerTypingStatus method is used to indicate to the agent that the customer
-         *      is in the middle of sending a message.  
+         *      is in the middle of sending a message.
          */
         SendCustomerStartTyping: function () {
             this._sendCustomerStartTyping();
         },
         /**
          * The SendCustomerTypingStatus method is used to indicate to the agent that the customer
-         *       has stopped typing.  
+         *       has stopped typing.
          */
         SendCustomerStopTyping: function () {
             this._sendCustomerStopTyping();
         },
         /**
          * The GetTranscript method is used fetch transcript from server
-         *       for ongoing chats.  
+         *       for ongoing chats.
          */
         GetTranscript: function () {
             this._getTranscript();
@@ -2294,8 +2294,8 @@ eGainLibrary = function (librarySettings) {
             this._end();
         },
         /**
-         * PauseChat method is called when a chat is paused. This API pauses the connection manager. 
-         * The pause time should be less than the MAX pause time configured at chat server. 
+         * PauseChat method is called when a chat is paused. This API pauses the connection manager.
+         * The pause time should be less than the MAX pause time configured at chat server.
          * This API will send XMPP pause request to server and then will pause the request manager.
          */
         Pause: function () {
@@ -2303,7 +2303,7 @@ eGainLibrary = function (librarySettings) {
         },
         /**
          * AttachToChat API is called to attach to an existing chat connection. This API needs to be called on page
-         * navigation. 
+         * navigation.
          * USE CASE : When page is reloaded, when user navigates to different page etc
          * @param {Integer} entryPointID is the chat entry point ID
          * @param {locale} Chat locale having language code and country code
@@ -2356,7 +2356,7 @@ eGainLibrary = function (librarySettings) {
 
     this.Chat = Chat;
     /*
-     * 
+     *
      * Callback object will have methods specific to Callback
      */
     var Callback = function () {
@@ -2674,7 +2674,7 @@ eGainLibrary = function (librarySettings) {
 
 Strophe.log = function (level, msg)
 {
-    console.log("LOG: " + level + " MESSAGE: " + msg);
+    // console.log("LOG: " + level + " MESSAGE: " + msg);
     try {
         if (level === Strophe.LogLevel.ERROR || level === Strophe.LogLevel.FATAL || eGainLibrary.debug)
         {
@@ -2735,15 +2735,15 @@ Strophe.Connection.prototype.connect = function(jid, pass, callback, wait, hold)
 			content : "text/xml; charset=utf-8",
 			ver : "1.6",
 			"xmlns:xmpp" : Strophe.NS.BOSH,
-			"xmpp:version" : "1.0"			
+			"xmpp:version" : "1.0"
 		};
-        // Build the <body> Structure       
+        // Build the <body> Structure
 	var body = this._buildBody().attrs(attributes);
-        
+
         // Pass all the eGain paramters to 'body' to add the child to the structure
 	var $egainParams = body.c('egainParams', {
 		'xmlns' : 'http://bindings.egain.com/chat'
-	}); 
+	});
 
 	if (this.eGainLoginParameters && this.eGainLoginParameters.length > 0) {
 
@@ -2751,21 +2751,21 @@ Strophe.Connection.prototype.connect = function(jid, pass, callback, wait, hold)
 			eGainLibrary.addParamXml($egainParams, this.eGainLoginParameters[i]);
 		}
 	}
-	
+
 	//sending visitor historytracking data
 	if(typeof this.vhtIds != "undefined" && this.vhtIds)
-	{		
+	{
 		body.c('visitorIdentifier')
 			.c('aId').t(this.vhtIds.aId).up()
 			.c('sId').t(this.vhtIds.sId).up()
 			.c('uId').t(this.vhtIds.uId).up()
 			.up()
-	}	
-	
+	}
+
 	//Sending backStopping parameters if backstopping is configured
-	if(typeof App != "undefined" && App 
-		&& typeof App.eGainCustomParams != "undefined" && App.eGainCustomParams 
-		&& typeof App.eGainCustomParams.backStoppingTime  != "undefined" && App.eGainCustomParams.backStoppingTime 
+	if(typeof App != "undefined" && App
+		&& typeof App.eGainCustomParams != "undefined" && App.eGainCustomParams
+		&& typeof App.eGainCustomParams.backStoppingTime  != "undefined" && App.eGainCustomParams.backStoppingTime
 		&& typeof App.eGainCustomParams.backStoppingAction  != "undefined" && App.eGainCustomParams.backStoppingAction)
 	{
 		body.c('backStoppingParams')
@@ -2773,10 +2773,10 @@ Strophe.Connection.prototype.connect = function(jid, pass, callback, wait, hold)
 			.c('action').t(App.eGainCustomParams.backStoppingAction).up()
 			.up()
 	}
-	
+
 	//Sending caseId if it exists
-	if(typeof App != "undefined" && App 
-		&& typeof App.eGainCustomParams != "undefined" && App.eGainCustomParams 
+	if(typeof App != "undefined" && App
+		&& typeof App.eGainCustomParams != "undefined" && App.eGainCustomParams
 		&& typeof App.eGainCustomParams.eglvcaseid  != "undefined" && App.eGainCustomParams.eglvcaseid )
 	{
 		body.c('caseId')
@@ -2786,7 +2786,7 @@ Strophe.Connection.prototype.connect = function(jid, pass, callback, wait, hold)
 	//console.log("\nBODY START: " + body);
 	// sending messaging_xx_XX.properties file content
 	body.c('messagingData', '<![CDATA['+this.eGainMessagingProperty+']]>').up();
-        
+
 	if (typeof this.samlResponse != 'undefined' && this.samlResponse != 'null') {
 		body.c('authenticationData')
 			.c('SAMLResponse').t(this.samlResponse).up()
@@ -2805,9 +2805,9 @@ Strophe.Connection.prototype.connect = function(jid, pass, callback, wait, hold)
 	}
 	//console.log("\nBODY END: " + body);
 	this._changeConnectStatus(Strophe.Status.CONNECTING, null);
-        
+
 	this._requests.push(new Strophe.Request(body.tree(),
-             this._onRequestStateChange.bind(this).prependArg(this._connect_cb.bind(this)), body.tree().getAttribute("rid")));   
+             this._onRequestStateChange.bind(this).prependArg(this._connect_cb.bind(this)), body.tree().getAttribute("rid")));
         //Strophe.document.cookie = "egain-last-request-id="+body.tree().getAttribute("rid");
 	this._throttledRequestHandler();
 }
@@ -2816,11 +2816,11 @@ Function.prototype.prependArg = function (arg)
 {
     var func = this;
 
-    return function () { 
+    return function () {
 	var newargs = [arg];
 	for (var i = 0; i < arguments.length; i++)
 	    newargs.push(arguments[i]);
-	return func.apply(this, newargs); 
+	return func.apply(this, newargs);
     };
 };
 
@@ -2830,7 +2830,7 @@ Function.prototype.prependArg = function (arg)
  * parameterDefinition
  */
 eGainLibrary.addParamXml = function ($egainParameters, parameterDefinition) {
-	
+
 	var attribName = parameterDefinition.attributeName;
 	if(!attribName)
 		return;
@@ -2844,7 +2844,7 @@ eGainLibrary.addParamXml = function ($egainParameters, parameterDefinition) {
 	if (attributeValue.constructor != Array) {
 		attributeValue = attributeValue.replace(/[\r\n]/g, '<br />');
 	} else {
-		for(var i=0; i < attributeValue.length; i++) {	
+		for(var i=0; i < attributeValue.length; i++) {
 			attributeValue[i] = attributeValue[i].replace(/[\r\n]/g, '<br />');
 		}
 	}
@@ -2860,13 +2860,13 @@ eGainLibrary.addParamXml = function ($egainParameters, parameterDefinition) {
 			.c('attributeValue').t(attributeValue).up() //
 			.c('validationString').up(parameterDefinition.validationString) //
 			.c('primaryKey').t(parameterDefinition.primaryKey).up() //
-	if (parameterDefinition.secureAttribute != 'undefined' && parameterDefinition.secureAttribute) {		
-			$egainParameters.c('secureAttribute').t(parameterDefinition.secureAttribute).up() //			
+	if (parameterDefinition.secureAttribute != 'undefined' && parameterDefinition.secureAttribute) {
+			$egainParameters.c('secureAttribute').t(parameterDefinition.secureAttribute).up() //
 	}
-			$egainParameters.c('minLength').t(parameterDefinition.minLength).up() //			
-			.c('maxLength').t(parameterDefinition.maxLength).up() //			
-			.c('required').t(parameterDefinition.required).up() //			
-			.c('fieldType').t(parameterDefinition.fieldType).up() //			
+			$egainParameters.c('minLength').t(parameterDefinition.minLength).up() //
+			.c('maxLength').t(parameterDefinition.maxLength).up() //
+			.c('required').t(parameterDefinition.required).up() //
+			.c('fieldType').t(parameterDefinition.fieldType).up() //
 
 			.up() // mapping
 			.up(); // /param
@@ -2887,7 +2887,7 @@ eGainLibrary.escapeXML = function (str) {
 		.replace(/[\r\n]/g, '<br />');
 	}
 	else {
-		for(var i=0; i < str.length; i++) {		
+		for(var i=0; i < str.length; i++) {
 			str[i] = str[i].replace(/&/g, '&amp;') //
 			.replace(/>/g, '&gt;') //
 			.replace(/</g, '&lt;') //
@@ -2964,7 +2964,7 @@ Strophe.Connection.prototype._connect_cb = function(req) {
         //    </ns2:responseParamMapping>
         //  </ns2:responseParam>
 		//</ns2:egainResponseParams>
-	
+
         var formValues = {};
         for (var mindex = 0; mindex < bodyWrap.childNodes.length; mindex++) {
                 var egainResponseParams = bodyWrap.childNodes[mindex];
@@ -2981,12 +2981,12 @@ Strophe.Connection.prototype._connect_cb = function(req) {
                                                     this.name = Strophe.getText(responseParamMapping.childNodes[1]);
                                             } else if(Strophe.getText(responseParamMapping.childNodes[0]) == 'subject') {
                                                     this.subject = Strophe.getText(responseParamMapping.childNodes[1]);
-                                            }else if(Strophe.getText(responseParamMapping.childNodes[0]) == 'first_name' || 
+                                            }else if(Strophe.getText(responseParamMapping.childNodes[0]) == 'first_name' ||
                                                                     Strophe.getText(responseParamMapping.childNodes[0]) == 'last_name') {
                                                     this.name = this.name ? this.name + ' ' + Strophe.getText(responseParamMapping.childNodes[1]) : Strophe.getText(responseParamMapping.childNodes[1]);
                                             }
                                     } else {
-                                            //For IE 10 & above and for other browsers 
+                                            //For IE 10 & above and for other browsers
                                             for (var i = 0; i < responseParamMapping.childNodes.length; i++) {
                                                     if(responseParamMapping.childNodes[i].tagName && responseParamMapping.childNodes[i].tagName.indexOf('attributeName') != -1) {
                                                             if (Strophe.getText(responseParamMapping.childNodes[i]) == 'full_name') {
@@ -3001,7 +3001,7 @@ Strophe.Connection.prototype._connect_cb = function(req) {
                                                                     i=i+2;
                                                             }
                                                     }
-                                            }								
+                                            }
                                     }
                                 }
                             }
@@ -3044,7 +3044,7 @@ Strophe.Connection.prototype._buildBody = function(){
             rid: this.rid++,
             xmlns: Strophe.NS.HTTPBIND
         });
-        
+
         /* Save request id to parent localstorage */
         var payLoad = {
             Method : "SET",
@@ -3060,7 +3060,7 @@ Strophe.Connection.prototype._buildBody = function(){
         if (this.sid !== null) {
             bodyWrap.attrs({sid: this.sid});
         }
-        
+
         return bodyWrap;
 };
 /**
@@ -3178,7 +3178,7 @@ Strophe.Connection.prototype._hitError = function(reqStatus) {
 	} else {
             if("function" === typeof this.eGainOnError){
                 this.eGainOnError({"status": "log", "message": "Retrying. " + reqStatus});
-            }	
+            }
 	}
 }
 
@@ -3391,7 +3391,7 @@ eGainLibrary.rawInput = function (data){
 	/* transcribe(new Date().format(L10N_TIME_FORMAT) + ' RECV: ' + data,
 			'rawInput');
                         */
-        console.log("eGainLibrary.rawInput: " + data);               
+        console.log("eGainLibrary.rawInput: " + data);
 }
 
 module.exports = {
