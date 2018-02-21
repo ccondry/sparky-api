@@ -439,8 +439,10 @@ function createEventHandlers (myChat, session) {
     })
   };
   /* Example browser console.log when the chat is completed */
-  myEventHandlers.OnConnectionComplete = function (args) {
-    console.log("Connection Complete!", args)
+  myEventHandlers.OnConnectionComplete = function () {
+    console.log("Connection Complete!")
+    // end ECE session
+    session.eceSession.End()
     // remove escalated flag
     session.escalated = false
   };
