@@ -388,7 +388,7 @@ function createEventHandlers (myChat, session) {
   /* Example browser alert when chat is connected */
   myEventHandlers.OnConnectSuccess = function (args) {
     console.log('OnConnectSuccess', args)
-    var welcomeMessage = "You are now connected to a Cumulus Financial Expert.";
+    var welcomeMessage = "You are now connected to an Expert.";
     console.log("You are now connected to an Agent " + welcomeMessage);
     session.messages.push({
       text: welcomeMessage,
