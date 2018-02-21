@@ -9,6 +9,7 @@ var Strophe = strophe.Strophe;
 var jquery = require('jquery');
 var $ = jquery;
 var fs = require('fs');
+const path = require('path')
 /**
  * This eGainLibrarySettings defines the settings with which the Library is initialized.
  *      It can be used run the library in development mode and define CORS host.
@@ -1602,7 +1603,8 @@ eGainLibrary = function (librarySettings) {
         // Locale messaging properties
         this._loadMessagingProperties = function (messagingPropertyUrl) {
             // Read eGain messaging propterties
-            fs.readFile('./l10n/messaging_en_us.properties', 'utf8', function (err,data) {
+            // console.log('__dirname', __dirname)
+            fs.readFile(path.resolve(__dirname, './l10n/messaging_en_us.properties'), 'utf8', function (err,data) {
                 if (err) {
                     return console.log(err);
                 }
@@ -2585,7 +2587,8 @@ eGainLibrary = function (librarySettings) {
 
         this._loadMessagingProperties = function (messagingPropertyUrl, customMessagingPropertyUrl) {
             // Read eGain messaging propterties
-            fs.readFile('./l10n/messaging_en_us.properties', 'utf8', function (err,data) {
+            // console.log('__dirname', __dirname)
+            fs.readFile(path.resolve(__dirname, './l10n/messaging_en_us.properties'), 'utf8', function (err,data) {
                 if (err) {
                     return console.log(err);
                 }
