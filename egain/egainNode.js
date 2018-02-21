@@ -1198,6 +1198,8 @@ eGainLibrary = function (librarySettings) {
                             _onDuplicateSession(duplicateSessionEventArgs);
                             break;
                         default:
+                            console.log('failed to connect to ECE. status:', status)
+                            console.log('failed to connect to ECE. condition:', condition)
                             if (condition.indexOf('remote-connection-failed') != -1) {
                                 connectionFailure = true;
                                 var errorCode = condition.split(":");
