@@ -86,6 +86,9 @@ app.post('/api/v1/session', (req, res) => {
     lastName: req.body.lastName,
     apiAiToken
   }
+
+  // start conversation off with an initial message from the bot
+  processCustomerMessage(sessions[sessionId], 'sparky')
   // generate uuid and return to client
   res.status(200).send({sessionId})
 })
