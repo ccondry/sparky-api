@@ -184,6 +184,7 @@ async function processCustomerMessage (session, text) {
 }
 
 function processAiResponse (session, text) {
+  // check the api.ai response message and perform the associated action
   switch (text) {
     case 'escalate': {
       // escalate request to agent
@@ -192,6 +193,25 @@ function processAiResponse (session, text) {
     }
     case 'video': {
       // make REM video call
+      session.messages.push({
+        text: 'start-rem-video',
+        type: 'command',
+        datetime: new Date().toJSON()
+      })
+      break
+    }
+    case 'calculator': {
+      // open mortgage calculator
+      session.messages.push({
+        text: 'Ok... Your calculator should have appeared on the left!',
+        type: 'bot',
+        datetime: new Date().toJSON()
+      })
+      session.messages.push({
+        text: 'mortgage-calculator',
+        type: 'command',
+        datetime: new Date().toJSON()
+      })
       break
     }
     default: {
