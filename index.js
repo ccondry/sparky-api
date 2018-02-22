@@ -84,7 +84,8 @@ app.post('/api/v1/session', (req, res) => {
     email: req.body.email,
     firstName: req.body.firstName,
     lastName: req.body.lastName,
-    apiAiToken
+    apiAiToken,
+    visitId: req.body.visitId
   }
 
   // start conversation off with an initial message from the bot
@@ -375,9 +376,26 @@ function escalateIt (session) {
   customerPhone.eGainMaxLength = "18";
   customerPhone.eGainRequired = "1";
   customerPhone.eGainFieldType = "1";
-  customerPhone.eGainPrimaryKey = "1";
+  customerPhone.eGainPrimaryKey = "0";
   customerPhone.eGainValidationString = "";
   customerObject.AddCustomerParameter(customerPhone);
+
+  // add altocloud visit ID, if exists
+  if (session.visitId) {
+    var visitId = new myLibrary.Datatype.CustomerParameter();
+    customerPhone.eGainParentObject = "casemgmt";
+    customerPhone.eGainChildObject = "activity_data";
+    customerPhone.eGainAttribute = "visitid";
+    customerPhone.eGainValue = session.visitId;
+    customerPhone.eGainParamName = "visitid";
+    customerPhone.eGainMinLength = "1";
+    customerPhone.eGainMaxLength = "65";
+    customerPhone.eGainRequired = "0";
+    customerPhone.eGainFieldType = "2";
+    customerPhone.eGainPrimaryKey = "0";
+    customerPhone.eGainValidationString = "";
+    customerObject.AddCustomerParameter(visitId);
+  }
 
   /* Now call the Chat initiliaztion method with your entry point and callbacks */
   /* Now create an instance of the Chat Object */
