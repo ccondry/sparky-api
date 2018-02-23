@@ -11,6 +11,8 @@ const request = require('request-promise-native')
 const uuidv1 = require('uuid/v1')
 const pkg = require('./package.json')
 const cors = require('cors')
+const axios = require('axios')
+
 // init express
 const app = express()
 app.use(bodyParser.json())
@@ -84,7 +86,8 @@ app.post('/api/v1/session', (req, res) => {
     email: req.body.email,
     firstName: req.body.firstName,
     lastName: req.body.lastName,
-    apiAiToken
+    apiAiToken,
+    visitId: req.body.visitId
   }
 
   // start conversation off with an initial message from the bot
@@ -184,6 +187,7 @@ async function processCustomerMessage (session, text) {
 }
 
 function processAiResponse (session, text) {
+  // check the api.ai response message and perform the associated action
   switch (text) {
     case 'escalate': {
       // escalate request to agent
@@ -192,6 +196,25 @@ function processAiResponse (session, text) {
     }
     case 'video': {
       // make REM video call
+      session.messages.push({
+        text: 'start-rem-video',
+        type: 'command',
+        datetime: new Date().toJSON()
+      })
+      break
+    }
+    case 'calculator': {
+      // open mortgage calculator
+      session.messages.push({
+        text: 'Ok... Your calculator should have appeared on the left!',
+        type: 'bot',
+        datetime: new Date().toJSON()
+      })
+      session.messages.push({
+        text: 'mortgage-calculator',
+        type: 'command',
+        datetime: new Date().toJSON()
+      })
       break
     }
     default: {
@@ -283,7 +306,61 @@ app.post('/ai', (req, res) => {
 
 });
 
+// looks up customer in Context Service and creates a new
+// Context Service POD with current chat transcript
+async function sendTranscript (session) {
+  // look up customer ID
+  const params = {
+    q: session.email,
+    field: 'query_string',
+    token: process.env.CS_TOKEN_GET_CUSTOMER
+  }
+  let customers
+  try {
+    customers = await axios.get(`https://cxdemo.net/labconfig/api/demo/cs/customer`, {params})
+    // console.log(`sendTranscript: get CS customers response -`, customers)
+    console.log(`sendTranscript: found ${customers.data.length} matching customer(s) in Context Service`)
+  } catch (e) {
+    console.log(`sendTranscript: exception while looking up Context Service customer ${session.email}`, e)
+    throw e
+  }
+  // get customer ID from Context Service
+  // console.log('got customers: ', customers)
+  console.log('sendTranscript: chose first Context Service customer -', customers.data[0].customerId)
+  const customer = customers.data[0]
 
+  // generate transcript string
+  let transcript = ''
+  session.messages.forEach(message => {
+    transcript += `${message.type}: ${message.text}\r\n\r\n`
+  })
+
+  const body = {
+    "customerId": customer.customerId,
+    "mediaType": "chat",
+    "dataElements":{
+      "Context_Notes": "Bot Chat Transcript",
+      "Context_POD_Activity_Link": "https://sparky.cxdemo.net/",
+      "Context_POD_Source_Cust_Name": `${session.firstName} ${session.lastName}`,
+      "Context_POD_Source_Phone": session.phone,
+      "Context_POD_Source_Email": session.email,
+      "Context_Chat_Transcript": transcript
+    },
+    "tags": ["transcript", "bot"],
+    // "requestId":"4c26daa0-c8b5-11e7-81c3-11121369121d",
+    "fieldsets":["cisco.base.pod", "cisco.dcloud.cumulus.chat"],
+    "token": process.env.CS_TOKEN_CREATE_POD,
+  }
+
+  // create transcript POD
+  try {
+    await axios.post('https://cxdemo.net/labconfig/api/demo/cs/pod/', body)
+    console.log(`sendTranscript: successfully created POD in Context Service for ${session.email}`)
+  } catch (e) {
+    console.log(`sendTranscript: exception while creating POD in Context Service for ${session.email}`, e)
+    throw e
+  }
+}
 
 function escalateIt (session) {
   /* Create the customer object */
@@ -293,6 +370,10 @@ function escalateIt (session) {
   // var FirstName = "Coty";
   // var LastName = "Condry";
 
+  // send the chat transcript to Context Service
+  sendTranscript(session)
+
+  // build chat customer object
   var ChatEntryPointId = session.entryPointId
   var PhoneNumber = session.phone
   var EmailAddress = session.email
@@ -355,9 +436,26 @@ function escalateIt (session) {
   customerPhone.eGainMaxLength = "18";
   customerPhone.eGainRequired = "1";
   customerPhone.eGainFieldType = "1";
-  customerPhone.eGainPrimaryKey = "1";
+  customerPhone.eGainPrimaryKey = "0";
   customerPhone.eGainValidationString = "";
   customerObject.AddCustomerParameter(customerPhone);
+
+  // add altocloud visit ID, if exists
+  if (session.visitId) {
+    var visitId = new myLibrary.Datatype.CustomerParameter();
+    customerPhone.eGainParentObject = "casemgmt";
+    customerPhone.eGainChildObject = "activity_data";
+    customerPhone.eGainAttribute = "visitid";
+    customerPhone.eGainValue = session.visitId;
+    customerPhone.eGainParamName = "visitid";
+    customerPhone.eGainMinLength = "1";
+    customerPhone.eGainMaxLength = "65";
+    customerPhone.eGainRequired = "0";
+    customerPhone.eGainFieldType = "2";
+    customerPhone.eGainPrimaryKey = "0";
+    customerPhone.eGainValidationString = "";
+    customerObject.AddCustomerParameter(visitId);
+  }
 
   /* Now call the Chat initiliaztion method with your entry point and callbacks */
   /* Now create an instance of the Chat Object */
@@ -388,7 +486,7 @@ function createEventHandlers (myChat, session) {
   /* Example browser alert when chat is connected */
   myEventHandlers.OnConnectSuccess = function (args) {
     console.log('OnConnectSuccess', args)
-    var welcomeMessage = "You are now connected to a Cumulus Financial Expert.";
+    var welcomeMessage = "You are now connected to an Expert.";
     console.log("You are now connected to an Agent " + welcomeMessage);
     session.messages.push({
       text: welcomeMessage,
@@ -439,8 +537,10 @@ function createEventHandlers (myChat, session) {
     })
   };
   /* Example browser console.log when the chat is completed */
-  myEventHandlers.OnConnectionComplete = function (args) {
-    console.log("Connection Complete!", args)
+  myEventHandlers.OnConnectionComplete = function () {
+    console.log("Connection Complete!")
+    // end ECE session
+    session.eceSession.End()
     // remove escalated flag
     session.escalated = false
   };

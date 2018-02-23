@@ -1,36 +1,37 @@
 {
-  "name": "fb-chat-bot",
+  "name": "sparky-api",
   "version": "0.1.0",
-  "description": "Facebook bot using api.ai",
-  "main": "webhook.js",
+  "description": "Sparky - an ECE chat bot using api.ai",
+  "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/girliemac/fb-apiai-bot-simple"
+    "url": "git+https://gitlab.com/cxdemo/sparky-api"
   },
   "keywords": [
     "bot",
     "ai",
     "chat",
-    "facebook",
-    "messenger"
+    "cxdemo",
+    "cisco",
+    "ece"
   ],
-  "author": "Frank Kicenko",
-  "license": "private",
+  "author": "Coty Condry",
+  "license": "UNLICENSED",
   "dependencies": {
-    "apiai": "^3.0.3",
+    "axios": "^0.18.0",
     "body-parser": "^1.15.2",
     "cors": "^2.8.4",
     "dotenv": "^4.0.0",
     "express": "^4.14.0",
     "jquery": "^3.3.1",
-    "node-strophe": "^2.0.0",
+    "node-strophe": "git+https://github.com/juxe/node-strophe.git",
     "request": "^2.79.0",
     "request-promise-native": "^1.0.5",
-    "sax": "^1.2.4"
+    "sax": "^1.2.1"
   },
   "devDependencies": {}
 }
