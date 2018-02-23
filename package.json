@@ -22,6 +22,7 @@
   "license": "private",
   "dependencies": {
     "apiai": "^3.0.3",
+    "axios": "^0.18.0",
     "body-parser": "^1.15.2",
     "cors": "^2.8.4",
     "dotenv": "^4.0.0",
