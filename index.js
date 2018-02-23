@@ -332,7 +332,7 @@ async function sendTranscript (session) {
   // generate transcript string
   let transcript = ''
   session.messages.forEach(message => {
-    transcript += `${message.type}: ${message.text}\r\n`
+    transcript += `${message.type}: ${message.text}\r\n\r\n`
   })
 
   const body = {
