@@ -16,7 +16,7 @@ const fbPages = {
   '145865646228399': {
     // Cumulus Finance
     apiAiToken: '1c4d3b458b3f4109bec0b38f792cfc46',
-    entryPointId: '1001'
+    entryPointId: '1004'
   }
 }
 
