@@ -1604,9 +1604,10 @@ eGainLibrary = function (librarySettings) {
         };
         // Locale messaging properties
         this._loadMessagingProperties = function (messagingPropertyUrl) {
+          console.log('_loadMessagingProperties - messagingPropertyUrl =', messagingPropertyUrl)
             // Read eGain messaging propterties
             // console.log('__dirname', __dirname)
-            fs.readFile(path.resolve(__dirname, '../l10n/messaging_en_US.properties'), 'utf8', function (err,data) {
+            fs.readFile(path.resolve(__dirname + '/../', messagingPropertyUrl), 'utf8', function (err,data) {
                 if (err) {
                     return console.log(err);
                 }
@@ -2590,7 +2591,7 @@ eGainLibrary = function (librarySettings) {
         this._loadMessagingProperties = function (messagingPropertyUrl, customMessagingPropertyUrl) {
             // Read eGain messaging propterties
             // console.log('__dirname', __dirname)
-            fs.readFile(path.resolve(__dirname, '../l10n/messaging_en_US.properties'), 'utf8', function (err,data) {
+            fs.readFile(path.resolve(__dirname + '/../', messagingPropertyUrl), 'utf8', function (err,data) {
                 if (err) {
                     return console.log(err);
                 }
