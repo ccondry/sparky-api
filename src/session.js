@@ -3,18 +3,28 @@ const myLibrary = require('./egainLibrary.js')
 const request = require('request-promise-native')
 const egainEventHandlers = require('./egainEventHandlers')
 const transcript = require('./transcript')
+const facebook = require('./facebook')
 
 // predefined named chat bot tokens
-const tokens = {
+const botTokens = {
   'cumulus-finance': '1c4d3b458b3f4109bec0b38f792cfc46',
   'sparky-retail': 'a2083e974dc84b599e86124fca44a9e3'
+}
+
+// map of facebook page IDs to bot tokens
+const fbPages = {
+  '145865646228399': {
+    // Cumulus Finance
+    apiAiToken: '1c4d3b458b3f4109bec0b38f792cfc46',
+    entryPointId: '1001'
+  }
 }
 
 class Session {
   constructor (type, data) {
     if (type === 'sparky-ui') {
       // get api.ai token
-      const apiAiToken = data.apiAiToken || tokens[data.bot] || '1c4d3b458b3f4109bec0b38f792cfc46'
+      const apiAiToken = data.apiAiToken || botTokens[data.bot] || '1c4d3b458b3f4109bec0b38f792cfc46'
 
       // sparky-ui chat bot client
       this.id = uuidv1()
@@ -30,6 +40,23 @@ class Session {
       this.visitId = data.visitId
       this.language = data.language || 'en'
     }
+
+    if (type === 'facebook') {
+      // sparky-ui chat bot client
+      this.id = uuidv1()
+      this.type = 'facebook'
+      this.state = 'active'
+      this.messages = []
+      this.entryPointId = fbPages[data.pageId].entryPointId || '1001'
+      this.phone = data.phone
+      this.email = data.email
+      this.firstName = data.firstName
+      this.lastName = data.lastName
+      this.apiAiToken = fbPages[data.pageId].apiAiToken || '1c4d3b458b3f4109bec0b38f792cfc46'
+      this.language = 'en',
+      this.pageId = data.pageId,
+      this.userId = data.userId
+    }
   }
 
   // add new message to session
@@ -40,7 +67,11 @@ class Session {
       type,
       datetime: new Date().toJSON()
     })
-    // TODO if facebook client, send the message to facebook
+    // if this is a bot/system/agent message, send it to the customer on facebook
+    if (this.type === 'facebook' && type !== 'customer') {
+      // send to facebook
+      facebook.dispatchMsg(this.userId, message)
+    }
   }
 
   // add new command to messages array
