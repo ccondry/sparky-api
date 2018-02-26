@@ -1,12 +1,45 @@
 function create (myChat, session) {
   let myEventHandlers = myChat.GetEventHandlers()
+
+  myEventHandlers.OnConnectionInitialized = function (args) {
+    console.log('OnConnectionInitialized', args)
+  }
+  myEventHandlers.OnConnectionPaused = function (args) {
+    console.log('OnConnectionPaused', args)
+  }
+  myEventHandlers.OnConnectionResumed = function (args) {
+    console.log('OnConnectionResumed', args)
+  }
+  myEventHandlers.OnConnectionAttached = function (args) {
+    console.log('OnConnectionAttached', args)
+  }
+  myEventHandlers.OnConnectionAttachedFailure = function (args) {
+    console.log('OnConnectionAttachedFailure', args)
+  }
+  myEventHandlers.OnDuplicateSession = function (args) {
+    console.log('OnDuplicateSession', args)
+  }
+  myEventHandlers.OnSysemMessageReceived = function (args) {
+    console.log('OnSysemMessageReceived', args)
+  }
+  myEventHandlers.OnGetQueueCurrentStatus = function (args) {
+    console.log('OnGetQueueCurrentStatus', args)
+  }
+  myEventHandlers.OnMessagePropertyLoad = function (args) {
+    console.log('OnMessagePropertyLoad', args)
+  }
+  myEventHandlers.OnErrorOccured = function (args) {
+    console.log('OnErrorOccured', args)
+  }
+
+
   /* Example browser alert when chat is connected */
   myEventHandlers.OnConnectSuccess = function (args) {
     console.log('OnConnectSuccess', args)
-    var welcomeMessage = "You are now connected to an Expert.";
-    console.log("You are now connected to an Agent " + welcomeMessage);
+    var welcomeMessage = "Ok, I'll get you connected to one of our Experts. One moment...";
+    console.log(welcomeMessage);
     session.addMessage('system', welcomeMessage)
-  };
+  }
   /* Example browser alert when there is a connection failure */
   myEventHandlers.OnConnectionFailure = function (args) {
     console.log('OnConnectionFailure', args)
