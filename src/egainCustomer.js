@@ -3,7 +3,8 @@ const myLibrary = require('./egainLibrary.js')
 function create ({firstName, lastName, phone, email, visitId}) {
   const customerObject = new myLibrary.Datatype.CustomerObject();
 
-  customerObject.SetPrimaryKey(customerObject.PrimaryKeyParams.PRIMARY_KEY_EMAIL, email);
+  // customerObject.SetPrimaryKey(customerObject.PrimaryKeyParams.PRIMARY_KEY_EMAIL, email);
+  customerObject.SetPrimaryKey(customerObject.PrimaryKeyParams.PRIMARY_KEY_PHONE, phone);
 
   const customerFirstName = new myLibrary.Datatype.CustomerParameter();
   customerFirstName.eGainParentObject = "casemgmt";
