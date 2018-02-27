@@ -30,6 +30,79 @@ function addFacebookSession (pageId, senderId, session) {
   facebookSessions[pageId][senderId] = session
 }
 
+async function handleMessage (message) {
+  // facebook user ID
+  const userId = message.sender.id
+  // facebook page ID
+  const pageId = message.recipient.id
+  // message text
+  const messageText = message.message.text
+  // message attachments
+  const attachments = message.message.attachments
+  // postbacks
+  const postback = message.message.postback
+  // get user info
+  const fbUser = await fb.getSenderInfo(message.sender.id)
+  // console.log('fbUser =', fbUser)
+  const firstName = fbUser.first_name
+  // console.log('firstName = ', firstName)
+  const lastName = fbUser.last_name
+
+  let session
+  // find session, if exists
+  session = getFacebookSession(message.recipient.id, message.sender.id)
+  if (session === null) {
+    console.log(`new facebook chat session for ${firstName} ${lastName}`)
+    // new session
+    // create session and store in sessions global
+    session = new Session('facebook', {
+      pageId,
+      userId,
+      phone: userId,
+      email: userId,
+      firstName,
+      lastName
+    })
+    // add session to global Faceobook sessions
+    addFacebookSession(session)
+  }
+  // was there text in the message?
+  if (messageText) {
+    // add message to session data
+    session.addCustomerMessage(messageText)
+  }
+  // were there any attachments?
+  if (attachments) {
+    // process attachments to send to agent
+    attachments.forEach(attachment => {
+    // are we escalated to an eGain agent?
+    if (session.escalated) {
+      // send the file to the agent in eGain
+      session.egainSession._sendCustomerAttachmentNotification(attachment.payload.url, `${session.firstName} ${session.lastName}`)
+    } else {
+      // was it just a sticker?
+      if (attachment.payload.sticker_id) {
+        // ignore stickers
+        console.log(`${session.firstName} ${session.lastName} sent a Facebook sticker. Ignoring sticker.`)
+        session.addMessage('customer', '(sticker)')
+      } else {
+        console.log(`${session.firstName} ${session.lastName} sent a file attachment.`)
+        // note that user attached a file
+        session.addMessage('customer', '(file attachment)')
+        // just the bot here - let user know we can't do anything with them
+        session.addMessage('bot', `I'm sorry, but I can't handle file attachments. If you would like to speak to an agent, say 'agent'.`)
+      }
+    }
+  })
+  }
+  // was there a postback?
+  if (postback) {
+    // log postback details
+    console.log(`Facebook postback for ${firstName} ${lastName}`, postback)
+    // fb.handlePostback(userId, postback)
+  }
+}
+
 // Accepts POST requests at /webhook endpoint for Facebook
 router.post('/webhook', (req, res) => {
   // Parse the request body from the POST
@@ -41,68 +114,7 @@ router.post('/webhook', (req, res) => {
     body.entry.forEach(entry => {
       const pageId = entry.id // facebook page ID
       // process each message in the set
-      entry.messaging.forEach(async (message) => {
-        // facebook user ID
-        const userId = message.sender.id
-        // facebook page ID
-        const pageId = message.recipient.id
-        // message text
-        const messageText = message.message.text
-        // get user info
-        const fbUser = await fb.getSenderInfo(message.sender.id)
-        // console.log('fbUser =', fbUser)
-        const firstName = fbUser.first_name
-        // console.log('firstName = ', firstName)
-        const lastName = fbUser.last_name
-        // find session, if exists
-        const session = getFacebookSession(message.recipient.id, message.sender.id)
-        if (session !== null) {
-          // existing session
-          // add message to session data
-          session.addCustomerMessage(messageText)
-        } else {
-          console.log(`new facebook chat session for ${firstName} ${lastName}`)
-          // new session
-          // create session and store in sessions global
-          const session = new Session('facebook', {
-            pageId,
-            userId,
-            phone: userId,
-            email: userId,
-            firstName,
-            lastName
-          })
-          // store session in global sessions
-          // sessions[session.id] = session
-          // add session to global Faceobook sessions
-          addFacebookSession(session)
-          // add first message
-          session.addCustomerMessage(messageText)
-        }
-      })
-      // Check if the event is a message or postback and
-      // pass the event to the appropriate handler function
-      // if (webhook_event.message) {
-      //   if(!inChat) {
-      //     fb.sendMessage(webhook_event);
-      //   } else if(inChat && typeof(myChat !== 'undefined')) {
-      //     // Check for the sending of an attachment
-      //     if (webhook_event.message.attachments) {
-      //       //handleMessage(sender_psid, webhook_event.message);
-      //       //myChat.getFileData(webhook_event.message.attachments[0].payload.url);
-      //       myChat._sendCustomerAttachmentNotification(webhook_event.message.attachments[0].payload.url, "Michael Littlefoot");
-      //     } else {
-      //       if (webhook_event.message.text === "goodbye") {
-      //         myChat.End();
-      //         inChat = false;
-      //       } else {
-      //         myChat.SendMessageToAgent(webhook_event.message.text);
-      //       }
-      //     }
-      //   }
-      // } else if (webhook_event.postback) {
-      //   fb.handlePostback(sender_psid, webhook_event.postback)
-      // }
+      entry.messaging.forEach(handleMessage)
     })
     // Return a '200 OK' response to all events
     res.status(200).send('EVENT_RECEIVED');

@@ -15,7 +15,8 @@ const botTokens = {
 const fbPages = {
   '145865646228399': {
     // Cumulus Finance
-    apiAiToken: '1c4d3b458b3f4109bec0b38f792cfc46',
+    // apiAiToken: '1c4d3b458b3f4109bec0b38f792cfc46',
+    apiAiToken: 'a88ffa6256174c198e62e882d68af6fa',
     entryPointId: '1004'
   }
 }
@@ -30,6 +31,7 @@ class Session {
       this.id = uuidv1()
       this.type = 'sparky-ui'
       this.state = 'active'
+      this.escalated = false
       this.messages = []
       this.entryPointId = data.entryPointId || '1001'
       this.phone = data.phone
@@ -46,6 +48,7 @@ class Session {
       this.id = uuidv1()
       this.type = 'facebook'
       this.state = 'active'
+      this.escalated = false
       this.messages = []
       this.entryPointId = fbPages[data.pageId].entryPointId || '1001'
       this.phone = data.phone
@@ -53,8 +56,8 @@ class Session {
       this.firstName = data.firstName
       this.lastName = data.lastName
       this.apiAiToken = fbPages[data.pageId].apiAiToken || '1c4d3b458b3f4109bec0b38f792cfc46'
-      this.language = 'en',
-      this.pageId = data.pageId,
+      this.language = 'en'
+      this.pageId = data.pageId
       this.userId = data.userId
     }
   }
@@ -70,7 +73,7 @@ class Session {
     // if this is a bot/system/agent message, send it to the customer on facebook
     if (this.type === 'facebook' && type !== 'customer') {
       // send to facebook
-      facebook.dispatchMsg(this.userId, message)
+      facebook.sendMessage(this.userId, message)
     }
   }
 
@@ -161,14 +164,22 @@ class Session {
         break
       }
       case 'video': {
-        // make REM video call
-        this.addCommand('start-rem-video')
+        if (this.type === 'sparky-ui') {
+          // make REM video call
+          this.addCommand('start-rem-video')
+        } else {
+          this.addMessage('bot', `I'm sorry, I'm not able to connect a video call to you from here.`)
+        }
         break
       }
       case 'calculator': {
-        this.addMessage('bot', 'Ok... Your calculator should have appeared on the left!')
-        // open mortgage calculator
-        this.addCommand('mortgage-calculator')
+        if (this.type === 'sparky-ui') {
+          this.addMessage('bot', 'Ok... Your calculator should have appeared on the left!')
+          // open mortgage calculator
+          this.addCommand('mortgage-calculator')
+        } else {
+          this.addMessage('bot', 'Here is our mortgage calculator: http://static.cxdemo.net/documents/sparky/calculator.html')
+        }
         break
       }
       default: {
@@ -181,8 +192,9 @@ class Session {
 
   escalate () {
     // send the chat transcript to Context Service
-    transcript.send(this)
+    transcript.send(this).catch(e => {})
 
+    // build customer object for connection to eGain
     const customerObject = require('./egainCustomer').create({
       firstName: this.firstName,
       lastName: this.lastName,
