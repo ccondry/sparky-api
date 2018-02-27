@@ -102,6 +102,7 @@ class Session {
     this.addMessage('customer', message)
     // is this chat escalated to an agent?
     if (this.isEscalated) {
+      console.log('this chat is escalated already. sending message to ECE agent.')
       // send message to eGain agent
       this.egainSession.SendMessageToAgent(message)
       // check for command words
@@ -115,6 +116,7 @@ class Session {
         }
       }
     } else {
+      // console.log('getting bot response...')
       // let bot handle the response
       this.processCustomerMessage(message)
     }
