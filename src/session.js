@@ -3,7 +3,7 @@ const myLibrary = require('./egainLibrary.js')
 const request = require('request-promise-native')
 const egainEventHandlers = require('./egainEventHandlers')
 const transcript = require('./transcript')
-const facebook = require('./facebook')
+// const facebook = require('./facebook')
 
 // predefined named chat bot tokens
 const botTokens = {
@@ -12,14 +12,14 @@ const botTokens = {
 }
 
 // map of facebook page IDs to bot tokens
-const fbPages = {
-  '145865646228399': {
-    // Cumulus Finance
-    // apiAiToken: '1c4d3b458b3f4109bec0b38f792cfc46',
-    apiAiToken: 'a88ffa6256174c198e62e882d68af6fa',
-    entryPointId: '1004'
-  }
-}
+// const fbPages = {
+//   '145865646228399': {
+//     // Cumulus Finance
+//     // apiAiToken: '1c4d3b458b3f4109bec0b38f792cfc46',
+//     apiAiToken: 'a88ffa6256174c198e62e882d68af6fa',
+//     entryPointId: '1004'
+//   }
+// }
 
 class Session {
   constructor (type, data) {
@@ -50,15 +50,17 @@ class Session {
       this.state = 'active'
       this.isEscalated = false
       this.messages = []
-      this.entryPointId = fbPages[data.pageId].entryPointId || '1001'
+      this.page = data.page
+      this.entryPointId = data.page.entryPointId || '1001'
       this.phone = data.phone
       this.email = data.email
       this.firstName = data.firstName
       this.lastName = data.lastName
-      this.apiAiToken = fbPages[data.pageId].apiAiToken || '1c4d3b458b3f4109bec0b38f792cfc46'
+      this.apiAiToken = data.page.aiToken || '1c4d3b458b3f4109bec0b38f792cfc46'
       this.language = 'en'
-      this.pageId = data.pageId
+      this.pageId = data.page.id
       this.userId = data.userId
+      this.callback = data.callback
     }
   }
 
@@ -71,9 +73,8 @@ class Session {
       datetime: new Date().toJSON()
     })
     // if this is a bot/system/agent message, send it to the customer on facebook
-    if (this.type === 'facebook' && type !== 'customer') {
-      // send to facebook
-      facebook.sendMessage(this.userId, message)
+    if (type !== 'customer' && this.callback && typeof this.callback === 'function') {
+      this.callback(type, message)
     }
   }
 
