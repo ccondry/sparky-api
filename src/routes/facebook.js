@@ -67,7 +67,7 @@ async function handleMessage (message) {
       firstName,
       lastName
     })
-    // add session to global Faceobook sessions
+    // add session to global Facebook sessions
     addFacebookSession(session)
   }
   // was there text in the message?
