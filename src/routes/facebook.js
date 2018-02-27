@@ -24,10 +24,14 @@ function getFacebookSession (pageId, senderId) {
   }
 }
 
-function addFacebookSession (pageId, senderId, session) {
+function addFacebookSession (session) {
+  const pageId = session.pageId
+  const senderId = session.userId
+  // console.log(`addFacebookSession: pageId ${pageId} : senderId ${senderId} : session `, session)
   facebookSessions[pageId] = facebookSessions[pageId] || {}
   facebookSessions[pageId][senderId] = facebookSessions[pageId][senderId] || {}
   facebookSessions[pageId][senderId] = session
+  // console.log('facebook sessions:', util.inspect(facebookSessions, false, null))
 }
 
 async function handleMessage (message) {
