@@ -10,15 +10,11 @@ async function send (session) {
       field: 'query_string',
       token: process.env.CS_TOKEN_GET_CUSTOMER
     }
-    let customers
-    try {
-      customers = await axios.get(`https://cxdemo.net/labconfig/api/demo/cs/customer`, {params})
-      console.log(`sendTranscript: found ${customers.data.length} matching customer(s) in Context Service`)
-    } catch (e) {
-      console.log(`sendTranscript: exception while looking up Context Service customer ${session.email}`, e)
-      throw e
+    let customers = await axios.get(`https://cxdemo.net/labconfig/api/demo/cs/customer`, {params})
+    console.log(`sendTranscript: found ${customers.data.length} matching customer(s) in Context Service`)
+    if (!customers.data.length) {
+      throw `no customers found matching ${session.email}`
     }
-
     // get customer ID from Context Service
     console.log('sendTranscript: chose first Context Service customer -', customers.data[0].customerId)
     const customer = customers.data[0]
@@ -50,7 +46,7 @@ async function send (session) {
     await axios.post('https://cxdemo.net/labconfig/api/demo/cs/pod/', body)
     console.log(`sendTranscript: successfully created POD in Context Service for ${session.email}`)
   } catch (e) {
-    console.log(`sendTranscript: exception while creating transcript POD in Context Service for ${session.email}`, e)
+    console.error(`sendTranscript: exception while creating transcript POD in Context Service for ${session.email}`, e)
     throw e
   }
 }

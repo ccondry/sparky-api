@@ -25,7 +25,7 @@ app.use('/api/vi/ai', require('./routes/ai'))
 // session management for sparky-ui client
 app.use('/api/v1/session', require('./routes/session'))
 // Facebook webhook
-app.use('/api/v1/fb', require('./routes/facebook'))
+app.use('/api/v1/facebook', require('./routes/facebook'))
 
 // listen on port defined in .env
 const server = app.listen(process.env.PORT || 5000, () => {

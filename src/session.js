@@ -3,23 +3,35 @@ const myLibrary = require('./egainLibrary.js')
 const request = require('request-promise-native')
 const egainEventHandlers = require('./egainEventHandlers')
 const transcript = require('./transcript')
+const facebook = require('./facebook')
 
 // predefined named chat bot tokens
-const tokens = {
+const botTokens = {
   'cumulus-finance': '1c4d3b458b3f4109bec0b38f792cfc46',
   'sparky-retail': 'a2083e974dc84b599e86124fca44a9e3'
+}
+
+// map of facebook page IDs to bot tokens
+const fbPages = {
+  '145865646228399': {
+    // Cumulus Finance
+    // apiAiToken: '1c4d3b458b3f4109bec0b38f792cfc46',
+    apiAiToken: 'a88ffa6256174c198e62e882d68af6fa',
+    entryPointId: '1004'
+  }
 }
 
 class Session {
   constructor (type, data) {
     if (type === 'sparky-ui') {
       // get api.ai token
-      const apiAiToken = data.apiAiToken || tokens[data.bot] || '1c4d3b458b3f4109bec0b38f792cfc46'
+      const apiAiToken = data.apiAiToken || botTokens[data.bot] || '1c4d3b458b3f4109bec0b38f792cfc46'
 
       // sparky-ui chat bot client
       this.id = uuidv1()
       this.type = 'sparky-ui'
       this.state = 'active'
+      this.isEscalated = false
       this.messages = []
       this.entryPointId = data.entryPointId || '1001'
       this.phone = data.phone
@@ -29,6 +41,24 @@ class Session {
       this.apiAiToken = apiAiToken
       this.visitId = data.visitId
       this.language = data.language || 'en'
+    }
+
+    if (type === 'facebook') {
+      // sparky-ui chat bot client
+      this.id = uuidv1()
+      this.type = 'facebook'
+      this.state = 'active'
+      this.isEscalated = false
+      this.messages = []
+      this.entryPointId = fbPages[data.pageId].entryPointId || '1001'
+      this.phone = data.phone
+      this.email = data.email
+      this.firstName = data.firstName
+      this.lastName = data.lastName
+      this.apiAiToken = fbPages[data.pageId].apiAiToken || '1c4d3b458b3f4109bec0b38f792cfc46'
+      this.language = 'en'
+      this.pageId = data.pageId
+      this.userId = data.userId
     }
   }
 
@@ -40,7 +70,11 @@ class Session {
       type,
       datetime: new Date().toJSON()
     })
-    // TODO if facebook client, send the message to facebook
+    // if this is a bot/system/agent message, send it to the customer on facebook
+    if (this.type === 'facebook' && type !== 'customer') {
+      // send to facebook
+      facebook.sendMessage(this.userId, message)
+    }
   }
 
   // add new command to messages array
@@ -58,14 +92,17 @@ class Session {
     // end ECE session
     this.egainSession.End()
     // remove escalated flag
-    this.escalated = false
+    this.isEscalated = false
+    // delete the messages in memory so that new transcripts are only the latest
+    this.messages = []
   }
 
   addCustomerMessage (message) {
     // add message to memory
     this.addMessage('customer', message)
     // is this chat escalated to an agent?
-    if (this.escalated) {
+    if (this.isEscalated) {
+      console.log('this chat is escalated already. sending message to ECE agent.')
       // send message to eGain agent
       this.egainSession.SendMessageToAgent(message)
       // check for command words
@@ -79,6 +116,7 @@ class Session {
         }
       }
     } else {
+      // console.log('getting bot response...')
       // let bot handle the response
       this.processCustomerMessage(message)
     }
@@ -130,14 +168,22 @@ class Session {
         break
       }
       case 'video': {
-        // make REM video call
-        this.addCommand('start-rem-video')
+        if (this.type === 'sparky-ui') {
+          // make REM video call
+          this.addCommand('start-rem-video')
+        } else {
+          this.addMessage('bot', `I'm sorry, I'm not able to connect a video call to you from here.`)
+        }
         break
       }
       case 'calculator': {
-        this.addMessage('bot', 'Ok... Your calculator should have appeared on the left!')
-        // open mortgage calculator
-        this.addCommand('mortgage-calculator')
+        if (this.type === 'sparky-ui') {
+          this.addMessage('bot', 'Ok... Your calculator should have appeared on the left!')
+          // open mortgage calculator
+          this.addCommand('mortgage-calculator')
+        } else {
+          this.addMessage('bot', 'Here is our mortgage calculator: http://static.cxdemo.net/documents/sparky/calculator.html')
+        }
         break
       }
       default: {
@@ -150,8 +196,9 @@ class Session {
 
   escalate () {
     // send the chat transcript to Context Service
-    transcript.send(this)
+    transcript.send(this).catch(e => {})
 
+    // build customer object for connection to eGain
     const customerObject = require('./egainCustomer').create({
       firstName: this.firstName,
       lastName: this.lastName,
@@ -174,7 +221,7 @@ class Session {
       // add reference to ECE session in the session global
       this.egainSession = myChat
       // set escalated flag
-      this.escalated = true
+      this.isEscalated = true
     } catch (e) {
       console.error('error starting ECE chat', e)
     }
