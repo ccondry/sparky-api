@@ -31,7 +31,7 @@ class Session {
       this.id = uuidv1()
       this.type = 'sparky-ui'
       this.state = 'active'
-      this.escalated = false
+      this.isEscalated = false
       this.messages = []
       this.entryPointId = data.entryPointId || '1001'
       this.phone = data.phone
@@ -48,7 +48,7 @@ class Session {
       this.id = uuidv1()
       this.type = 'facebook'
       this.state = 'active'
-      this.escalated = false
+      this.isEscalated = false
       this.messages = []
       this.entryPointId = fbPages[data.pageId].entryPointId || '1001'
       this.phone = data.phone
@@ -92,14 +92,14 @@ class Session {
     // end ECE session
     this.egainSession.End()
     // remove escalated flag
-    this.escalated = false
+    this.isEscalated = false
   }
 
   addCustomerMessage (message) {
     // add message to memory
     this.addMessage('customer', message)
     // is this chat escalated to an agent?
-    if (this.escalated) {
+    if (this.isEscalated) {
       // send message to eGain agent
       this.egainSession.SendMessageToAgent(message)
       // check for command words
@@ -217,7 +217,7 @@ class Session {
       // add reference to ECE session in the session global
       this.egainSession = myChat
       // set escalated flag
-      this.escalated = true
+      this.isEscalated = true
     } catch (e) {
       console.error('error starting ECE chat', e)
     }

@@ -76,7 +76,7 @@ async function handleMessage (message) {
     // process attachments to send to agent
     attachments.forEach(attachment => {
     // are we escalated to an eGain agent?
-    if (session.escalated) {
+    if (session.isEscalated) {
       // send the file to the agent in eGain
       session.egainSession._sendCustomerAttachmentNotification(attachment.payload.url, `${session.firstName} ${session.lastName}`)
     } else {
