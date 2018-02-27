@@ -6,6 +6,7 @@ const sessions = require('../sessions')
 
 /* For Facebook Validation */
 router.get('/webhook', (req, res) => {
+  console.log('Facebook validation request:', req.query)
   if (req.query['hub.mode'] && req.query['hub.verify_token'] === 'biamjack123') {
     res.status(200).send(req.query['hub.challenge'])
   } else {
