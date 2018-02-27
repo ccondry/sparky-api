@@ -93,6 +93,8 @@ class Session {
     this.egainSession.End()
     // remove escalated flag
     this.isEscalated = false
+    // delete the messages in memory so that new transcripts are only the latest
+    this.messages = []
   }
 
   addCustomerMessage (message) {
