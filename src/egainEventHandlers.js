@@ -18,6 +18,7 @@ function create (myChat, session) {
   }
   myEventHandlers.OnDuplicateSession = function (args) {
     console.log('OnDuplicateSession', args)
+    session.deescalate()
   }
   myEventHandlers.OnSysemMessageReceived = function (args) {
     console.log('OnSysemMessageReceived', args)
