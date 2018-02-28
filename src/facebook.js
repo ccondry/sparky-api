@@ -4,6 +4,7 @@ const Session = require('./session.js')
 const db = require('./mongodb')
 const Entities = require('html-entities').AllHtmlEntities
 const entities = new Entities()
+const hydra = require('./hydra')
 
 const facebookSessions = {}
 
@@ -11,7 +12,7 @@ async function findPage (id) {
   const page = db.findOne('facebook.pages', {id})
   if (page !== null) {
     return page
-  } 
+  }
 }
 
 async function registerPage (id, token, aiToken, entryPointId) {
@@ -83,6 +84,7 @@ function addFacebookSession (session) {
   facebookSessions[pageId][senderId] = session
 }
 
+// handle incoming facebook messages from users to page
 async function handleMessage (message) {
   // facebook user ID
   const userId = message.sender.id
@@ -133,8 +135,17 @@ async function handleMessage (message) {
   }
   // was there text in the message?
   if (messageText) {
-    // add message to session data
-    session.addCustomerMessage(messageText)
+    // was this a registration message?
+    if (messageText.startsWith('register ') && messageText.split(' ').length === 2 && messageText.split(' ').pop().length < 9) {
+      // extract username
+      const username = messageText.split(' ').pop()
+      // register user
+      // TODO register user
+      registerUsername(username, userId).catch(e => console.error(e))
+    } else {
+      // add message to session data
+      session.addCustomerMessage(messageText)
+    }
   }
   // were there any attachments?
   if (attachments) {
@@ -173,6 +184,36 @@ async function handleMessage (message) {
     console.log(`Facebook postback for ${firstName} ${lastName}`, postback)
     // handlePostback(userId, postback, pageId)
   }
+}
+
+async function registerUsername (username, id) {
+  // try to find the user's current facebook registration data
+  const response1 = await hydra({
+    method: 'get',
+    service: 'cxdemo-config-service',
+    path: `users/${username}`
+  })
+  const user = response1.results[0]
+  if (!user) {
+    // user not found
+    return responses.sendError(`User ${username} not found`)
+  }
+  if (isNaN(id) || fbid.length !== 16) {
+    // not a facebook ID
+    return responses.sendError('Failed - Invalid Facebook ID')
+  }
+  // get current facebook registrations
+  const body = user.facebooks || []
+  // add incoming facebook ID to current list
+  body.push(id)
+  // attempt registration by patching user data with new list
+  const response2 = await hydra({
+    method: 'patch',
+    service: 'cxdemo-config-service',
+    path: `users/${username}`,
+    query: { field: 'facebooks' },
+    body
+  })
 }
 
 module.exports = {
