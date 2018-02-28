@@ -204,7 +204,7 @@ async function registerUsername (username, id) {
     // user not found
     return responses.sendError(`User ${username} not found`)
   }
-  if (isNaN(id) || fbid.length !== 16) {
+  if (isNaN(id) || id.length !== 16) {
     // not a facebook ID
     return responses.sendError('Failed - Invalid Facebook ID')
   }
