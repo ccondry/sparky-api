@@ -71,7 +71,9 @@ async function sendMessage(id, text, page) {
 function getFacebookSession (pageId, senderId) {
   try {
     return facebookSessions[pageId][senderId]
-  } catch () {}
+  } catch (e) {
+    return undefined
+  }
 }
 
 function removeFacebookSession (session) {
