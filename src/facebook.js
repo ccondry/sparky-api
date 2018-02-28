@@ -137,11 +137,16 @@ async function handleMessage (message) {
   if (messageText) {
     // was this a registration message?
     if (messageText.startsWith('register ') && messageText.split(' ').length === 2 && messageText.split(' ').pop().length < 9) {
+      console.log('register command received - ', messageText)
       // extract username
       const username = messageText.split(' ').pop()
       // register user
-      // TODO register user
-      registerUsername(username, userId).catch(e => console.error(e))
+      try {
+        await registerUsername(username, userId)
+        console.log(`${userId} registered in CXDemo with ${username}`)
+      } catch (e) {
+        console.error(e)
+      }
     } else {
       // add message to session data
       session.addCustomerMessage(messageText)
@@ -187,6 +192,7 @@ async function handleMessage (message) {
 }
 
 async function registerUsername (username, id) {
+  console.log(`registering ${id} for ${username}`)
   // try to find the user's current facebook registration data
   const response1 = await hydra({
     method: 'get',
