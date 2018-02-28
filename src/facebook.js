@@ -71,9 +71,7 @@ async function sendMessage(id, text, page) {
 function getFacebookSession (pageId, senderId) {
   try {
     return facebookSessions[pageId][senderId]
-  } catch (e) {
-    return null
-  }
+  } catch () {}
 }
 
 function removeFacebookSession (session) {
@@ -113,7 +111,7 @@ async function handleMessage (message) {
   // find session, if exists
   session = getFacebookSession(pageId, userId)
   // if session doesn't exist, create one
-  if (session === null) {
+  if (!session) {
     console.log('new facebook chat session')
     // find page info in database
     const page = await findPage(pageId)
