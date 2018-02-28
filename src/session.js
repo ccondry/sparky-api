@@ -75,6 +75,7 @@ class Session {
   }
 
   deescalate () {
+    console.log(`deescalate session`)
     // end ECE session
     this.egainSession.End()
     // remove escalated flag
