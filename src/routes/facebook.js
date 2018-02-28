@@ -5,7 +5,7 @@ const fb = require('../facebook')
 /* For Facebook Validation */
 router.get('/webhook', (req, res) => {
   console.log('Facebook validation request:', req.query)
-  if (req.query['hub.mode'] && req.query['hub.verify_token'] === 'biamjack123') {
+  if (req.query['hub.mode'] && req.query['hub.verify_token'] === process.env.FACEBOOK_VERIFY_TOKEN) {
     res.status(200).send(req.query['hub.challenge'])
   } else {
     res.status(403).end()

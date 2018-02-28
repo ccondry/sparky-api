@@ -3,29 +3,12 @@ const myLibrary = require('./egainLibrary.js')
 const request = require('request-promise-native')
 const egainEventHandlers = require('./egainEventHandlers')
 const transcript = require('./transcript')
-// const facebook = require('./facebook')
-
-// predefined named chat bot tokens
-const botTokens = {
-  'cumulus-finance': '1c4d3b458b3f4109bec0b38f792cfc46',
-  'sparky-retail': 'a2083e974dc84b599e86124fca44a9e3'
-}
-
-// map of facebook page IDs to bot tokens
-// const fbPages = {
-//   '145865646228399': {
-//     // Cumulus Finance
-//     // apiAiToken: '1c4d3b458b3f4109bec0b38f792cfc46',
-//     apiAiToken: 'a88ffa6256174c198e62e882d68af6fa',
-//     entryPointId: '1004'
-//   }
-// }
 
 class Session {
   constructor (type, data) {
     if (type === 'sparky-ui') {
       // get api.ai token
-      const apiAiToken = data.apiAiToken || botTokens[data.bot] || '1c4d3b458b3f4109bec0b38f792cfc46'
+      const apiAiToken = data.apiAiToken || process.env.APIAI_TOKEN
 
       // sparky-ui chat bot client
       this.id = uuidv1()
