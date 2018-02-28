@@ -43,8 +43,10 @@ class Session {
       this.language = 'en'
       this.pageId = data.page.id
       this.userId = data.userId
-      this.callback = data.callback
+      this.onAddMessage = data.onAddMessage
     }
+    // run this callback at de-escalation time
+    this.onDeescalate = data.onDeescalate
   }
 
   // add new message to session
@@ -56,8 +58,8 @@ class Session {
       datetime: new Date().toJSON()
     })
     // if this is a bot/system/agent message, send it to the customer on facebook
-    if (type !== 'customer' && this.callback && typeof this.callback === 'function') {
-      this.callback(type, message)
+    if (type !== 'customer' && this.onAddMessage && typeof this.onAddMessage === 'function') {
+      this.onAddMessage.call(this, type, message)
     }
   }
 
@@ -79,6 +81,9 @@ class Session {
     this.isEscalated = false
     // delete the messages in memory so that new transcripts are only the latest
     this.messages = []
+    if (this.onDeescalate && typeof this.onDeescalate === 'function') {
+      this.onDeescalate.call(this)
+    }
   }
 
   addCustomerMessage (message) {

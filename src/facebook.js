@@ -76,6 +76,14 @@ function getFacebookSession (pageId, senderId) {
   }
 }
 
+function removeFacebookSession (session) {
+  try {
+    delete facebookSessions[session.pageId][session.senderId]
+  } catch (e) {
+    // do nothing
+  }
+}
+
 function addFacebookSession (session) {
   const pageId = session.page.id
   const senderId = session.userId
@@ -125,9 +133,12 @@ async function handleMessage (message) {
       email: userId,
       firstName,
       lastName,
-      callback: function (type, message) {
+      onAddMessage: function (type, message) {
         // send messages to facebook user, and decode HTML characters
         sendMessage(userId, entities.decode(message), page)
+      },
+      onDeescalate: function () {
+        removeFacebookSession(this)
       }
     })
     // add session to global Facebook sessions
