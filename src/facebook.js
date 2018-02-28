@@ -77,9 +77,9 @@ function getFacebookSession (pageId, senderId) {
 }
 
 function removeFacebookSession (session) {
-  console.log(`removeFacebookSession facebookSessions[${session.pageId}][${session.userID}]`)
+  console.log(`removeFacebookSession facebookSessions[${session.pageId}][${session.userId}]`)
   try {
-    delete facebookSessions[session.pageId][session.userID]
+    delete facebookSessions[session.pageId][session.userId]
     console.log(`facebookSessions`, facebookSessions)
   } catch (e) {
     // do nothing
