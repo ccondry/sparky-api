@@ -11,12 +11,7 @@ async function findPage (id) {
   const page = db.findOne('facebook.pages', {id})
   if (page !== null) {
     return page
-  } else {
-    // if not found, add to database for easier tracking
-    // db.insert('facebook.pages', {
-    //   pageId
-    // })
-  }
+  } 
 }
 
 async function registerPage (id, token, aiToken, entryPointId) {
