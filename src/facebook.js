@@ -1,93 +1,61 @@
-// Facebook token
-const PAGE_ACCESS_TOKEN = process.env.FB_TOKEN
-
 const request = require('request-promise-native')
+const Session = require('./session.js')
+// console.log('Session', Session)
+const db = require('./mongodb')
+const Entities = require('html-entities').AllHtmlEntities
+const entities = new Entities()
 
-// if (!message || message.length === 0 || message.trim().length === 0) {
-//   // don't try to send an empty message to facebook
-//   console.log('sendMessage: message text to Facebook was empty or blank. Not sending to Facebook.')
-// }
+const facebookSessions = {}
 
-// function handleMessage(sender_psid, received_message) {
-//   let response;
-//
-//   // Checks if the message contains text
-//   if (received_message.text) {
-//     // Create the payload for a basic text message, which
-//     // will be added to the body of our request to the Send API
-//     response = {
-//       "text": `You sent the message: "${received_message.text}". Now send me an attachment!`
-//     }
-//   } else if (received_message.attachments) {
-//     response = {
-//       "attachment":
-//       {
-//         "type":"template",
-//         "payload":{
-//           "template_type":"generic",
-//           "elements":[
-//             {
-//               "title":"Welcome to Peter'\''s Hats",
-//               "image_url":"https://capricorn.ucplanning.com",
-//               "subtitle":"We'\''ve got the right hat for everyone.",
-//               "default_action": {
-//                 "type": "web_url",
-//                 "url": "https://capricorn.ucplanning.com",
-//                 "messenger_extensions": true,
-//                 "webview_height_ratio": "tall",
-//                 "fallback_url": "https://capricorn.ucplanning.com"
-//               },
-//               "buttons":[
-//                 {
-//                   "type":"web_url",
-//                   "url":"https://capricorn.ucplanning.com",
-//                   "title":"View Website"
-//                 },{
-//                   "type":"postback",
-//                   "title":"Start Chatting",
-//                   "payload":"DEVELOPER_DEFINED_PAYLOAD"
-//                 }
-//               ]
-//             }
-//           ]
-//         }
-//       }
-//     }
-//   }
-//   callSendAPI(sender_psid, response);
-// }
+async function findPage (id) {
+  const page = db.findOne('facebook.pages', {id})
+  if (page !== null) {
+    return page
+  } 
+}
 
-function handlePostback(sender, postback) {
+async function registerPage (id, token, aiToken, entryPointId) {
+  const page = db.upsert('facebook.pages', {pageId}, {
+    id,
+    token,
+    aiToken,
+    entryPointId
+  })
+}
+
+function handlePostback(sender, postback, page) {
   switch (postback.payload) {
-    case 'yes': sendMessage(recipient, 'Thanks!'); break
-    case 'no': sendMessage(recipient, 'Oops, try sending another image.'); break
+    case 'yes': sendMessage(recipient, 'Thanks!', page); break
+    case 'no': sendMessage(recipient, 'Oops, try sending another image.', page); break
   }
 }
 
 // Get the sender info from FB
-function getSenderInfo(sender_psid) {
+async function getSenderInfo(sender_psid, page) {
+  const access_token = page.token
   // Send the HTTP request to the Messenger Platform
   return request({
     url: `https://graph.facebook.com/v2.6/${sender_psid}`,
     qs: {
       fields: 'first_name,last_name,profile_pic',
-      access_token: PAGE_ACCESS_TOKEN
+      access_token
     },
     method: 'GET',
     json: true
   })
 }
 
-// send facebook message
-async function sendMessage(id, text) {
+// send facebook message from page to user
+async function sendMessage(id, text, page) {
   if (!text || text.length === 0) {
     console.log(`Not sending empty string to Facebook.`)
     return
   }
+  const access_token = page.token
   try {
     await request({
       url: 'https://graph.facebook.com/v2.6/me/messages',
-      qs: {access_token: PAGE_ACCESS_TOKEN},
+      qs: {access_token},
       method: 'POST',
       json: {
         recipient: {id},
@@ -99,8 +67,115 @@ async function sendMessage(id, text) {
   }
 }
 
+function getFacebookSession (pageId, senderId) {
+  try {
+    return facebookSessions[pageId][senderId]
+  } catch (e) {
+    return null
+  }
+}
+
+function addFacebookSession (session) {
+  const pageId = session.page.id
+  const senderId = session.userId
+  facebookSessions[pageId] = facebookSessions[pageId] || {}
+  facebookSessions[pageId][senderId] = facebookSessions[pageId][senderId] || {}
+  facebookSessions[pageId][senderId] = session
+}
+
+async function handleMessage (message) {
+  // facebook user ID
+  const userId = message.sender.id
+  // facebook page ID
+  const pageId = message.recipient.id
+  console.log(`message received from user ${userId} on Facebook page ${pageId}`)
+  // message text
+  const messageText = message.message.text
+  // message attachments
+  const attachments = message.message.attachments
+  // postbacks
+  const postback = message.message.postback
+
+  let session
+  // find session, if exists
+  session = getFacebookSession(pageId, userId)
+  // if session doesn't exist, create one
+  if (session === null) {
+    // find page info in database
+    const page = await findPage(pageId)
+    console.log('page', page)
+    if (page === null || !page.token || !page.aiToken || !page.entryPointId) {
+      throw `Facebook page ${pageId} not registered. Please register this Facebook page with a token, AI token, and entry point ID.`
+    }
+    // get user info
+    const fbUser = await getSenderInfo(message.sender.id, page)
+    // console.log('fbUser =', fbUser)
+    const firstName = fbUser.first_name
+    // console.log('firstName = ', firstName)
+    const lastName = fbUser.last_name
+    console.log(`new facebook chat session for ${firstName} ${lastName}`)
+    // new session
+    // create session and store in sessions global
+    session = new Session('facebook', {
+      page,
+      userId,
+      phone: userId,
+      email: userId,
+      firstName,
+      lastName,
+      callback: function (type, message) {
+        // send messages to facebook user, and decode HTML characters
+        sendMessage(userId, entities.decode(message), page)
+      }
+    })
+    // add session to global Facebook sessions
+    addFacebookSession(session)
+  }
+  // was there text in the message?
+  if (messageText) {
+    // add message to session data
+    session.addCustomerMessage(messageText)
+  }
+  // were there any attachments?
+  if (attachments) {
+    // process attachments to send to agent
+    attachments.forEach(attachment => {
+      // are we escalated to an eGain agent?
+      if (session.isEscalated) {
+        // send the file to the agent in eGain
+        session.egainSession._sendCustomerAttachmentNotification(attachment.payload.url, `${session.firstName} ${session.lastName}`)
+      } else {
+        // was it just a sticker?
+        if (attachment.payload.sticker_id) {
+          // ignore stickers
+          console.log(`${session.firstName} ${session.lastName} sent a Facebook sticker. Ignoring sticker.`)
+          // add message to transcript
+          session.addMessage('customer', '(sticker)')
+          // send message to facebook user
+          // sendMessage(userId, message, page)
+        } else {
+          console.log(`${session.firstName} ${session.lastName} sent a file attachment.`)
+          // note that user attached a file
+          session.addMessage('customer', '(file attachment)')
+          // just the bot here - let user know we can't do anything with them
+          const m = `I'm sorry, but I can't handle file attachments. If you would like to speak to an agent, say 'agent'.`
+          // add message to transcript
+          session.addMessage('bot', m)
+          // send message to facebook user
+          sendMessage(userId, m, page)
+        }
+      }
+    })
+  }
+  // was there a postback?
+  if (postback) {
+    // log postback details
+    console.log(`Facebook postback for ${firstName} ${lastName}`, postback)
+    // handlePostback(userId, postback, pageId)
+  }
+}
+
 module.exports = {
   sendMessage,
-  getSenderInfo,
-  handlePostback
+  handleMessage
 }
