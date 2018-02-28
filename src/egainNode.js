@@ -1213,6 +1213,11 @@ eGainLibrary = function (librarySettings) {
                                 //chatConnectionFailureEventArgs.StatusCode = "CONNECT_FAIL";
                                 chatConnectionFailureEventArgs.StatusMessage = condition;
                                 _onConnectionFailure(chatConnectionFailureEventArgs);
+                            } else {
+                              connectionFailure = true;
+                              //chatConnectionFailureEventArgs.StatusCode = "CONNECT_FAIL";
+                              chatConnectionFailureEventArgs.StatusMessage = condition;
+                              _onConnectionFailure(chatConnectionFailureEventArgs);
                             }
                             break;
                     }
