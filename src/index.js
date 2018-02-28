@@ -7,6 +7,26 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const hydraExpress = require('hydra-express')
+const hydra = hydraExpress.getHydra()
+const pkg = require('../package.json')
+
+// set up hydra and redis config
+const hydraConfig = {
+  hydra: {
+    serviceName: pkg.name,
+    serviceIP: process.env.hydra_service_ip || '',
+    servicePort: process.env.hydra_service_port || 0,
+    serviceType: process.env.hydra_service_type || '',
+    serviceDescription: pkg.description,
+    redis: {
+      url: process.env.redis_url,
+      port: process.env.redis_port,
+      db: process.env.redis_db
+    }
+  }
+}
+
 
 // init express
 const app = express()
@@ -27,7 +47,15 @@ app.use('/api/v1/session', require('./routes/session'))
 // Facebook webhook
 app.use('/api/v1/facebook', require('./routes/facebook'))
 
-// listen on port defined in .env
-const server = app.listen(process.env.PORT || 5000, () => {
-  console.log('Express server listening on port %d in %s mode', server.address().port, app.settings.env)
+// init hydra and start express
+hydraExpress.init(hydraConfig, () => {})
+.then(serviceInfo => {
+  // listen on port defined in .env
+  const server = app.listen(process.env.PORT || 5000, () => {
+    console.log('Express server listening on port %d in %s mode', server.address().port, app.settings.env)
+  })
+})
+.catch(e => {
+  console.log(e)
+  process.exit(1)
 })

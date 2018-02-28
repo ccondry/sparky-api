@@ -3,29 +3,12 @@ const myLibrary = require('./egainLibrary.js')
 const request = require('request-promise-native')
 const egainEventHandlers = require('./egainEventHandlers')
 const transcript = require('./transcript')
-// const facebook = require('./facebook')
-
-// predefined named chat bot tokens
-const botTokens = {
-  'cumulus-finance': '1c4d3b458b3f4109bec0b38f792cfc46',
-  'sparky-retail': 'a2083e974dc84b599e86124fca44a9e3'
-}
-
-// map of facebook page IDs to bot tokens
-// const fbPages = {
-//   '145865646228399': {
-//     // Cumulus Finance
-//     // apiAiToken: '1c4d3b458b3f4109bec0b38f792cfc46',
-//     apiAiToken: 'a88ffa6256174c198e62e882d68af6fa',
-//     entryPointId: '1004'
-//   }
-// }
 
 class Session {
   constructor (type, data) {
     if (type === 'sparky-ui') {
       // get api.ai token
-      const apiAiToken = data.apiAiToken || botTokens[data.bot] || '1c4d3b458b3f4109bec0b38f792cfc46'
+      const apiAiToken = data.apiAiToken || process.env.APIAI_TOKEN
 
       // sparky-ui chat bot client
       this.id = uuidv1()
@@ -60,8 +43,10 @@ class Session {
       this.language = 'en'
       this.pageId = data.page.id
       this.userId = data.userId
-      this.callback = data.callback
+      this.onAddMessage = data.onAddMessage
     }
+    // run this callback at de-escalation time
+    this.onDeescalate = data.onDeescalate
   }
 
   // add new message to session
@@ -73,8 +58,8 @@ class Session {
       datetime: new Date().toJSON()
     })
     // if this is a bot/system/agent message, send it to the customer on facebook
-    if (type !== 'customer' && this.callback && typeof this.callback === 'function') {
-      this.callback(type, message)
+    if (type !== 'customer' && this.onAddMessage && typeof this.onAddMessage === 'function') {
+      this.onAddMessage.call(this, type, message)
     }
   }
 
@@ -90,12 +75,16 @@ class Session {
   }
 
   deescalate () {
+    console.log(`deescalate session`)
     // end ECE session
     this.egainSession.End()
     // remove escalated flag
     this.isEscalated = false
     // delete the messages in memory so that new transcripts are only the latest
     this.messages = []
+    if (this.onDeescalate && typeof this.onDeescalate === 'function') {
+      this.onDeescalate.call(this)
+    }
   }
 
   addCustomerMessage (message) {
