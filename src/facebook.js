@@ -111,6 +111,7 @@ async function handleMessage (message) {
   session = getFacebookSession(pageId, userId)
   // if session doesn't exist, create one
   if (session === null) {
+    console.log('new facebook chat session')
     // find page info in database
     const page = await findPage(pageId)
     console.log('page', page)
@@ -143,6 +144,8 @@ async function handleMessage (message) {
     })
     // add session to global Facebook sessions
     addFacebookSession(session)
+  } else {
+    console.log('existing facebook chat session')
   }
   // was there text in the message?
   if (messageText) {
