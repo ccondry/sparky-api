@@ -104,6 +104,21 @@ async function handleMessage (message) {
   console.log(`message received from user ${userId} on Facebook page ${pageId}`)
   // message text
   const messageText = message.message.text
+  // was this a registration message?
+  let isRegistrationMessage = false
+  if (messageText && messageText.startsWith('register ') && messageText.split(' ').length === 2 && messageText.split(' ').pop().length < 9) {
+    isRegistrationMessage = true
+    console.log('register command received - ', messageText)
+    // extract username
+    const username = messageText.split(' ').pop()
+    // register user
+    try {
+      await registerUsername(username, userId)
+      console.log(`${userId} registered in CXDemo with ${username}`)
+    } catch (e) {
+      console.error(e)
+    }
+  }
   // message attachments
   const attachments = message.message.attachments
   // postbacks
@@ -152,23 +167,9 @@ async function handleMessage (message) {
     console.log('existing facebook chat session')
   }
   // was there text in the message?
-  if (messageText) {
-    // was this a registration message?
-    if (messageText.startsWith('register ') && messageText.split(' ').length === 2 && messageText.split(' ').pop().length < 9) {
-      console.log('register command received - ', messageText)
-      // extract username
-      const username = messageText.split(' ').pop()
-      // register user
-      try {
-        await registerUsername(username, userId)
-        console.log(`${userId} registered in CXDemo with ${username}`)
-      } catch (e) {
-        console.error(e)
-      }
-    } else {
-      // add message to session data
-      session.addCustomerMessage(messageText)
-    }
+  if (messageText && !isRegistrationMessage) {
+    // add message to session data
+    session.addCustomerMessage(messageText)
   }
   // were there any attachments?
   if (attachments) {
