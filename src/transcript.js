@@ -1,5 +1,4 @@
 const axios = require('axios')
-const hydra = require('./hydra')
 
 // looks up customer in Context Service and creates a new
 // Context Service POD with current chat transcript
@@ -10,22 +9,6 @@ async function send (session) {
       q: session.email,
       field: 'query_string',
       token: process.env.CS_TOKEN_GET_CUSTOMER
-    }
-    // if this is a facebook chat, try to match up the facebook ID with
-    // a user's email address
-    if (session.type === 'facebook') {
-      const response1 = await hydra({
-        service: 'cxdemo-config-service',
-        path: `users`,
-        query: {facebooks: session.userId}
-      })
-      const user = response1.results[0]
-      // find an email address for the user
-      try {
-        params.q = user.emails[0]
-      } catch (e) {
-        params.q = user.email
-      }
     }
 
     let customers = await axios.get(`https://cxdemo.net/labconfig/api/demo/cs/customer`, {params})

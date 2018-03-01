@@ -3,50 +3,47 @@ const myLibrary = require('./egainLibrary.js')
 const request = require('request-promise-native')
 const egainEventHandlers = require('./egainEventHandlers')
 const transcript = require('./transcript')
+const hydra = require('./hydra')
 
 class Session {
   constructor (type, data) {
-    if (type === 'sparky-ui') {
-      // get api.ai token
-      const apiAiToken = data.apiAiToken || process.env.APIAI_TOKEN
+    this.id = uuidv1()
+    this.state = 'active'
+    this.isEscalated = false
+    this.messages = []
+    this.phone = data.phone
+    this.email = data.email
+    this.firstName = data.firstName
+    this.lastName = data.lastName
+    this.language = data.language || 'en'
+    // run this callback at de-escalation time
+    this.onDeescalate = data.onDeescalate
+    // run this callback when messages are added
+    this.onAddMessage = data.onAddMessage
 
-      // sparky-ui chat bot client
-      this.id = uuidv1()
-      this.type = 'sparky-ui'
-      this.state = 'active'
-      this.isEscalated = false
-      this.messages = []
+    if (type === 'sparky-ui') {
+      // sparky-ui chat client
+      // get api.ai token
+      this.apiAiToken = data.apiAiToken || process.env.APIAI_TOKEN
+
       this.entryPointId = data.entryPointId || '1001'
-      this.phone = data.phone
-      this.email = data.email
-      this.firstName = data.firstName
-      this.lastName = data.lastName
+      this.type = 'sparky-ui'
       this.apiAiToken = apiAiToken
       this.visitId = data.visitId
-      this.language = data.language || 'en'
     }
 
     if (type === 'facebook') {
-      // sparky-ui chat bot client
-      this.id = uuidv1()
+      // facebook chat client
       this.type = 'facebook'
-      this.state = 'active'
-      this.isEscalated = false
-      this.messages = []
       this.page = data.page
+      this.apiAiToken = data.page.aiToken || process.env.APIAI_TOKEN
       this.entryPointId = data.page.entryPointId || '1001'
-      this.phone = data.phone
-      this.email = data.email
-      this.firstName = data.firstName
-      this.lastName = data.lastName
-      this.apiAiToken = data.page.aiToken || '1c4d3b458b3f4109bec0b38f792cfc46'
-      this.language = 'en'
+
       this.pageId = data.page.id
       this.userId = data.userId
-      this.onAddMessage = data.onAddMessage
+      // try to get email address and phone number from CXDemo
+      this.getDemoUserData().catch(e => {})
     }
-    // run this callback at de-escalation time
-    this.onDeescalate = data.onDeescalate
   }
 
   // add new message to session
@@ -214,6 +211,35 @@ class Session {
       this.isEscalated = true
     } catch (e) {
       console.error('error starting ECE chat', e)
+    }
+  }
+
+  async getDemoUserData() {
+    // if this is a facebook chat, try to match up the facebook ID with
+    // a user's email address and phone number
+    if (this.type === 'facebook') {
+      const response1 = await hydra({
+        service: 'cxdemo-config-service',
+        path: `users`,
+        query: {facebooks: this.userId}
+      })
+      const user = response1.results[0]
+      // find an email address for the user
+      try {
+        this.email = user.emails[0]
+      } catch (e) {
+        this.email = user.email
+      }
+      // find a phone number for the user
+      try {
+        this.phone = user.phones[0]
+      } catch (e) {
+        if (user.telephoneNumber) {
+          this.phone = user.telephoneNumber
+        } else {
+          // do nothing
+        }
+      }
     }
   }
 }
