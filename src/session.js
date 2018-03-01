@@ -28,7 +28,6 @@ class Session {
 
       this.entryPointId = data.entryPointId || '1001'
       this.type = 'sparky-ui'
-      this.apiAiToken = apiAiToken
       this.visitId = data.visitId
     }
 
