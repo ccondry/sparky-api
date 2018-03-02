@@ -124,9 +124,9 @@ function removeSession (session) {
 function addSession (session) {
   const to = session.to
   const from = session.from
-  sessions[from] = sessions[from] || {}
-  sessions[from][to] = sessions[from][to] || {}
-  sessions[from][to] = session
+  sessions[to] = sessions[to] || {}
+  sessions[to][from] = sessions[to][from] || {}
+  sessions[to][from] = session
 }
 
 // handle incoming twilio messages
