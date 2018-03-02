@@ -96,7 +96,7 @@ class Session {
       // send message to eGain agent
       this.egainSession.SendMessageToAgent(message)
       // check for command words
-      switch (message) {
+      switch (message.toLowerCase()) {
         case 'goodbye': {
           // tell user session ended
           this.addMessage('system', 'Your session with our expert has ended, but you can still chat with Sparky.')
