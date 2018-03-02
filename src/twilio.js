@@ -115,15 +115,15 @@ function getSession (to, from) {
 
 function removeSession (session) {
   try {
-    delete sessions[session.to][session.from]
+    delete sessions[session.data.to][session.data.from]
   } catch (e) {
-    console.error(`failed to remove Twilio SMS session sessions[${session.to}][${session.from}]`, e)
+    console.error(`failed to remove Twilio SMS session sessions[${session.data.to}][${session.data.from}]`, e)
   }
 }
 
 function addSession (session) {
-  const to = session.to
-  const from = session.from
+  const to = session.data.to
+  const from = session.data.from
   sessions[to] = sessions[to] || {}
   sessions[to][from] = sessions[to][from] || {}
   sessions[to][from] = session
