@@ -20,29 +20,33 @@ class Session {
     this.onDeescalate = data.onDeescalate
     // run this callback when messages are added
     this.onAddMessage = data.onAddMessage
+    // resolve this promise to get user data
+    this.getCustomerData = data.getCustomerData
+    this.apiAiToken = data.apiAiToken || process.env.APIAI_TOKEN
+
+    this.entryPointId = data.entryPointId || '1001'
 
     if (type === 'sparky-ui') {
       // sparky-ui chat client
       // get api.ai token
-      this.apiAiToken = data.apiAiToken || process.env.APIAI_TOKEN
-
-      this.entryPointId = data.entryPointId || '1001'
       this.type = 'sparky-ui'
       this.visitId = data.visitId
-    }
-
-    if (type === 'facebook') {
+    } else if (type === 'facebook') {
       // facebook chat client
       this.type = 'facebook'
       this.page = data.page
-      this.apiAiToken = data.page.aiToken || process.env.APIAI_TOKEN
-      this.entryPointId = data.page.entryPointId || '1001'
+      // this.apiAiToken = data.page.aiToken || process.env.APIAI_TOKEN
+      // this.entryPointId = data.page.entryPointId || '1001'
 
       this.pageId = data.page.id
       this.userId = data.userId
       // try to get email address and phone number from CXDemo
       this.getDemoUserData().catch(e => {})
+    } else {
+      this.type = data.type
+      this.data = data
     }
+
   }
 
   // add new message to session
@@ -183,14 +187,14 @@ class Session {
   escalate () {
     // send the chat transcript to Context Service
     transcript.send(this).catch(e => {})
-
+    console.log('escalate session:', this)
     // build customer object for connection to eGain
     const customerObject = require('./egainCustomer').create({
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
-      phone: this.phone,
-      visitId: this.visitId
+      phone: this.phone
+      // visitId: this.visitId
     })
 
     try {

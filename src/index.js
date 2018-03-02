@@ -46,6 +46,8 @@ app.use('/api/vi/ai', require('./routes/ai'))
 app.use('/api/v1/session', require('./routes/session'))
 // Facebook webhook
 app.use('/api/v1/facebook', require('./routes/facebook'))
+// Twilio webhook
+app.use('/api/v1/twilio', require('./routes/twilio'))
 
 // init hydra and start express
 hydraExpress.init(hydraConfig, () => {})

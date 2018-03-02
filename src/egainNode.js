@@ -336,8 +336,11 @@ eGainLibrary = function (librarySettings) {
                         isValidCustomer = true;
                     }
                 }
-                if (!skipValidation && customer.PrimaryKey.Value.match(/[^0-9 \-\(\)]/) === null) {
+                if (!skipValidation && customer.PrimaryKey.Value && customer.PrimaryKey.Value.match(/[^0-9 \-\(\)]/) === null) {
                     isValidCustomer = true;
+                } else {
+                  // unknown?
+                  console.log('egainNode: customer.PrimaryKey.Value', customer.PrimaryKey.Value)
                 }
             }
             if (!isValidCustomer) {

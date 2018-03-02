@@ -133,7 +133,7 @@ async function handleMessage (message) {
     // find page info in database
     const page = await findPage(pageId)
     console.log('page', page)
-    if (page === null || !page.token || !page.aiToken || !page.entryPointId) {
+    if (page === null || !page.token) {
       throw `Facebook page ${pageId} not registered. Please register this Facebook page with a token, AI token, and entry point ID.`
     }
     // get user info
@@ -147,6 +147,8 @@ async function handleMessage (message) {
     // create session and store in sessions global
     session = new Session('facebook', {
       page,
+      apiAiToken: page.apiAiToken || page.aiToken,
+      entryPointId: page.entryPointId || page.entryPointId,
       userId,
       phone: userId,
       email: userId,
