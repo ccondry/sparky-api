@@ -23,7 +23,7 @@ class Session {
     this.getCustomerData = data.getCustomerData
     this.apiAiToken = data.apiAiToken || process.env.APIAI_TOKEN
 
-    this.entryPointId = data.entryPointId || '1001'
+    this.entryPointId = data.entryPointId || process.env.FACEBOOK_ENTRY_POINT_ID
 
     if (type === 'sparky-ui') {
       // sparky-ui chat client
