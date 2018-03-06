@@ -196,9 +196,14 @@ async function handleMessage (message) {
     } catch (e) {
       // continue
     }
+    let botEnabled = true
+    if (botConfig.enabled === false) {
+      botEnabled = false
+    }
     // create session and store in sessions global
     session = new Session('facebook', {
       page,
+      botEnabled,
       apiAiToken: botConfig.aiToken || page.apiAiToken || page.aiToken,
       entryPointId: brandConfig.entryPointId || page.entryPointId || page.entryPointId,
       userId,

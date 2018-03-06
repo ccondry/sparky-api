@@ -25,6 +25,12 @@ class Session {
 
     this.entryPointId = data.entryPointId || process.env.FACEBOOK_ENTRY_POINT_ID
 
+    if (data.botEnabled === false) {
+      this.botEnabled = false
+    } else {
+      this.botEnabled = true
+    }
+
     if (type === 'sparky-ui') {
       // sparky-ui chat client
       // get api.ai token
@@ -46,7 +52,10 @@ class Session {
       this.data = data
     }
     console.log(`creating Sparky session ${this.id} for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId}`)
-
+    if (!data.botEnabled) {
+      // if bot disabled, escalate directly to an agent
+      this.escalate()
+    }
   }
 
   // add new message to session
