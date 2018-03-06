@@ -195,7 +195,7 @@ class Session {
     }
   }
 
-  escalate () {
+  escalate (message) {
     // send the chat transcript to Context Service
     transcript.send(this).catch(e => {})
     console.log('escalate session:', this)
@@ -204,7 +204,8 @@ class Session {
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
-      phone: this.phone
+      phone: this.phone,
+      subject: message
       // visitId: this.visitId
     })
 

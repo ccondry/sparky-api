@@ -65,18 +65,35 @@ function create ({firstName, lastName, phone, email, visitId}) {
   // add altocloud visit ID, if exists
   if (visitId) {
     const customerVisitId = new myLibrary.Datatype.CustomerParameter();
-    customerPhone.eGainParentObject = "casemgmt";
-    customerPhone.eGainChildObject = "activity_data";
-    customerPhone.eGainAttribute = "visitid";
-    customerPhone.eGainValue = visitId;
-    customerPhone.eGainParamName = "visitid";
-    customerPhone.eGainMinLength = "1";
-    customerPhone.eGainMaxLength = "65";
-    customerPhone.eGainRequired = "0";
-    customerPhone.eGainFieldType = "2";
-    customerPhone.eGainPrimaryKey = "0";
-    customerPhone.eGainValidationString = "";
+    customerVisitId.eGainParentObject = "casemgmt";
+    customerVisitId.eGainChildObject = "activity_data";
+    customerVisitId.eGainAttribute = "visitid";
+    customerVisitId.eGainValue = visitId;
+    customerVisitId.eGainParamName = "visitid";
+    customerVisitId.eGainMinLength = "1";
+    customerVisitId.eGainMaxLength = "65";
+    customerVisitId.eGainRequired = "0";
+    customerVisitId.eGainFieldType = "2";
+    customerVisitId.eGainPrimaryKey = "0";
+    customerVisitId.eGainValidationString = "";
     customerObject.AddCustomerParameter(customerVisitId);
+  }
+
+  // add subject, if exists
+  if (subject) {
+    const customerSubject = new myLibrary.Datatype.CustomerParameter();
+    customerSubject.eGainParentObject = "casemgmt";
+    customerSubject.eGainChildObject = "activity_data";
+    customerSubject.eGainAttribute = "Subject";
+    customerSubject.eGainValue = subject;
+    customerSubject.eGainParamName = "subject";
+    customerSubject.eGainMinLength = "1";
+    customerSubject.eGainMaxLength = "120";
+    customerSubject.eGainRequired = "0";
+    customerSubject.eGainFieldType = "2";
+    customerSubject.eGainPrimaryKey = "0";
+    customerSubject.eGainValidationString = "";
+    customerObject.AddCustomerParameter(customerSubject);
   }
 
   return customerObject
