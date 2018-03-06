@@ -37,9 +37,13 @@ function create (myChat, session) {
   /* Example browser alert when chat is connected */
   myEventHandlers.OnConnectSuccess = function (args) {
     console.log('OnConnectSuccess', args)
-    var welcomeMessage = "Ok, I'll get you connected to one of our Experts. One moment...";
-    console.log(welcomeMessage);
-    session.addMessage('system', welcomeMessage)
+    if (session.botEnabled) {
+      var welcomeMessage = "Ok, I'll get you connected to one of our Experts. One moment...";
+      console.log(welcomeMessage);
+      session.addMessage('system', welcomeMessage)
+    } else {
+      // do nothing
+    }
   }
   /* Example browser alert when there is a connection failure */
   myEventHandlers.OnConnectionFailure = function (args) {
