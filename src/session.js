@@ -91,6 +91,7 @@ class Session {
     this.messages = []
     // call custom deescalate handler
     if (this.onDeescalate && typeof this.onDeescalate === 'function') {
+      console.log('calling deescalate handler')
       this.onDeescalate.call(this)
     }
   }
