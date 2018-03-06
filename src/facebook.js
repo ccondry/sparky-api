@@ -186,8 +186,10 @@ async function handleMessage (message) {
     try {
       // look up user info from cxdemo
       userData = await getDemoUserData(userId)
+      console.log('found demo user data:', userData)
       // get user's facebook brand config for this page, if exists
       brandConfig = userData.brand.facebook[pageId] || {}
+      console.log('found brand config in user data:', brandConfig)
     } catch (e) {
       // continue
     }
