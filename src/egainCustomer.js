@@ -84,7 +84,7 @@ function create ({firstName, lastName, phone, email, visitId, subject}) {
     const customerSubject = new myLibrary.Datatype.CustomerParameter();
     customerSubject.eGainParentObject = "casemgmt";
     customerSubject.eGainChildObject = "activity_data";
-    customerSubject.eGainAttribute = "Subject";
+    customerSubject.eGainAttribute = "subject";
     customerSubject.eGainValue = subject;
     customerSubject.eGainParamName = "subject";
     customerSubject.eGainMinLength = "1";
