@@ -75,12 +75,15 @@ class Session {
 
   deescalate () {
     console.log(`deescalate session`)
-    // end ECE session
-    this.egainSession.End()
+    // try to end eGain session
+    if (this.egainSession) {
+      this.egainSession.End()
+    }
     // remove escalated flag
     this.isEscalated = false
     // delete the messages in memory so that new transcripts are only the latest
     this.messages = []
+    // call custom deescalate handler
     if (this.onDeescalate && typeof this.onDeescalate === 'function') {
       this.onDeescalate.call(this)
     }
@@ -94,20 +97,20 @@ class Session {
       console.log('this chat is escalated already. sending message to ECE agent.')
       // send message to eGain agent
       this.egainSession.SendMessageToAgent(message)
-      // check for command words
-      switch (message.toLowerCase()) {
-        case 'goodbye': {
-          // tell user session ended
-          this.addMessage('system', 'Your session with our expert has ended, but you can still chat with Sparky.')
-          // end eGain session
-          this.deescalate()
-          break
-        }
-      }
     } else {
       // console.log('getting bot response...')
       // let bot handle the response
       this.processCustomerMessage(message)
+    }
+    // check for command words
+    switch (message.toLowerCase()) {
+      case 'goodbye': {
+        // tell user session ended
+        // this.addMessage('system', 'Your session with our expert has ended, but you can still chat with Sparky.')
+        // end session
+        this.deescalate()
+        break
+      }
     }
   }
 
