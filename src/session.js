@@ -52,10 +52,6 @@ class Session {
       this.data = data
     }
     console.log(`creating Sparky session ${this.id} for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId}`)
-    if (!data.botEnabled) {
-      // if bot disabled, escalate directly to an agent
-      this.escalate()
-    }
   }
 
   // add new message to session
@@ -107,6 +103,9 @@ class Session {
       console.log('this chat is escalated already. sending message to ECE agent.')
       // send message to eGain agent
       this.egainSession.SendMessageToAgent(message)
+    } else if (this.botEnabled === false) {
+      // if bot disabled, escalate directly to an agent
+      this.escalate(message)
     } else {
       // console.log('getting bot response...')
       // let bot handle the response
