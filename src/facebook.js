@@ -8,6 +8,44 @@ const hydra = require('./hydra')
 
 const facebookSessions = {}
 
+async function getDemoUserData(fbid) {
+  const data = {}
+  // if this is a facebook chat, try to match up the facebook ID with
+  // a user's email address and phone number
+  const response1 = await hydra({
+    service: 'cxdemo-config-service',
+    path: `users`,
+    query: {facebooks: fbid}
+  })
+  const user = response1.results[0]
+  // find an email address for the user
+  try {
+    data.email = user.emails[0]
+  } catch (e) {
+    // default to lab user's email
+    data.email = user.email
+  }
+  // find a phone number for the user
+  try {
+    data.phone = user.phones[0]
+  } catch (e) {
+    if (user.telephoneNumber) {
+      data.phone = user.telephoneNumber
+    } else {
+      // do nothing
+    }
+  }
+  // get brand config for facebook pages for the user
+  try {
+    data.brand = {
+      facebook: user.brand.facebook
+    }
+  } catch (e) {
+    // do nothing
+  }
+  return data
+}
+
 async function findPage (id) {
   const page = db.findOne('facebook.pages', {id})
   if (page !== null) {
@@ -137,21 +175,30 @@ async function handleMessage (message) {
       throw `Facebook page ${pageId} not registered. Please register this Facebook page with a token, AI token, and entry point ID.`
     }
     // get user info
-    const fbUser = await getSenderInfo(message.sender.id, page)
+    const fbUser = await getSenderInfo(userId, page)
     // console.log('fbUser =', fbUser)
     const firstName = fbUser.first_name
     // console.log('firstName = ', firstName)
     const lastName = fbUser.last_name
     console.log(`new facebook chat session for ${firstName} ${lastName}`)
-    // new session
+    let userData = {}
+    let brandConfig = {}
+    try {
+      // look up user info from cxdemo
+      userData = await getDemoUserData(userId)
+      // get user's facebook brand config for this page, if exists
+      brandConfig = userData.brand.facebook[pageId]
+    } catch (e) {
+      // continue
+    }
     // create session and store in sessions global
     session = new Session('facebook', {
       page,
-      apiAiToken: page.apiAiToken || page.aiToken,
-      entryPointId: page.entryPointId || page.entryPointId,
+      apiAiToken: brandConfig.aiToken || page.apiAiToken || page.aiToken,
+      entryPointId: brandConfig.entryPointId || page.entryPointId || page.entryPointId,
       userId,
-      phone: userId,
-      email: userId,
+      phone: userData.phone || userId,
+      email: userData.email || userId,
       firstName,
       lastName,
       onAddMessage: function (type, message) {

@@ -3,7 +3,6 @@ const myLibrary = require('./egainLibrary.js')
 const request = require('request-promise-native')
 const egainEventHandlers = require('./egainEventHandlers')
 const transcript = require('./transcript')
-const hydra = require('./hydra')
 
 class Session {
   constructor (type, data) {
@@ -41,7 +40,7 @@ class Session {
       this.pageId = data.page.id
       this.userId = data.userId
       // try to get email address and phone number from CXDemo
-      this.getDemoUserData().catch(e => {})
+      // this.getDemoUserData().catch(e => {})
     } else {
       this.type = data.type
       this.data = data
@@ -214,35 +213,6 @@ class Session {
       this.isEscalated = true
     } catch (e) {
       console.error('error starting ECE chat', e)
-    }
-  }
-
-  async getDemoUserData() {
-    // if this is a facebook chat, try to match up the facebook ID with
-    // a user's email address and phone number
-    if (this.type === 'facebook') {
-      const response1 = await hydra({
-        service: 'cxdemo-config-service',
-        path: `users`,
-        query: {facebooks: this.userId}
-      })
-      const user = response1.results[0]
-      // find an email address for the user
-      try {
-        this.email = user.emails[0]
-      } catch (e) {
-        this.email = user.email
-      }
-      // find a phone number for the user
-      try {
-        this.phone = user.phones[0]
-      } catch (e) {
-        if (user.telephoneNumber) {
-          this.phone = user.telephoneNumber
-        } else {
-          // do nothing
-        }
-      }
     }
   }
 }
