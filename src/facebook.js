@@ -187,7 +187,7 @@ async function handleMessage (message) {
       // look up user info from cxdemo
       userData = await getDemoUserData(userId)
       // get user's facebook brand config for this page, if exists
-      brandConfig = userData.brand.facebook[pageId]
+      brandConfig = userData.brand.facebook[pageId] || {}
     } catch (e) {
       // continue
     }
