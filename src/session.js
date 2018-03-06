@@ -45,6 +45,7 @@ class Session {
       this.type = data.type
       this.data = data
     }
+    console.log(`creating Sparky session ${this.id} for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId}`)
 
   }
 
