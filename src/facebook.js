@@ -183,6 +183,7 @@ async function handleMessage (message) {
     console.log(`new facebook chat session for ${firstName} ${lastName}`)
     let userData = {}
     let brandConfig = {}
+    let botConfig = {}
     try {
       // look up user info from cxdemo
       userData = await getDemoUserData(userId)
@@ -190,13 +191,15 @@ async function handleMessage (message) {
       // get user's facebook brand config for this page, if exists
       brandConfig = userData.brand.facebook[pageId] || {}
       console.log('found brand config in user data:', brandConfig)
+      botConfig = brandConfig.bot || {}
+      console.log('found bot config in user data:', botConfig)
     } catch (e) {
       // continue
     }
     // create session and store in sessions global
     session = new Session('facebook', {
       page,
-      apiAiToken: brandConfig.aiToken || page.apiAiToken || page.aiToken,
+      apiAiToken: botConfig.aiToken || page.apiAiToken || page.aiToken,
       entryPointId: brandConfig.entryPointId || page.entryPointId || page.entryPointId,
       userId,
       phone: userData.phone || userId,
