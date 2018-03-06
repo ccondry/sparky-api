@@ -21,7 +21,6 @@ router.post('/webhook', (req, res) => {
   if (body.object === 'page') {
     // process potentially multiple webhook data entries from facebook
     body.entry.forEach(entry => {
-      const pageId = entry.id // facebook page ID
       // process each message in the set
       entry.messaging.forEach(message => {
         fb.handleMessage(message).catch(e => console.error(e))
