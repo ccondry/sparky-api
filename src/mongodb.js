@@ -7,7 +7,7 @@ const url = process.env.mongo_url
 
 function find (collection, query) {
   return new Promise((resolve, reject) => {
-    console.log('query =', query)
+    // console.log('query =', query)
     try {
       MongoClient.connect(url, function(connectError, db) {
         if (connectError) reject(connectError)
@@ -25,7 +25,7 @@ function find (collection, query) {
 
 function findOne (collection, query) {
   return new Promise((resolve, reject) => {
-    console.log('query =', query)
+    // console.log('query =', query)
     try {
       MongoClient.connect(url, function(err, db) {
         db.collection(collection).findOne(query, function (err, result) {
@@ -42,7 +42,7 @@ function findOne (collection, query) {
 
 function upsert (collection, query, data) {
   return new Promise((resolve, reject) => {
-    console.log('mongodb upsert. query =', query)
+    // console.log('mongodb upsert. query =', query)
     try {
       MongoClient.connect(url, function(connectError, db) {
         if (connectError) reject(connectError)
@@ -69,7 +69,7 @@ function upsert (collection, query, data) {
 
 function update (collection, query, data, field) {
   return new Promise((resolve, reject) => {
-    console.log('query =', query)
+    // console.log('query =', query)
     try {
       MongoClient.connect(url, function(connectError, db) {
         if (connectError) reject(connectError)
@@ -110,7 +110,7 @@ function insert (collection, data) {
 
 function remove (collection, query) {
   return new Promise((resolve, reject) => {
-    console.log('query =', query)
+    // console.log('query =', query)
     try {
       MongoClient.connect(url, function(connectError, db) {
         if (connectError) reject(connectError)
