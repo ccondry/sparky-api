@@ -77,12 +77,12 @@ function getDemoConfig (user) {
       config.botEnabled = false
     } else {
       config.botEnabled = true
-      if (user.brand.sms.bot.apiAiToken) {
+      if (user.brand.sms.bot.aiToken) {
         config.apiAiToken = user.brand.sms.bot.apiAiToken
       } else {
         config.apiAiToken = process.env.APIAI_TOKEN
       }
-      if (user.brand.sms.bot.entryPointId) {
+      if (user.brand.sms.entryPointId) {
         config.entryPointId = user.brand.sms.bot.entryPointId
       } else {
         config.entryPointId = process.env.SMS_ENTRY_POINT_ID
@@ -207,8 +207,9 @@ async function handleMessage (message) {
       email: customerData.email,
       firstName: customerData.firstName,
       lastName: customerData.lastName,
-      apiAiToken: getDemoConfig.apiAiToken,
-      entryPointId: getDemoConfig.entryPointId,
+      apiAiToken: demoConfig.apiAiToken,
+      entryPointId: demoConfig.entryPointId,
+      botEnabled: demoConfig.botEnabled,
       onAddMessage: async function (type, message) {
         // send messages to SMS user, and decode HTML characters
         try {
