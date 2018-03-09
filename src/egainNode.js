@@ -2048,7 +2048,7 @@ eGainLibrary = function (librarySettings) {
         // send it to ECE
         function getUrlData(fileURL) {
             $.get( fileURL, function( data ) {
-                console.log("Received Data from Facebook: " + fileURL);
+                console.log("egainNode: getUrlData: " + fileURL);
                 return data;
             });
 //            var download = function(url, dest, cb) {
