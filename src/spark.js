@@ -15,6 +15,12 @@ async function handleWebhook (body) {
   if (body.actorId === body.createdBy) {
     return
   }
+  // find app config in database
+  const app = await findApp(body.appId)
+  // console.log('app', app)
+  if (app === null || !app.token) {
+    throw `Spark app ${appId} not registered. Please register this Spark app with a Spark access token and Spark bot ID.`
+  }
   // req.body.data.roomType = 'direct'
   // console.log('Spark webhook', body)
   const roomType = body.data.roomType
@@ -23,13 +29,13 @@ async function handleWebhook (body) {
     const messageId = body.data.id
     const options = {
       headers: {
-        'Authorization': `Bearer ${process.env.spark_bot_access_token}`
+        'Authorization': `Bearer ${app.token}`
       }
     }
     try {
       const response = await axios.get(`https://api.ciscospark.com/v1/messages/${messageId}`, options)
       console.log('response.data', response.data)
-      await handleMessage(body.appId, response.data)
+      await handleMessage(app, response.data)
     } catch (e) {
       console.error('error during Spark handleWebhook', e)
     }
@@ -38,7 +44,8 @@ async function handleWebhook (body) {
   }
 }
 
-async function handleMessage (appId, {text, personEmail, personId, roomId, files}) {
+async function handleMessage (app, {text, personEmail, personId, roomId, files}) {
+  const appId = app.id
   console.log(`message received from Spark user ${personEmail} on app ID ${appId}:`, text)
 
   let session
@@ -47,12 +54,6 @@ async function handleMessage (appId, {text, personEmail, personId, roomId, files
   // if session doesn't exist, create one
   if (!session) {
     console.log('new Spark chat session')
-    // find app config in database
-    const app = await findApp(appId)
-    // console.log('app', app)
-    if (app === null || !app.token) {
-      throw `Spark app ${appId} not registered. Please register this Spark app with a Spark access token and Spark bot ID.`
-    }
     // get user info
     const user = await getSenderInfo(personId, app.token)
     // console.log('found Spark user info', user.data)
@@ -178,12 +179,6 @@ async function getDemoUserData(email) {
 
 function findApp (id) {
   return db.findOne('spark.apps', {id})
-  // TODO enable database again
-  // return {
-  //   token: process.env.spark_bot_access_token,
-  //   appId: process.env.spark_bot_app_id
-  // botId: process.env.spark_bot_id
-  // }
 }
 
 // async function registerPage (id, token, aiToken, entryPointId) {
