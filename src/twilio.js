@@ -11,10 +11,9 @@ const sessions = {}
 
 const twilio = require('twilio')
 
-const accountSid = process.env.twilio_account_sid // Your Account SID from www.twilio.com/console
-const authToken = process.env.twilio_auth_token   // Your Auth Token from www.twilio.com/console
+// const accountSid = process.env.twilio_account_sid // Your Account SID from www.twilio.com/console
+// const authToken = process.env.twilio_auth_token   // Your Auth Token from www.twilio.com/console
 
-const client = new twilio(accountSid, authToken)
 
 async function getContextCustomerData(phone) {
   // try to match up the phone number with a user's info
@@ -70,34 +69,36 @@ async function getDemoUserCustomerData (user) {
   return customerData
 }
 
-function getDemoConfig (user) {
-  const config = {}
-  if (user && user.brand && user.brand.sms && user.brand.sms.bot) {
-    if (user.brand.sms.bot.enabled === false) {
-      config.botEnabled = false
-    } else {
-      config.botEnabled = true
-      if (user.brand.sms.bot.aiToken) {
-        config.apiAiToken = user.brand.sms.bot.apiAiToken
-      } else {
-        config.apiAiToken = process.env.APIAI_TOKEN
-      }
-      if (user.brand.sms.entryPointId) {
-        config.entryPointId = user.brand.sms.bot.entryPointId
-      } else {
-        config.entryPointId = process.env.SMS_ENTRY_POINT_ID
-      }
-    }
-  }
-  return config
-}
+// function getDemoConfig (user) {
+//   const config = {}
+//   if (user && user.sms && user.sms.apps) {
+//     if (user.brand.sms.bot.enabled === false) {
+//       config.botEnabled = false
+//     } else {
+//       config.botEnabled = true
+//       if (user.brand.sms.bot.aiToken) {
+//         config.apiAiToken = user.brand.sms.bot.apiAiToken
+//       } else {
+//         config.apiAiToken = process.env.APIAI_TOKEN
+//       }
+//       if (user.brand.sms.entryPointId) {
+//         config.entryPointId = user.brand.sms.bot.entryPointId
+//       } else {
+//         config.entryPointId = process.env.SMS_ENTRY_POINT_ID
+//       }
+//     }
+//   }
+//   return config
+// }
 
 // send twilio SMS to user
-function sendMessage(from, to, body) {
+function sendMessage(from, to, body, app) {
   if (!body || body.length === 0) {
     console.log(`Not sending empty string to SMS.`)
     return
   }
+  console.log('app', app)
+  const client = new twilio(app.sid, app.token)
   return client.messages.create({
     body,
     to,  // Text this number
@@ -127,6 +128,11 @@ function addSession (session) {
   sessions[to] = sessions[to] || {}
   sessions[to][from] = sessions[to][from] || {}
   sessions[to][from] = session
+}
+
+function findApp (id) {
+  console.log('finding sms.apps matching', id)
+  return db.findOne('sms.apps', {id})
 }
 
 // handle incoming twilio messages
@@ -193,11 +199,28 @@ async function handleMessage (message) {
       customerData = await getDemoUserCustomerData(demoUser)
     }
     // console.log('customerData', customerData)
-    const demoConfig = getDemoConfig(demoUser)
-
+    // const demoConfig = getDemoConfig(demoUser, to)
+    let brandConfig = {}
+    let botConfig = {}
+    try {
+      // look up user info from cxdemo
+      // userData = await getDemoUserData(personEmail)
+      // console.log('found demo user data:', userData)
+      // get user's facebook brand config for this page, if exists
+      brandConfig = demoUser.sms.apps[to] || {}
+      console.log('found brand config in user data:', brandConfig)
+      botConfig = brandConfig.bot || {}
+      console.log('found bot config in user data:', botConfig)
+    } catch (e) {
+      // continue
+    }
+    let botEnabled = true
+    if (botConfig.enabled === false) {
+      botEnabled = false
+    }
     // find page info in database
-    console.log('demoConfig', demoConfig)
-
+    // console.log('demoConfig', demoConfig)
+    const app = await findApp(to)
     // create session and store in sessions global
     session = new Session('twilio', {
       type: 'twilio',
@@ -207,13 +230,13 @@ async function handleMessage (message) {
       email: customerData.email,
       firstName: customerData.firstName,
       lastName: customerData.lastName,
-      apiAiToken: demoConfig.apiAiToken,
-      entryPointId: demoConfig.entryPointId,
-      botEnabled: demoConfig.botEnabled,
+      apiAiToken: botConfig.aiToken || app.aiToken,
+      entryPointId: brandConfig.entryPointId || app.entryPointId,
+      botEnabled,
       onAddMessage: async function (type, message) {
         // send messages to SMS user, and decode HTML characters
         try {
-          const smsResponse = await sendMessage(to, from, entities.decode(message))
+          const smsResponse = await sendMessage(to, from, entities.decode(message), app)
           // console.log('smsResponse', smsResponse)
           console.log(`SMS sent to ${from}`)
         } catch (e) {
