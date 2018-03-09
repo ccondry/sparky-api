@@ -48,6 +48,8 @@ app.use('/api/v1/session', require('./routes/session'))
 app.use('/api/v1/facebook', require('./routes/facebook'))
 // Twilio webhook
 app.use('/api/v1/twilio', require('./routes/twilio'))
+// Cisco Spark webhooks
+app.use('/api/v1/spark', require('./routes/spark'))
 
 // init hydra and start express
 hydraExpress.init(hydraConfig, () => {})
