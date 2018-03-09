@@ -199,7 +199,7 @@ class Session {
   escalate (message) {
     // send the chat transcript to Context Service
     transcript.send(this).catch(e => {})
-    console.log('escalate session:', this)
+    // console.log('escalate session:', this)
     // build customer object for connection to eGain
     const customerObject = require('./egainCustomer').create({
       firstName: this.firstName,
