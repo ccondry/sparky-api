@@ -37,8 +37,8 @@ async function getDemoUserData(fbid) {
   }
   // get brand config for facebook pages for the user
   try {
-    data.brand = {
-      facebook: user.brand.facebook
+    data.apps = {
+      facebook: user.facebook.apps
     }
   } catch (e) {
     // do nothing
@@ -115,9 +115,9 @@ function getFacebookSession (pageId, senderId) {
 }
 
 function removeFacebookSession (session) {
-  console.log(`removeFacebookSession facebookSessions[${session.pageId}][${session.userId}]`)
+  console.log(`removeFacebookSession facebookSessions[${session.data.page.id}][${session.data.userId}]`)
   try {
-    delete facebookSessions[session.pageId][session.userId]
+    delete facebookSessions[session.data.page.id][session.data.userId]
     console.log(`facebookSessions`, facebookSessions)
   } catch (e) {
     // do nothing
@@ -126,8 +126,8 @@ function removeFacebookSession (session) {
 }
 
 function addFacebookSession (session) {
-  const pageId = session.page.id
-  const senderId = session.userId
+  const pageId = session.data.page.id
+  const senderId = session.data.userId
   facebookSessions[pageId] = facebookSessions[pageId] || {}
   facebookSessions[pageId][senderId] = facebookSessions[pageId][senderId] || {}
   facebookSessions[pageId][senderId] = session
@@ -189,7 +189,7 @@ async function handleMessage (message) {
       userData = await getDemoUserData(userId)
       console.log('found demo user data:', userData)
       // get user's facebook brand config for this page, if exists
-      brandConfig = userData.brand.facebook[pageId] || {}
+      brandConfig = userData.apps[pageId] || {}
       console.log('found brand config in user data:', brandConfig)
       botConfig = brandConfig.bot || {}
       console.log('found bot config in user data:', botConfig)

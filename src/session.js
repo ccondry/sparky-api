@@ -30,28 +30,9 @@ class Session {
     } else {
       this.botEnabled = true
     }
-
-    if (type === 'sparky-ui') {
-      // sparky-ui chat client
-      // get api.ai token
-      this.type = 'sparky-ui'
-      this.visitId = data.visitId
-    } else if (type === 'facebook') {
-      // facebook chat client
-      this.type = 'facebook'
-      this.page = data.page
-      // this.apiAiToken = data.page.aiToken || process.env.APIAI_TOKEN
-      // this.entryPointId = data.page.entryPointId || '1001'
-
-      this.pageId = data.page.id
-      this.userId = data.userId
-      // try to get email address and phone number from CXDemo
-      // this.getDemoUserData().catch(e => {})
-    } else {
-      this.type = data.type
-      this.data = data
-    }
-    console.log(`creating Sparky session ${this.id} for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId}`)
+    this.type = type
+    this.data = data
+    console.log(`creating ${this.type} Sparky session ${this.id} for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId}`)
   }
 
   // add new message to session
