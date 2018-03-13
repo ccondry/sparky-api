@@ -74,6 +74,8 @@ class Session {
     if (this.onDeescalate && typeof this.onDeescalate === 'function') {
       console.log('calling deescalate handler')
       this.onDeescalate.call(this)
+    } else {
+      console.log('onDeescalate not a function. onDeescalate =', this.onDeescalate)
     }
   }
 
