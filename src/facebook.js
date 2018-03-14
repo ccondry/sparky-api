@@ -70,7 +70,8 @@ function handlePostback(sender, postback, page) {
 }
 
 // Get the sender info from FB
-async function getSenderInfo(sender_psid, page) {
+function getSenderInfo(sender_psid, page) {
+  // console.log(`getSenderInfo - sender_psid = ${sender_psid} ; page.token = ${page.token}`)
   const access_token = page.token
   // Send the HTTP request to the Messenger Platform
   return request({
@@ -175,18 +176,28 @@ async function handleMessage (message) {
       throw `Facebook page ${pageId} not registered. Please register this Facebook page with a token, AI token, and entry point ID.`
     }
     // get user info
-    const fbUser = await getSenderInfo(userId, page)
-    // console.log('fbUser =', fbUser)
-    const firstName = fbUser.first_name
-    // console.log('firstName = ', firstName)
-    const lastName = fbUser.last_name
-    console.log(`new facebook chat session for ${firstName} ${lastName}`)
+    let firstName
+    let lastName
+    try {
+      console.log('getting facebook user info')
+      const fbUser = await getSenderInfo(userId, page)
+      console.log('got facebook user info', fbUser)
+      // console.log('fbUser =', fbUser)
+      firstName = fbUser.first_name
+      // console.log('firstName = ', firstName)
+      lastName = fbUser.last_name
+    } catch (e) {
+      console.log(`failed to get facebook user info. Facebook returned HTTP ${e.statusCode}`, e.error)
+    }
     let userData = {}
     let brandConfig = {}
     let botConfig = {}
     try {
       // look up user info from cxdemo
       userData = await getDemoUserData(userId)
+      // get first and last name from demo user data if FB sender lookup failed
+      firstName = firstName || userData.firstName
+      lastName = lastName || userData.lastName
       console.log('found demo user data:', userData)
       // get user's facebook brand config for this page, if exists
       brandConfig = userData.apps[pageId] || {}
@@ -195,7 +206,9 @@ async function handleMessage (message) {
       console.log('found bot config in user data:', botConfig)
     } catch (e) {
       // continue
+      console.log('failed to get demo user data', e)
     }
+    console.log(`new facebook chat session for ${firstName} ${lastName}`)
     let botEnabled = true
     if (botConfig.enabled === false) {
       botEnabled = false
