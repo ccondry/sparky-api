@@ -2121,7 +2121,14 @@ eGainLibrary = function (librarySettings) {
             $.ajax({
                 type: 'POST',
                 url: _corsHost + '/egain/chat/entrypoint/sendCustAttachmentNotificaiton',
-                data: {'sid': _connection.sid, 'customerIdentity': customerName, 'attachmentName': file.name, 'attachmentInternalName': file.newName, 'attachmentId': uniqueFileId, 'attachmentSize': file.size},
+                data: {
+                  'sid': _connection.sid,
+                  'customerIdentity': customerName,
+                  'attachmentName': file.name,
+                  'attachmentInternalName': file.newName,
+                  'attachmentId': uniqueFileId,
+                  'attachmentSize': file.size
+                },
                 dataType: 'text',
                 file: file,
                 success: function (rettext) {
