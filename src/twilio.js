@@ -305,7 +305,7 @@ async function registerUsername (username, id) {
     // user not found
     return responses.sendError(`User ${username} not found`)
   }
-  // get current facebook registrations
+  // get current phone registrations
   const body = user.phones || []
   // add phone to current list
   body.push(id)
