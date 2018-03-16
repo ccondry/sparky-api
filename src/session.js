@@ -154,7 +154,7 @@ class Session {
         this.escalate()
         break
       }
-      case 'start_video': {
+      case 'start-video': {
         if (this.type === 'sparky-ui') {
           // make REM video call
           if (fulfillment.speech !== 'video') {
