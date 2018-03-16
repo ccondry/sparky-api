@@ -111,9 +111,9 @@ class Session {
     try {
       // figure out a response using AI
       const response = await this.queryAi(text)
-      // console.log('processCustomerMessage response =', response)
+      console.log('processCustomerMessage response =', response)
       // process the response text
-      this.processAiResponse(response.result.fulfillment)
+      this.processAiResponse(response.result)
 
     } catch (e) {
       console.error('exception during processCustomerMessage', e)
@@ -142,38 +142,52 @@ class Session {
     })
   }
 
-  processAiResponse (fulfillment) {
-    // TODO use intents instead of speech response for commands
-    const text = fulfillment.speech
+  processAiResponse (result) {
+    const fulfillment = result.fulfillment
     // check the api.ai response message and perform the associated action
-    switch (text) {
+    switch (result.action) {
       case 'escalate': {
+        if (fulfillment.speech !== 'escalate') {
+          this.addMessage('bot', fulfillment.speech)
+        }
         // escalate request to agent
         this.escalate()
         break
       }
-      case 'video': {
+      case 'start_video': {
         if (this.type === 'sparky-ui') {
           // make REM video call
+          if (fulfillment.speech !== 'video') {
+            this.addMessage('bot', fulfillment.speech)
+          }
           this.addCommand('start-rem-video')
         } else {
           this.addMessage('bot', `I'm sorry, I'm not able to connect a video call to you from here.`)
         }
         break
       }
-      case 'calculator': {
+      case 'mortgage-calculator': {
         if (this.type === 'sparky-ui') {
-          this.addMessage('bot', 'Ok... Your calculator should have appeared on the left!')
+          if (fulfillment.speech === 'calculator') {
+            this.addMessage('bot', 'Ok... Your calculator should have appeared on the left!')
+          } else {
+            this.addMessage('bot', fulfillment.speech)
+          }
+          console.log('sending mortgage-calculator command')
           // open mortgage calculator
           this.addCommand('mortgage-calculator')
         } else {
-          this.addMessage('bot', 'Here is our mortgage calculator: http://static.cxdemo.net/documents/sparky/calculator.html')
+          if (fulfillment.speech === 'calculator') {
+            this.addMessage('bot', 'Here is our mortgage calculator: http://static.cxdemo.net/documents/sparky/calculator.html')
+          } else {
+            this.addMessage('bot', fulfillment.speech)
+          }
         }
         break
       }
       default: {
         // add bot's reply to session's messages list
-        this.addMessage('bot', text)
+        this.addMessage('bot', fulfillment.speech)
         break
       }
     }
