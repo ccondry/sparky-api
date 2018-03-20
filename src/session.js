@@ -8,6 +8,7 @@ class Session {
   constructor (type, data) {
     this.id = uuidv1()
     this.state = 'active'
+    this.inSurvey = true
     this.isEscalated = false
     this.messages = []
     this.phone = data.phone
@@ -147,7 +148,7 @@ class Session {
     // check the api.ai response message and perform the associated action
     switch (result.action) {
       case 'escalate': {
-        if (fulfillment.speech !== 'escalate') {
+        if (fulfillment.speech !== 'escalate' && fulfillment.speech.length) {
           this.addMessage('bot', fulfillment.speech)
         }
         // escalate request to agent
@@ -184,6 +185,13 @@ class Session {
           }
         }
         break
+      }
+      case 'survey-end': {
+        this.inSurvey = false
+        // say last bot message and then end session
+        this.addMessage('bot', fulfillment.speech)
+        // end of survey should end the session
+        this.deescalate()
       }
       default: {
         // add bot's reply to session's messages list
@@ -226,6 +234,23 @@ class Session {
       console.error('error starting ECE chat', e)
     }
   }
+
+  onEgainEnd () {
+    // survey enabled for this bot?
+    console.log('this.data.survey = ', this.data.survey)
+    if (this.data.survey) {
+      // set escalated flag to false
+      this.isEscalated = false
+      // egain session ended - now provide chat survey
+      this.inSurvey = true
+      // start survey conversation by saying 'survey' to bot AI
+      this.processCustomerMessage('survey')
+    } else {
+      // survey not enabled - just go to deescalate
+      this.deescalate()
+    }
+  }
+
 }
 
 module.exports = Session

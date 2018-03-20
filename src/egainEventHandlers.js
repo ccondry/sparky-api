@@ -18,7 +18,7 @@ function create (myChat, session) {
   }
   myEventHandlers.OnDuplicateSession = function (args) {
     console.log('OnDuplicateSession', args)
-    session.deescalate()
+    session.onEgainEnd()
   }
   myEventHandlers.OnSysemMessageReceived = function (args) {
     console.log('OnSysemMessageReceived', args)
@@ -50,11 +50,11 @@ function create (myChat, session) {
     console.log('OnConnectionFailure', args)
     // console.log('Oops! Something went wrong');
     // session.addMessage('system', 'Sorry, we are unable to get an expert to help you at this time. Please try again later.')
-    session.deescalate()
+    session.onEgainEnd()
   };
   /* Example output of agent messages to a DIV named TransScript with jQuery */
   myEventHandlers.OnAgentMessageReceived = function (args) {
-    console.log('OnAgentMessageReceived', args)
+    // console.log('OnAgentMessageReceived', args)
     console.log("Agent Message Received: " + args.Message)
     session.addMessage('agent', args.Message)
   };
@@ -76,7 +76,7 @@ function create (myChat, session) {
   /* Example browser console.log when the chat is completed */
   myEventHandlers.OnConnectionComplete = function () {
     console.log("Chat with eGain agent complete.")
-    session.deescalate()
+    session.onEgainEnd()
   };
   /* Example of adding message in transcript when customer attachment invite is sent to server */
   myEventHandlers.OnCustomerAttachmentNotificationSent = function (args) {
