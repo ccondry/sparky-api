@@ -192,6 +192,7 @@ class Session {
         this.addMessage('bot', fulfillment.speech)
         // end of survey should end the session
         this.deescalate()
+        break
       }
       default: {
         // add bot's reply to session's messages list
