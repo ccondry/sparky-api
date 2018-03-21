@@ -193,8 +193,10 @@ class Session {
         this.inSurvey = false
         // say last bot message and then end session
         this.addMessage('bot', fulfillment.speech)
-        // end of survey should end the session
-        this.deescalate()
+        if (this.type !== 'sparky-ui') {
+          // end of survey should end the session for bots other than sparky-ui
+          this.deescalate()
+        }
         break
       }
       default: {
