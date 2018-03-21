@@ -33,6 +33,9 @@ class Session {
     }
     this.type = type
     this.data = data
+    if (typeof this.data.survey === 'undefined') {
+      this.data.survey = true
+    }
     console.log(`creating ${this.type} Sparky session ${this.id} for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId}`)
   }
 
