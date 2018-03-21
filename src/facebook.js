@@ -216,7 +216,7 @@ async function handleMessage (message) {
     }
     // enable survey by default
     let survey = true
-    if (botConfig.survey === false) {
+    if (brandConfig.survey === false) {
       survey = false
     }
     // create session and store in sessions global

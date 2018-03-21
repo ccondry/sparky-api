@@ -220,7 +220,7 @@ async function handleMessage (message) {
     }
     // enable survey by default
     let survey = true
-    if (botConfig.survey === false) {
+    if (brandConfig.survey === false) {
       survey = false
     }
     // find app default config in database
