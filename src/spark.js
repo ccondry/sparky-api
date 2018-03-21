@@ -79,11 +79,17 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
     if (botConfig.enabled === false) {
       botEnabled = false
     }
+    // enable survey by default
+    let survey = true
+    if (botConfig.survey === false) {
+      survey = false
+    }
     // create session and store in sessions global
     session = new Session('spark', {
       appId,
       appToken: app.token,
       botEnabled,
+      survey,
       apiAiToken: botConfig.aiToken || app.apiAiToken || app.aiToken,
       entryPointId: brandConfig.entryPointId || app.entryPointId,
       personId,

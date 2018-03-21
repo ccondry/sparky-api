@@ -218,8 +218,12 @@ async function handleMessage (message) {
     if (botConfig.enabled === false) {
       botEnabled = false
     }
-    // find page info in database
-    // console.log('demoConfig', demoConfig)
+    // enable survey by default
+    let survey = true
+    if (botConfig.survey === false) {
+      survey = false
+    }
+    // find app default config in database
     const app = await findApp(to)
     // create session and store in sessions global
     session = new Session('twilio', {
@@ -233,6 +237,7 @@ async function handleMessage (message) {
       apiAiToken: botConfig.aiToken || app.aiToken,
       entryPointId: brandConfig.entryPointId || app.entryPointId,
       botEnabled,
+      survey,
       onAddMessage: async function (type, message) {
         // send messages to SMS user, and decode HTML characters
         try {

@@ -209,14 +209,21 @@ async function handleMessage (message) {
       console.log('failed to get demo user data', e)
     }
     console.log(`new facebook chat session for ${firstName} ${lastName}`)
+    // enable bot by default
     let botEnabled = true
     if (botConfig.enabled === false) {
       botEnabled = false
+    }
+    // enable survey by default
+    let survey = true
+    if (botConfig.survey === false) {
+      survey = false
     }
     // create session and store in sessions global
     session = new Session('facebook', {
       page,
       botEnabled,
+      survey,
       apiAiToken: botConfig.aiToken || page.apiAiToken || page.aiToken,
       entryPointId: brandConfig.entryPointId || page.entryPointId || page.entryPointId,
       userId,
