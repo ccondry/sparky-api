@@ -199,6 +199,10 @@ class Session {
         }
         break
       }
+      case 'start-survey': {
+        this.startSurvey()
+        break
+      }
       default: {
         // add bot's reply to session's messages list
         this.addMessage('bot', fulfillment.speech)
@@ -247,14 +251,18 @@ class Session {
     if (this.data.survey) {
       // set escalated flag to false
       this.isEscalated = false
-      // egain session ended - now provide chat survey
-      this.inSurvey = true
-      // start survey conversation by saying 'survey' to bot AI
-      this.processCustomerMessage('survey')
+      this.startSurvey()
     } else {
       // survey not enabled - just go to deescalate
       this.deescalate()
     }
+  }
+
+  startSurvey () {
+    // egain session ended - now provide chat survey
+    this.inSurvey = true
+    // start survey conversation by saying 'survey' to bot AI
+    this.processCustomerMessage('survey')
   }
 
 }
