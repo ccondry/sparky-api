@@ -99,16 +99,6 @@ class Session {
       // let bot handle the response
       this.processCustomerMessage(message)
     }
-    // check for command words
-    switch (message.toLowerCase()) {
-      case 'goodbye': {
-        // tell user session ended
-        // this.addMessage('system', 'Your session with our expert has ended, but you can still chat with Sparky.')
-        // end session
-        this.deescalate()
-        break
-      }
-    }
   }
 
   async processCustomerMessage (text) {
@@ -201,6 +191,16 @@ class Session {
       }
       case 'start-survey': {
         this.startSurvey()
+        break
+      }
+      case 'end-session': {
+        // end session
+        if (this.data.survey) {
+          this.startSurvey()
+        } else {
+          // survey not enabled - just go to deescalate
+          this.deescalate()
+        }
         break
       }
       default: {
