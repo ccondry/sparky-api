@@ -36,7 +36,7 @@ class Session {
     if (typeof this.data.survey === 'undefined') {
       this.data.survey = true
     }
-    console.log(`creating ${this.type} Sparky session ${this.id} for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId}`)
+    console.log(`creating ${this.type} Sparky session ${this.id} for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId} and survey is ${this.data.survey ? 'enabled' : 'disabled'}`)
   }
 
   // add new message to session
