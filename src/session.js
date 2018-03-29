@@ -24,7 +24,7 @@ class Session {
     this.getCustomerData = data.getCustomerData
     this.apiAiToken = data.apiAiToken || process.env.APIAI_TOKEN
 
-    this.entryPointId = data.entryPointId || process.env.FACEBOOK_ENTRY_POINT_ID
+    this.entryPointId = data.entryPointId || process.env.ENTRY_POINT_ID
 
     if (data.botEnabled === false) {
       this.botEnabled = false
