@@ -9,17 +9,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/cxdemo/sparky-api"
+    "url": "git+https://gitlab.com/dcloud-collab/sparky-api"
   },
   "keywords": [
     "bot",
     "ai",
     "chat",
-    "cxdemo",
+    "dcloud",
     "cisco",
     "ece"
   ],
-  "author": "Coty Condry",
+  "author": "Coty Condry <ccondry@cisco.com>",
   "license": "UNLICENSED",
   "dependencies": {
     "awesome-phonenumber": "^2.2.5",
@@ -29,7 +29,6 @@
     "dotenv": "^4.0.0",
     "express": "^4.14.0",
     "html-entities": "^1.2.1",
-    "hydra-express": "^1.6.0",
     "jquery": "^3.3.1",
     "mongodb": "^2.2.34",
     "node-strophe": "git+https://github.com/juxe/node-strophe.git",

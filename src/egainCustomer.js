@@ -1,6 +1,7 @@
-const myLibrary = require('./egainLibrary.js')
+const egainLibrary = require('./egainLibrary.js')
 
-function create ({firstName, lastName, phone, email, visitId, subject, pkey}) {
+function create ({egainHost, firstName, lastName, phone, email, visitId, subject, pkey}) {
+  const myLibrary = egainLibrary.get(egainHost)
   const customerObject = new myLibrary.Datatype.CustomerObject();
 
   if (pkey === 'email') {

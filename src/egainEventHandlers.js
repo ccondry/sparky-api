@@ -65,7 +65,7 @@ function create (myChat, session) {
   }
   /* Example browser console.log when an error occurs */
   myEventHandlers.OnErrorOccurred = function (args) {
-    console.log('Oops! Error Occurred' + args.toString());
+    console.log('OnErrorOccurred', args);
     session.addMessage('system', args.toString())
   }
   /* Example browser console.log when agents are not available */

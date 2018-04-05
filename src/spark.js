@@ -3,7 +3,7 @@ const Session = require('./session.js')
 const db = require('./mongodb')
 const Entities = require('html-entities').AllHtmlEntities
 const entities = new Entities()
-const hydra = require('./hydra')
+// const hydra = require('./hydra')
 const axios = require('axios')
 
 const sessions = {}

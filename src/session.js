@@ -1,5 +1,5 @@
 const uuidv1 = require('uuid/v1')
-const myLibrary = require('./egainLibrary.js')
+const egainLibrary = require('./egainLibrary.js')
 const request = require('request-promise-native')
 const egainEventHandlers = require('./egainEventHandlers')
 const transcript = require('./transcript')
@@ -8,23 +8,27 @@ class Session {
   constructor (type, data) {
     this.id = uuidv1()
     this.state = 'active'
-    this.inSurvey = true
+    this.inSurvey = false
     this.isEscalated = false
     this.messages = []
     this.phone = data.phone
     this.email = data.email
     this.firstName = data.firstName
     this.lastName = data.lastName
-    this.language = data.language || 'en'
+    this.language = data.language || process.env.DEFAULT_LANGUAGE || 'en'
     // run this callback at de-escalation time
     this.onDeescalate = data.onDeescalate
     // run this callback when messages are added
     this.onAddMessage = data.onAddMessage
     // resolve this promise to get user data
     this.getCustomerData = data.getCustomerData
-    this.apiAiToken = data.apiAiToken || process.env.APIAI_TOKEN
+    this.apiAiToken = data.apiAiToken || process.env.API_AI_TOKEN
 
     this.entryPointId = data.entryPointId || process.env.ENTRY_POINT_ID
+
+    // dCloud session information
+    this.dcloudSession = data.dcloudSession
+    this.dcloudDatacenter = data.dcloudDatacenter
 
     if (data.botEnabled === false) {
       this.botEnabled = false
@@ -33,23 +37,51 @@ class Session {
     }
     this.type = type
     this.data = data
+    // enable survey by default
     if (typeof this.data.survey === 'undefined') {
       this.data.survey = true
     }
-    console.log(`creating ${this.type} Sparky session ${this.id} for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId} and survey is ${this.data.survey ? 'enabled' : 'disabled'}`)
+    if (this.dcloudSession && this.dcloudDatacenter) {
+      // check if session is valid, and get the session info
+      this.egainHost = `https://${this.dcloudDatacenter}-${this.dcloudSession}.localtunnel.me/system`
+    } else {
+      // egainHost null by default
+      this.egainHost = null
+    }
+    // console.log(`creating ${this.type} Sparky session ${this.id}: for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId} and survey is ${this.data.survey ? 'enabled' : 'disabled'}`)
+    const logData = JSON.parse(JSON.stringify(this))
+    console.log(`creating ${this.type} Sparky session:`, logData)
   }
+
+  // get dCloud session information
+  // getSessionInfo () {
+  //   return request({
+  //     method: 'GET',
+  //     url: `https://mm.cxdemo.net/api/v1/datacenters/${this.dcloudDatacenter}/sessions/${this.dcloudSession}`,
+  //     json: true
+  //   })
+  // }
 
   // add new message to session
   addMessage (type, message) {
-    // push message to array
-    this.messages.push({
-      text: message,
-      type,
-      datetime: new Date().toJSON()
-    })
-    // if this is a bot/system/agent message, send it to the customer on facebook
-    if (type !== 'customer' && this.onAddMessage && typeof this.onAddMessage === 'function') {
-      this.onAddMessage.call(this, type, message)
+    // if message is not empty string
+    if (message.length) {
+      // push message to array
+      this.messages.push({
+        text: message,
+        type,
+        datetime: new Date().toJSON()
+      })
+      // if this is a bot/system/agent message, send it to the customer on facebook
+      if (type !== 'customer') {
+        // match the Incoming log message format
+        console.log('Outgoing:', JSON.stringify({text: message, sessionId: this.id}))
+        if (this.onAddMessage && typeof this.onAddMessage === 'function') {
+          this.onAddMessage.call(this, type, message)
+        }
+      }
+    } else {
+      // don't add empty messages
     }
   }
 
@@ -86,6 +118,10 @@ class Session {
   addCustomerMessage (message) {
     // add message to memory
     this.addMessage('customer', message)
+    if (message.toLowerCase() === 'goodbye') {
+      // end session
+      this.deescalate()
+    }
     // is this chat escalated to an agent?
     if (this.isEscalated) {
       console.log('this chat is escalated already. sending message to ECE agent.')
@@ -105,12 +141,12 @@ class Session {
     try {
       // figure out a response using AI
       const response = await this.queryAi(text)
-      console.log('processCustomerMessage response =', response)
+      // console.log('processCustomerMessage response =', response)
       // process the response text
       this.processAiResponse(response.result)
 
     } catch (e) {
-      console.error('exception during processCustomerMessage', e)
+      console.error('exception during processCustomerMessage', e.message)
     }
   }
 
@@ -172,7 +208,7 @@ class Session {
           this.addCommand('mortgage-calculator')
         } else {
           if (fulfillment.speech === 'calculator') {
-            this.addMessage('bot', 'Here is our mortgage calculator: http://static.cxdemo.net/documents/sparky/calculator.html')
+            this.addMessage('bot', 'Here is our mortgage calculator: ' + process.env.CALCULATOR_URL)
           } else {
             this.addMessage('bot', fulfillment.speech)
           }
@@ -211,12 +247,13 @@ class Session {
     }
   }
 
-  escalate (message) {
+  async escalate (message) {
     // send the chat transcript to Context Service
     transcript.send(this).catch(e => {})
     // console.log('escalate session:', this)
     // build customer object for connection to eGain
     const customerObject = require('./egainCustomer').create({
+      egainHost: this.egainHost,
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
@@ -226,8 +263,15 @@ class Session {
     })
 
     try {
+      if (!this.egainHost) {
+        // wait for whatever operations necessary to get egain host
+        // TODO implement chat questions to get datacenter info if not available
+        // await this.getEgainHost()
+        throw 'No eGain host was set.'
+      }
+      const myLibrary = egainLibrary.get(this.egainHost)
       // create instance of ECE chat object
-      const myChat = new myLibrary.Chat();
+      const myChat = new myLibrary.Chat()
       // build ECE chat event handlers
       const myEventHandlers = egainEventHandlers.create(myChat, this)
       // init the ECE chat object

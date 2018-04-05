@@ -1,11 +1,11 @@
 const express = require('express')
 const router = express.Router()
-const Session = require('../session')
-const sessions = require('../sessions')
+const Session = require('../../session')
+const sessions = require('../../sessions')
 
 // get new session ID for sparky-ui client
 router.post('/', (req, res) => {
-  console.log('request to create new session: ', req.body)
+  // console.log('request to create new session: ', req.body)
 
   // create session and store in sessions global
   const session = new Session('sparky-ui', req.body)

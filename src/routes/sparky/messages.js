@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const sessions = require('../sessions')
+const sessions = require('../../sessions')
 
 // receive new customer messages from sparky-ui client
 router.post('/', (req, res) => {
