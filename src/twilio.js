@@ -30,6 +30,7 @@ function getVerticalConfig (vertical) {
 
 // get dCloud session information
 function getDcloudSession (from) {
+  console.log('getting dcloud session info for', from)
   return request({
     method: 'GET',
     url: `https://mm.cxdemo.net/api/v1/phones/${from}`,
