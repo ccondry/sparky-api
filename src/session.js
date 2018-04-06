@@ -44,6 +44,8 @@ class Session {
     if (this.dcloudSession && this.dcloudDatacenter) {
       // check if session is valid, and get the session info
       this.egainHost = `https://${this.dcloudDatacenter.toLowerCase()}-${this.dcloudSession}.localtunnel.me/system`
+      // this.egainHost = `http://pcce.vpod773.dc-01.com/system`
+      // this.egainHost = `https://cceece.dcloud.cisco.com/system`
     } else {
       // egainHost null by default
       this.egainHost = null
