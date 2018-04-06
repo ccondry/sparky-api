@@ -66,7 +66,12 @@ function create (myChat, session) {
   /* Example browser console.log when an error occurs */
   myEventHandlers.OnErrorOccurred = function (args) {
     console.log('OnErrorOccurred', args);
-    session.addMessage('system', args.toString())
+    // session.addMessage('system', args.toString())
+    if (args.status === 'error') {
+      session.addMessage('system', `I'm sorry, but we're having trouble connecting to an agent. Please try again later.`)
+    } else if (args.status === 'log') {
+    }
+    // session.deescalate(args.message)
   }
   /* Example browser console.log when agents are not available */
   myEventHandlers.OnAgentsNotAvailable = function (args) {
