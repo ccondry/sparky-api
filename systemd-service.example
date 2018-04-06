@@ -1,0 +1,21 @@
+[Unit]
+Description=Sparky chat API service script for the dCloud PCCE ECE demo
+Documentation=https://gitlab.com/dcloud-collab/sparky-api#README
+After=network.target
+StartLimitInterval=2000
+StartLimitBurst=5
+
+[Service]
+Restart=always
+RestartSec=5
+User=root
+Group=root
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/opt/dcloud/sparky-api/
+Type=simple
+ExecStart=/usr/bin/node /opt/dcloud/sparky-api/src/index.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
