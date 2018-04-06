@@ -107,7 +107,7 @@ class Session {
     // remove escalated flag
     this.isEscalated = false
     // delete the messages in memory so that new transcripts are only the latest
-    this.messages = []
+    // this.messages = []
     // call custom deescalate handler
     if (this.onDeescalate && typeof this.onDeescalate === 'function') {
       console.log('calling deescalate handler')
