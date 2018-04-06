@@ -69,6 +69,7 @@ function create (myChat, session) {
     // session.addMessage('system', args.toString())
     if (args.status === 'error') {
       session.addMessage('system', `I'm sorry, but we're having trouble connecting to an agent. Please try again later.`)
+      session.onEgainEnd()
     } else if (args.status === 'log') {
     }
     // session.deescalate(args.message)
