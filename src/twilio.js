@@ -15,6 +15,7 @@ const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN)
 const contextService = require('./context-service')
 
 async function getBrandConfig (vertical) {
+  console.log('getting brand config for', vertical)
   const verticalConfig = await getVerticalConfig(vertical)
   return verticalConfig.chat
 }
@@ -31,9 +32,18 @@ function getVerticalConfig (vertical) {
 // get dCloud session information
 function getDcloudSession (from) {
   console.log('getting dcloud session info for', from)
+  const pn = PhoneNumber(from)
+  let phone
+  if (pn.getNumber('regionCode') === 'US') {
+    // use US phone number without +1
+    phone = pn.getNumber('significant')
+  } else {
+    // use non-US number without +
+    phone = from.slice(1)
+  }
   return request({
     method: 'GET',
-    url: `https://mm.cxdemo.net/api/v1/phones/${from}`,
+    url: `https://mm.cxdemo.net/api/v1/phones/${phone}`,
     headers: {
       authorization: 'Bearer ' + process.env.DCLOUD_API_TOKEN
     },
