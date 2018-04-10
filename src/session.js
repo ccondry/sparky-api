@@ -191,23 +191,23 @@ class Session {
   processAiResponse (result) {
     const fulfillment = result.fulfillment
     // check the api.ai response message and perform the associated action
+    console.log('ai response', result)
     switch (result.action) {
       case 'datacenter': {
-        // console.log('ai response', result)
         if (fulfillment.speech.length) {
           this.addMessage('bot', fulfillment.speech)
         }
         // set datacenter
-        this.dcloudDatacenter = parameters.dc
+        this.dcloudDatacenter = result.parameters.dc
         break
       }
       case 'dcloud-session': {
-        console.log('ai response', result)
+        // console.log('ai response', result)
         if (fulfillment.speech.length) {
           this.addMessage('bot', fulfillment.speech)
         }
         // set dcloud session ID
-        this.dcloudSession = parameters.session
+        this.dcloudSession = result.parameters.session
         break
       }
       case 'escalate': {
