@@ -207,9 +207,13 @@ class Session {
             // set egainHost to public DNS of demo vpod
             this.egainHost = `https://${response.dns}/ece/system`
             console.log('egainHost = ', this.egainHost)
+            // continue conversation with bot
+            this.addCustomerMessage('instructions')
           })
           .catch(e => {
             console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e)
+            // try to get info from customer again
+            this.addCustomerMessage('wrong-information')
           })
         }
         break
@@ -229,9 +233,13 @@ class Session {
             // set egainHost to public DNS of demo vpod
             this.egainHost = `https://${response.dns}/ece/system`
             console.log('egainHost = ', this.egainHost)
+            // continue conversation with bot
+            this.addCustomerMessage('wrong-information')
           })
           .catch(e => {
             console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e)
+            // continue conversation with bot
+            this.addCustomerMessage('get-datacenter')
           })
         }
         break
