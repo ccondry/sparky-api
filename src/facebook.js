@@ -8,44 +8,6 @@ const entities = new Entities()
 
 const facebookSessions = {}
 
-async function getDemoUserData(fbid) {
-  const data = {}
-  // if this is a facebook chat, try to match up the facebook ID with
-  // a user's email address and phone number
-  const response1 = await hydra({
-    service: 'cxdemo-config-service',
-    path: `users`,
-    query: {facebooks: fbid}
-  })
-  const user = response1.results[0]
-  // find an email address for the user
-  try {
-    data.email = user.emails[0]
-  } catch (e) {
-    // default to lab user's email
-    data.email = user.email
-  }
-  // find a phone number for the user
-  try {
-    data.phone = user.phones[0]
-  } catch (e) {
-    if (user.telephoneNumber) {
-      data.phone = user.telephoneNumber
-    } else {
-      // do nothing
-    }
-  }
-  // get brand config for facebook pages for the user
-  try {
-    data.apps = {
-      facebook: user.facebook.apps
-    }
-  } catch (e) {
-    // do nothing
-  }
-  return data
-}
-
 async function findPage (id) {
   const page = db.findOne('facebook.pages', {id})
   if (page !== null) {
@@ -149,20 +111,6 @@ async function handleMessage (message) {
   // message text
   const messageText = message.message.text
   // was this a registration message?
-  let isRegistrationMessage = false
-  if (messageText && messageText.startsWith('register ') && messageText.split(' ').length === 2 && messageText.split(' ').pop().length < 9) {
-    isRegistrationMessage = true
-    console.log('register command received - ', messageText)
-    // extract username
-    const username = messageText.split(' ').pop()
-    // register user
-    try {
-      await registerUsername(username, userId)
-      console.log(`${userId} registered in CXDemo with ${username}`)
-    } catch (e) {
-      console.error(e)
-    }
-  }
   // message attachments
   const attachments = message.message.attachments
   // postbacks
@@ -205,12 +153,6 @@ async function handleMessage (message) {
     let brandConfig = {}
     let botConfig = {}
     try {
-      // look up user info from cxdemo
-      userData = await getDemoUserData(userId)
-      // get first and last name from demo user data if FB sender lookup failed
-      firstName = firstName || userData.firstName
-      lastName = lastName || userData.lastName
-      console.log('found demo user data:', userData)
       // get user's facebook brand config for this page, if exists
       brandConfig = userData.apps[pageId] || {}
       console.log('found brand config in user data:', brandConfig)
@@ -261,7 +203,7 @@ async function handleMessage (message) {
     console.log('existing facebook chat session')
 
     // was there text in the message?
-    if (messageText && !isRegistrationMessage) {
+    if (messageText) {
       // add message to session data
       session.addCustomerMessage(messageText)
     }
@@ -303,37 +245,6 @@ async function handleMessage (message) {
       // handlePostback(userId, postback, pageId)
     }
   }
-}
-
-async function registerUsername (username, id) {
-  console.log(`registering ${id} for ${username}`)
-  // try to find the user's current facebook registration data
-  const response1 = await hydra({
-    method: 'get',
-    service: 'cxdemo-config-service',
-    path: `users/${username}`
-  })
-  const user = response1.results[0]
-  if (!user) {
-    // user not found
-    return responses.sendError(`User ${username} not found`)
-  }
-  if (isNaN(id) || id.length !== 16) {
-    // not a facebook ID
-    return responses.sendError('Failed - Invalid Facebook ID')
-  }
-  // get current facebook registrations
-  const body = user.facebooks || []
-  // add incoming facebook ID to current list
-  body.push(id)
-  // attempt registration by patching user data with new list
-  const response2 = await hydra({
-    method: 'patch',
-    service: 'cxdemo-config-service',
-    path: `users/${username}`,
-    query: { field: 'facebooks' },
-    body
-  })
 }
 
 module.exports = {
