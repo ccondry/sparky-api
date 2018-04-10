@@ -302,10 +302,10 @@ class Session {
         }
         break
       }
-      case 'start-survey': {
-        this.startSurvey()
-        break
-      }
+      // case 'start-survey': {
+      //   this.startSurvey()
+      //   break
+      // }
       case 'end-session': {
         // end session
         if (this.data.survey) {
