@@ -199,6 +199,19 @@ class Session {
         }
         // set datacenter
         this.dcloudDatacenter = result.parameters.dc
+        // get session info now
+        if (this.dcloudSession && this.dcloudDatacenter) {
+          this.getSessionInfo()
+          .then(response => {
+            // console.log('dcloud session response', response)
+            // set egainHost to public DNS of demo vpod
+            this.egainHost = `https://${response.dns}/ece/system`
+            console.log('egainHost = ', this.egainHost)
+          })
+          .catch(e => {
+            console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e)
+          })
+        }
         break
       }
       case 'dcloud-session': {
@@ -208,6 +221,19 @@ class Session {
         }
         // set dcloud session ID
         this.dcloudSession = result.parameters.session
+        // get session info now
+        if (this.dcloudSession && this.dcloudDatacenter) {
+          this.getSessionInfo()
+          .then(response => {
+            // console.log('dcloud session response', response)
+            // set egainHost to public DNS of demo vpod
+            this.egainHost = `https://${response.dns}/ece/system`
+            console.log('egainHost = ', this.egainHost)
+          })
+          .catch(e => {
+            console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e)
+          })
+        }
         break
       }
       case 'escalate': {
