@@ -119,8 +119,13 @@ class Session {
     // add message to memory
     this.addMessage('customer', message)
     if (message.toLowerCase() === 'goodbye') {
-      // end session
-      this.deescalate()
+      // check whether we should do a survey or not
+      if (this.data.survey) {
+        this.startSurvey()
+      } else {
+        // survey not enabled - just go to deescalate
+        this.deescalate()
+      }
     }
     // is this chat escalated to an agent?
     if (this.isEscalated) {
