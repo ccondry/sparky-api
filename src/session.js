@@ -237,7 +237,7 @@ class Session {
             this.addCustomerMessage('wrong-information')
           })
           .catch(e => {
-            console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e)
+            onsole.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
             // continue conversation with bot
             this.addCustomerMessage('get-datacenter')
           })
