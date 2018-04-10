@@ -16,8 +16,12 @@ const contextService = require('./context-service')
 
 async function getBrandConfig (vertical) {
   console.log('getting brand config for', vertical)
-  const verticalConfig = await getVerticalConfig(vertical)
-  return verticalConfig.chat
+  try {
+    const verticalConfig = await getVerticalConfig(vertical)
+    return verticalConfig.chat
+  } catch (e) {
+    return {}
+  }
 }
 
 // get dCloud session information
