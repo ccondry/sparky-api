@@ -73,7 +73,7 @@ class Session {
   getSessionInfo () {
     return request({
       method: 'GET',
-      url: `https://mm.cxdemo.net/api/v1/datacenters/${this.dcloudDatacenter}/sessions/${this.dcloudSession}`,
+      url: `https://mm.cxdemo.net/api/v1/datacenters/${this.dcloudDatacenter.toUpperCase()}/sessions/${this.dcloudSession}`,
       json: true
     })
   }
