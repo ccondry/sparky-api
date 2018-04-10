@@ -193,12 +193,21 @@ class Session {
     // check the api.ai response message and perform the associated action
     switch (result.action) {
       case 'datacenter': {
-        console.log('ai response', result)
-        if (fulfillment.speech !== 'escalate' && fulfillment.speech.length) {
+        // console.log('ai response', result)
+        if (fulfillment.speech.length) {
           this.addMessage('bot', fulfillment.speech)
         }
-        // escalate request to agent
-        this.escalate()
+        // set datacenter
+        this.dcloudDatacenter = parameters.dc
+        break
+      }
+      case 'dcloud-session': {
+        console.log('ai response', result)
+        if (fulfillment.speech.length) {
+          this.addMessage('bot', fulfillment.speech)
+        }
+        // set dcloud session ID
+        this.dcloudSession = parameters.session
         break
       }
       case 'escalate': {
