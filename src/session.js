@@ -211,7 +211,7 @@ class Session {
             this.addCustomerMessage('instructions')
           })
           .catch(e => {
-            console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e)
+            console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
             // try to get info from customer again
             this.addCustomerMessage('wrong-information')
           })
