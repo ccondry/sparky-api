@@ -104,6 +104,13 @@ class Session {
     }
     // remove escalated flag
     this.isEscalated = false
+    // start survey if enabled
+    if (this.data.survey) {
+      this.startSurvey()
+    } else {
+      // survey not enabled - just end session
+      this.endSession()
+    }
   }
 
   endSession () {
