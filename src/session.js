@@ -104,8 +104,9 @@ class Session {
     }
     // remove escalated flag
     this.isEscalated = false
-    // delete the messages in memory so that new transcripts are only the latest
-    // this.messages = []
+  }
+
+  endSession () {
     // call custom removeSession handler
     if (this.removeSession && typeof this.removeSession === 'function') {
       console.log('calling removeSession handler')
@@ -119,12 +120,12 @@ class Session {
     // add message to memory
     this.addMessage('customer', message)
     if (message.toLowerCase() === 'goodbye') {
-      // check whether we should do a survey or not
-      if (this.data.survey) {
-        this.startSurvey()
-      } else {
-        // survey not enabled - just go to deescalate
+      if (this.isEscalated) {
+        // end ECE chat, but retain session so that we can complete survey
         this.deescalate()
+      } else {
+        // not in ECE chat, end the session (facebook, spark, twilio clients)
+        this.endSession()
       }
     }
     // is this chat escalated to an agent?
@@ -288,7 +289,8 @@ class Session {
         this.addMessage('bot', fulfillment.speech)
         if (this.type !== 'sparky-ui') {
           // end of survey should end the session for bots other than sparky-ui
-          this.deescalate()
+          // this.deescalate()
+          this.endSession()
         }
         break
       }
@@ -302,7 +304,8 @@ class Session {
           this.startSurvey()
         } else {
           // survey not enabled - just go to deescalate
-          this.deescalate()
+          // this.deescalate()
+          this.endSession()
         }
         break
       }
@@ -363,14 +366,9 @@ class Session {
   onEgainEnd () {
     // survey enabled for this bot?
     console.log('this.data.survey = ', this.data.survey)
-    if (this.data.survey) {
-      // set escalated flag to false
-      this.isEscalated = false
-      this.startSurvey()
-    } else {
-      // survey not enabled - just go to deescalate
-      this.deescalate()
-    }
+    // set escalated flag to false
+    this.isEscalated = false
+    this.deescalate()
   }
 
   startSurvey () {
