@@ -247,50 +247,54 @@ async function handleMessage (message) {
     })
     // add session to global Facebook sessions
     addFacebookSession(session)
+    // set first message as sparky-fb
+    session.addCustomerMessage('sparky-fb')
+    return
   } else {
     console.log('existing facebook chat session')
-  }
-  // was there text in the message?
-  if (messageText && !isRegistrationMessage) {
-    // add message to session data
-    session.addCustomerMessage(messageText)
-  }
-  // were there any attachments?
-  if (attachments) {
-    // process attachments to send to agent
-    attachments.forEach(attachment => {
-      // are we escalated to an eGain agent?
-      if (session.isEscalated) {
-        // send the file to the agent in eGain
-        session.egainSession._sendCustomerAttachmentNotification(attachment.payload.url, `${session.firstName} ${session.lastName}`)
-      } else {
-        // was it just a sticker?
-        if (attachment.payload.sticker_id) {
-          // ignore stickers
-          console.log(`${session.firstName} ${session.lastName} sent a Facebook sticker. Ignoring sticker.`)
-          // add message to transcript
-          session.addMessage('customer', '(sticker)')
-          // send message to facebook user
-          // sendMessage(userId, message, page)
+
+    // was there text in the message?
+    if (messageText && !isRegistrationMessage) {
+      // add message to session data
+      session.addCustomerMessage(messageText)
+    }
+    // were there any attachments?
+    if (attachments) {
+      // process attachments to send to agent
+      attachments.forEach(attachment => {
+        // are we escalated to an eGain agent?
+        if (session.isEscalated) {
+          // send the file to the agent in eGain
+          session.egainSession._sendCustomerAttachmentNotification(attachment.payload.url, `${session.firstName} ${session.lastName}`)
         } else {
-          console.log(`${session.firstName} ${session.lastName} sent a file attachment.`)
-          // note that user attached a file
-          session.addMessage('customer', '(file attachment)')
-          // just the bot here - let user know we can't do anything with them
-          const m = `I'm sorry, but I can't handle file attachments. If you would like to speak to an agent, say 'agent'.`
-          // add message to transcript
-          session.addMessage('bot', m)
-          // send message to facebook user
-          sendMessage(userId, m, page)
+          // was it just a sticker?
+          if (attachment.payload.sticker_id) {
+            // ignore stickers
+            console.log(`${session.firstName} ${session.lastName} sent a Facebook sticker. Ignoring sticker.`)
+            // add message to transcript
+            session.addMessage('customer', '(sticker)')
+            // send message to facebook user
+            // sendMessage(userId, message, page)
+          } else {
+            console.log(`${session.firstName} ${session.lastName} sent a file attachment.`)
+            // note that user attached a file
+            session.addMessage('customer', '(file attachment)')
+            // just the bot here - let user know we can't do anything with them
+            const m = `I'm sorry, but I can't handle file attachments. If you would like to speak to an agent, say 'agent'.`
+            // add message to transcript
+            session.addMessage('bot', m)
+            // send message to facebook user
+            sendMessage(userId, m, page)
+          }
         }
-      }
-    })
-  }
-  // was there a postback?
-  if (postback) {
-    // log postback details
-    console.log(`Facebook postback for ${firstName} ${lastName}`, postback)
-    // handlePostback(userId, postback, pageId)
+      })
+    }
+    // was there a postback?
+    if (postback) {
+      // log postback details
+      console.log(`Facebook postback for ${firstName} ${lastName}`, postback)
+      // handlePostback(userId, postback, pageId)
+    }
   }
 }
 
