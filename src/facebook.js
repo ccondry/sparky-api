@@ -172,7 +172,7 @@ async function handleMessage (message) {
   // find session, if exists
   session = getFacebookSession(pageId, userId)
   // did session expire?
-  if (new Date().getTime() > session.expiry) {
+  if (session && new Date().getTime() > session.expiry) {
     //remove session from sessions
     removeFacebookSession(session)
     // unset session var
