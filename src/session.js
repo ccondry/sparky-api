@@ -234,12 +234,12 @@ class Session {
             this.egainHost = `https://${response.dns}/ece/system`
             console.log('egainHost = ', this.egainHost)
             // continue conversation with bot
-            this.addCustomerMessage('wrong-information')
+            this.addCustomerMessage('instructions')
           })
           .catch(e => {
-            onsole.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
+            console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
             // continue conversation with bot
-            this.addCustomerMessage('get-datacenter')
+            this.addCustomerMessage('wrong-information')
           })
         }
         break
