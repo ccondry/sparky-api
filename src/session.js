@@ -173,32 +173,28 @@ class Session {
   }
 
   // check the dcloud session info using datacenter and session ID, and respond accordingly
-  checkSessionInfo () {
+  async checkSessionInfo () {
     if (!this.dcloudDatacenter || !this.dcloudSession) {
-      // not set yet, so ask for them
-      // TODO should this be a different prompt for the AI?
-      this.addCustomerMessage('wrong-information')
+      // not set yet
+      return false
     }
-    this.getSessionInfo()
-    .then(response => {
+    try {
+      const response = await this.getSessionInfo()
       // console.log('dcloud session response', response)
       // set egainHost to public DNS of demo vpod
       this.egainHost = `https://${response.dns}/ece/system`
       console.log('egainHost = ', this.egainHost)
-      // continue conversation with bot
-      this.addCustomerMessage('instructions')
-    })
-    .catch(e => {
+      return true
+    } catch (e) {
       console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
       // reset the session info to null
       this.dcloudDatacenter = null
       this.dcloudSession = null
-      // try to get info from customer again
-      this.addCustomerMessage('wrong-information')
-    })
+      return false
+    }
   }
 
-  processAiResponse (result) {
+  async processAiResponse (result) {
     const fulfillment = result.fulfillment
     // check the api.ai response message and perform the associated action
     console.log('ai response', result)
@@ -211,7 +207,14 @@ class Session {
         this.dcloudDatacenter = result.parameters.dc
         // get session info now
         if (this.dcloudSession && this.dcloudDatacenter) {
-          this.checkSessionInfo()
+          const valid = await this.checkSessionInfo()
+          if (valid) {
+            // continue conversation with bot
+            this.addCustomerMessage('instructions')
+          } else {
+            // try to get info from customer again
+            this.addCustomerMessage('wrong-information')
+          }
         }
         break
       }
@@ -224,7 +227,14 @@ class Session {
         this.dcloudSession = result.parameters.session
         // get session info now
         if (this.dcloudSession && this.dcloudDatacenter) {
-          this.checkSessionInfo()
+          const valid = await this.checkSessionInfo()
+          if (valid) {
+            // continue conversation with bot
+            this.addCustomerMessage('instructions')
+          } else {
+            // try to get info from customer again
+            this.addCustomerMessage('wrong-information')
+          }
         }
         break
       }
@@ -317,7 +327,13 @@ class Session {
     try {
       if (!this.egainHost) {
         // check if session is valid, and get the session info
-        this.checkSessionInfo()
+        const valid = await this.checkSessionInfo()
+        if (!valid) {
+          // try to get info from customer again
+          // TODO use a different message?
+          this.addCustomerMessage('wrong-information')
+        }
+        // continue escalation
       }
       const myLibrary = egainLibrary.get(this.egainHost)
       // create instance of ECE chat object
