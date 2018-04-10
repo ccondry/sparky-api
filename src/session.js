@@ -212,6 +212,9 @@ class Session {
           })
           .catch(e => {
             console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
+            // reset the session info to null
+            this.dcloudDatacenter = null
+            this.dcloudSession = null
             // try to get info from customer again
             this.addCustomerMessage('wrong-information')
           })
@@ -238,6 +241,9 @@ class Session {
           })
           .catch(e => {
             console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
+            // reset the session info to null
+            this.dcloudDatacenter = null
+            this.dcloudSession = null
             // continue conversation with bot
             this.addCustomerMessage('wrong-information')
           })
