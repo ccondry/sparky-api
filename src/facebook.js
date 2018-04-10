@@ -141,6 +141,11 @@ async function handleMessage (message) {
   // facebook page ID
   const pageId = message.recipient.id
   console.log(`message received from user ${userId} on Facebook page ${pageId}`)
+  if (!message.message) {
+    // no message text - log and return
+    console.log('non-message facebook webhook. ignoring.')
+    return
+  }
   // message text
   const messageText = message.message.text
   // was this a registration message?
