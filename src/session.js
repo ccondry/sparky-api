@@ -192,6 +192,15 @@ class Session {
     const fulfillment = result.fulfillment
     // check the api.ai response message and perform the associated action
     switch (result.action) {
+      case 'datacenter': {
+        console.log('ai response', result)
+        if (fulfillment.speech !== 'escalate' && fulfillment.speech.length) {
+          this.addMessage('bot', fulfillment.speech)
+        }
+        // escalate request to agent
+        this.escalate()
+        break
+      }
       case 'escalate': {
         if (fulfillment.speech !== 'escalate' && fulfillment.speech.length) {
           this.addMessage('bot', fulfillment.speech)
