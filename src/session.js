@@ -43,12 +43,24 @@ class Session {
     }
     if (this.dcloudSession && this.dcloudDatacenter) {
       // check if session is valid, and get the session info
-      this.egainHost = `https://${this.dcloudDatacenter.toLowerCase()}-${this.dcloudSession}.localtunnel.me/system`
-      // this.egainHost = `http://pcce.vpod773.dc-01.com/system`
+      // this.egainHost = `https://${this.dcloudDatacenter.toLowerCase()}-${this.dcloudSession}.localtunnel.me/system`
+      // this.egainHost = `http://pcce.vpod438.dc-01.com/ece/system`
       // this.egainHost = `https://cceece.dcloud.cisco.com/system`
+      this.egainHost = null
+      this.getSessionInfo()
+      .then(response => {
+        // console.log('dcloud session response', response)
+        // set egainHost to public DNS of demo vpod
+        this.egainHost = `https://${response.dns}/ece/system`
+        console.log('egainHost = ', this.egainHost)
+      })
+      .catch(e => {
+        console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e)
+      })
     } else {
       // egainHost null by default
       this.egainHost = null
+      // this.egainHost = `http://pcce.vpod438.dc-01.com/ece/system`
     }
     // console.log(`creating ${this.type} Sparky session ${this.id}: for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId} and survey is ${this.data.survey ? 'enabled' : 'disabled'}`)
     const logData = JSON.parse(JSON.stringify(this))
@@ -56,13 +68,13 @@ class Session {
   }
 
   // get dCloud session information
-  // getSessionInfo () {
-  //   return request({
-  //     method: 'GET',
-  //     url: `https://mm.cxdemo.net/api/v1/datacenters/${this.dcloudDatacenter}/sessions/${this.dcloudSession}`,
-  //     json: true
-  //   })
-  // }
+  getSessionInfo () {
+    return request({
+      method: 'GET',
+      url: `https://mm.cxdemo.net/api/v1/datacenters/${this.dcloudDatacenter}/sessions/${this.dcloudSession}`,
+      json: true
+    })
+  }
 
   // add new message to session
   addMessage (type, message) {
