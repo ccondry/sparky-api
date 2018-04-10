@@ -134,6 +134,7 @@ class Session {
         // not in ECE chat, end the session (facebook, spark, twilio clients)
         this.endSession()
       }
+      return
     }
     // is this chat escalated to an agent?
     if (this.isEscalated) {
