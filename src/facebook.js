@@ -149,37 +149,18 @@ async function handleMessage (message) {
     } catch (e) {
       console.log(`failed to get facebook user info. Facebook returned HTTP ${e.statusCode}`, e.error)
     }
-    let userData = {}
-    let brandConfig = {}
-    let botConfig = {}
-    try {
-      // get user's facebook brand config for this page, if exists
-      brandConfig = userData.apps[pageId] || {}
-      console.log('found brand config in user data:', brandConfig)
-      botConfig = brandConfig.bot || {}
-      console.log('found bot config in user data:', botConfig)
-    } catch (e) {
-      // continue
-      console.log('failed to get demo user data', e)
-    }
     console.log(`new facebook chat session for ${firstName} ${lastName}`)
     // enable bot by default
     let botEnabled = true
-    if (botConfig.enabled === false) {
-      botEnabled = false
-    }
     // enable survey by default
     let survey = true
-    if (brandConfig.survey === false) {
-      survey = false
-    }
     // create session and store in sessions global
     session = new Session('facebook', {
       page,
       botEnabled,
       survey,
-      apiAiToken: botConfig.aiToken || page.apiAiToken || page.aiToken,
-      entryPointId: brandConfig.entryPointId || page.entryPointId || page.entryPointId,
+      apiAiToken: page.apiAiToken || page.aiToken,
+      entryPointId: page.entryPointId || page.entryPointId,
       userId,
       phone: userData.phone || userId,
       email: userData.email || userId,
