@@ -67,40 +67,19 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
     const firstName = user.data.firstName
     const lastName = user.data.lastName
     console.log(`new Spark chat session is for ${firstName} ${lastName}`)
-    let userData = {}
-    let brandConfig = {}
-    let botConfig = {}
-    try {
-      // look up user info from cxdemo
-      userData = await getDemoUserData(personEmail)
-      console.log('found demo user data:', userData)
-      // get user's facebook brand config for this page, if exists
-      brandConfig = userData.apps[appId] || {}
-      console.log('found brand config in user data:', brandConfig)
-      botConfig = brandConfig.bot || {}
-      console.log('found bot config in user data:', botConfig)
-    } catch (e) {
-      // continue
-    }
     let botEnabled = true
-    if (botConfig.enabled === false) {
-      botEnabled = false
-    }
     // enable survey by default
     let survey = true
-    if (brandConfig.survey === false) {
-      survey = false
-    }
     // create session and store in sessions global
     session = new Session('spark', {
       appId,
       appToken: app.token,
       botEnabled,
       survey,
-      apiAiToken: botConfig.aiToken || app.apiAiToken || app.aiToken,
-      entryPointId: brandConfig.entryPointId || app.entryPointId,
+      apiAiToken: app.apiAiToken || app.aiToken,
+      entryPointId: app.entryPointId,
       personId,
-      phone: userData.phone || '',
+      phone: '',
       email: personEmail,
       firstName,
       lastName,
@@ -152,42 +131,6 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
       }
     })
   }
-}
-
-async function getDemoUserData(email) {
-  const data = {}
-  // if this is a facebook chat, try to match up the facebook ID with
-  // a user's email address and phone number
-  const response1 = await hydra({
-    service: 'cxdemo-config-service',
-    path: `users`,
-    query: {emails: email}
-  })
-  const user = response1.results[0]
-  // find an email address for the user
-  // try {
-  //   data.email = user.emails[0]
-  // } catch (e) {
-  //   // default to lab user's email
-  //   data.email = user.email
-  // }
-  // find a phone number for the user
-  try {
-    data.phone = user.phones[0]
-  } catch (e) {
-    if (user.telephoneNumber) {
-      data.phone = user.telephoneNumber
-    } else {
-      // do nothing
-    }
-  }
-  // get brand config for facebook pages for the user
-  try {
-    data.apps = user.spark.apps
-  } catch (e) {
-    // do nothing
-  }
-  return data
 }
 
 function findApp (id) {

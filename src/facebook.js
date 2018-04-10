@@ -162,8 +162,8 @@ async function handleMessage (message) {
       apiAiToken: page.apiAiToken || page.aiToken,
       entryPointId: page.entryPointId || page.entryPointId,
       userId,
-      phone: userData.phone || userId,
-      email: userData.email || userId,
+      phone: userId,
+      email: userId,
       firstName,
       lastName,
       onAddMessage: function (type, message) {
