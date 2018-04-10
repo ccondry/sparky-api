@@ -48,27 +48,8 @@ class Session {
     if (typeof this.data.survey === 'undefined') {
       this.data.survey = true
     }
-    if (this.dcloudSession && this.dcloudDatacenter) {
-      // check if session is valid, and get the session info
-      // this.egainHost = `https://${this.dcloudDatacenter.toLowerCase()}-${this.dcloudSession}.localtunnel.me/system`
-      // this.egainHost = `http://pcce.vpod438.dc-01.com/ece/system`
-      // this.egainHost = `https://cceece.dcloud.cisco.com/system`
-      this.egainHost = null
-      this.getSessionInfo()
-      .then(response => {
-        // console.log('dcloud session response', response)
-        // set egainHost to public DNS of demo vpod
-        this.egainHost = `https://${response.dns}/ece/system`
-        console.log('egainHost = ', this.egainHost)
-      })
-      .catch(e => {
-        console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e)
-      })
-    } else {
-      // egainHost null by default
-      this.egainHost = null
-      // this.egainHost = `http://pcce.vpod438.dc-01.com/ece/system`
-    }
+    // check if session is valid, and get the session info
+    this.checkSessionInfo()
     // console.log(`creating ${this.type} Sparky session ${this.id}: for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId} and survey is ${this.data.survey ? 'enabled' : 'disabled'}`)
     const logData = JSON.parse(JSON.stringify(this))
     console.log(`creating ${this.type} Sparky session:`, logData)
@@ -193,6 +174,32 @@ class Session {
     })
   }
 
+  // check the dcloud session info using datacenter and session ID, and respond accordingly
+  checkSessionInfo () {
+    if (!this.dcloudDatacenter || !this.dcloudSession) {
+      // not set yet, so ask for them
+      // TODO should this be a different prompt for the AI?
+      this.addCustomerMessage('wrong-information')
+    }
+    this.getSessionInfo()
+    .then(response => {
+      // console.log('dcloud session response', response)
+      // set egainHost to public DNS of demo vpod
+      this.egainHost = `https://${response.dns}/ece/system`
+      console.log('egainHost = ', this.egainHost)
+      // continue conversation with bot
+      this.addCustomerMessage('instructions')
+    })
+    .catch(e => {
+      console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
+      // reset the session info to null
+      this.dcloudDatacenter = null
+      this.dcloudSession = null
+      // try to get info from customer again
+      this.addCustomerMessage('wrong-information')
+    })
+  }
+
   processAiResponse (result) {
     const fulfillment = result.fulfillment
     // check the api.ai response message and perform the associated action
@@ -206,23 +213,7 @@ class Session {
         this.dcloudDatacenter = result.parameters.dc
         // get session info now
         if (this.dcloudSession && this.dcloudDatacenter) {
-          this.getSessionInfo()
-          .then(response => {
-            // console.log('dcloud session response', response)
-            // set egainHost to public DNS of demo vpod
-            this.egainHost = `https://${response.dns}/ece/system`
-            console.log('egainHost = ', this.egainHost)
-            // continue conversation with bot
-            this.addCustomerMessage('instructions')
-          })
-          .catch(e => {
-            console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
-            // reset the session info to null
-            this.dcloudDatacenter = null
-            this.dcloudSession = null
-            // try to get info from customer again
-            this.addCustomerMessage('wrong-information')
-          })
+          this.checkSessionInfo()
         }
         break
       }
@@ -235,23 +226,7 @@ class Session {
         this.dcloudSession = result.parameters.session
         // get session info now
         if (this.dcloudSession && this.dcloudDatacenter) {
-          this.getSessionInfo()
-          .then(response => {
-            // console.log('dcloud session response', response)
-            // set egainHost to public DNS of demo vpod
-            this.egainHost = `https://${response.dns}/ece/system`
-            console.log('egainHost = ', this.egainHost)
-            // continue conversation with bot
-            this.addCustomerMessage('instructions')
-          })
-          .catch(e => {
-            console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
-            // reset the session info to null
-            this.dcloudDatacenter = null
-            this.dcloudSession = null
-            // continue conversation with bot
-            this.addCustomerMessage('wrong-information')
-          })
+          this.checkSessionInfo()
         }
         break
       }
