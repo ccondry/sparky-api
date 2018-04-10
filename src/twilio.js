@@ -110,6 +110,14 @@ async function handleMessage (message) {
   let session
   // find session, if exists
   session = getSession(to, from)
+  // did session expire?
+  if (new Date().getTime() > session.expiry) {
+    //remove session from sessions
+    removeSession(session)
+    // unset session var
+    session = undefined
+  }
+
   // if session doesn't exist, create one
   if (!session) {
     console.log('new Twilio SMS chat session')

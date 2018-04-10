@@ -8,6 +8,11 @@ class Session {
   constructor (type, data) {
     this.id = uuidv1()
     this.state = 'active'
+    // set timestamp
+    this.timestamp = new Date().getTime()
+    // sessions expire after 2 hours
+    this.expiry = this.timestamp + 1000 * 60 * 60 * 2
+
     this.inSurvey = false
     this.isEscalated = false
     this.messages = []

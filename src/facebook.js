@@ -171,6 +171,13 @@ async function handleMessage (message) {
   let session
   // find session, if exists
   session = getFacebookSession(pageId, userId)
+  // did session expire?
+  if (new Date().getTime() > session.expiry) {
+    //remove session from sessions
+    removeFacebookSession(session)
+    // unset session var
+    session = undefined
+  }
   // if session doesn't exist, create one
   if (!session) {
     console.log('new facebook chat session')
