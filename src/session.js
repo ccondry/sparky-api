@@ -104,9 +104,11 @@ class Session {
     }
     // remove escalated flag
     this.isEscalated = false
-    // start survey if enabled
+    // start survey if enabled and not started already
     if (this.data.survey) {
-      this.startSurvey()
+      if (!this.inSurvey) {
+        this.startSurvey()
+      }
     } else {
       // survey not enabled - just end session
       this.endSession()
@@ -372,10 +374,6 @@ class Session {
   }
 
   onEgainEnd () {
-    // survey enabled for this bot?
-    console.log('this.data.survey = ', this.data.survey)
-    // set escalated flag to false
-    this.isEscalated = false
     this.deescalate()
   }
 
