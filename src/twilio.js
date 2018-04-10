@@ -202,8 +202,8 @@ async function handleMessage (message) {
           console.error(e)
         }
       },
-      onDeescalate: function () {
-        console.log('onDeescalate')
+      removeSession: function () {
+        console.log('removeSession')
         // remove this session from global sessions
         removeSession(this)
       }

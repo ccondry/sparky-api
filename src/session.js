@@ -22,7 +22,7 @@ class Session {
     this.lastName = data.lastName
     this.language = data.language || process.env.DEFAULT_LANGUAGE || 'en'
     // run this callback at de-escalation time
-    this.onDeescalate = data.onDeescalate
+    this.removeSession = data.removeSession
     // run this callback when messages are added
     this.onAddMessage = data.onAddMessage
     // resolve this promise to get user data
@@ -106,12 +106,12 @@ class Session {
     this.isEscalated = false
     // delete the messages in memory so that new transcripts are only the latest
     // this.messages = []
-    // call custom deescalate handler
-    if (this.onDeescalate && typeof this.onDeescalate === 'function') {
-      console.log('calling deescalate handler')
-      this.onDeescalate.call(this)
+    // call custom removeSession handler
+    if (this.removeSession && typeof this.removeSession === 'function') {
+      console.log('calling removeSession handler')
+      this.removeSession.call(this)
     } else {
-      console.log('onDeescalate not a function. onDeescalate =', this.onDeescalate)
+      console.log('removeSession not a function. removeSession =', this.removeSession)
     }
   }
 

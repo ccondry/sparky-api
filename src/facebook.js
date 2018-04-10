@@ -170,7 +170,7 @@ async function handleMessage (message) {
         // send messages to facebook user, and decode HTML characters
         sendMessage(userId, entities.decode(message), page)
       },
-      onDeescalate: function () {
+      removeSession: function () {
         console.log('onDeescalate')
         removeFacebookSession(this)
       }

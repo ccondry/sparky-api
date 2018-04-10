@@ -93,8 +93,8 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
           console.error('Error sending Spark message: ', error)
         })
       },
-      onDeescalate: function () {
-        console.log('onDeescalate')
+      removeSession: function () {
+        console.log('removeSession')
         removeSession(this)
       }
     })
