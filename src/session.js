@@ -48,8 +48,6 @@ class Session {
     if (typeof this.data.survey === 'undefined') {
       this.data.survey = true
     }
-    // check if session is valid, and get the session info
-    this.checkSessionInfo()
     // console.log(`creating ${this.type} Sparky session ${this.id}: for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId} and survey is ${this.data.survey ? 'enabled' : 'disabled'}`)
     const logData = JSON.parse(JSON.stringify(this))
     console.log(`creating ${this.type} Sparky session:`, logData)
@@ -318,10 +316,8 @@ class Session {
 
     try {
       if (!this.egainHost) {
-        // wait for whatever operations necessary to get egain host
-        // TODO implement chat questions to get datacenter info if not available
-        // await this.getEgainHost()
-        throw 'No eGain host was set.'
+        // check if session is valid, and get the session info
+        this.checkSessionInfo()
       }
       const myLibrary = egainLibrary.get(this.egainHost)
       // create instance of ECE chat object
