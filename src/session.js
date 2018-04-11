@@ -142,6 +142,7 @@ class Session {
     switch (message.toLowerCase()) {
       case 'goodbye':
       case 'bye':
+      case 'ciao':
       this.goodbye()
     }
     // is this chat escalated to an agent?
