@@ -326,6 +326,18 @@ class Session {
   }
 
   async escalate (message) {
+    if (!this.egainHost) {
+      // check if session is valid, and get the session info
+      const valid = await this.checkSessionInfo()
+      if (!valid) {
+        // try to get info from customer again
+        // TODO use a different message?
+        this.addCustomerMessage('wrong-information')
+        return
+      } else {
+        // continue escalation
+      }
+    }
     // send the chat transcript to Context Service
     transcript.send(this).catch(e => {})
     // console.log('escalate session:', this)
@@ -341,16 +353,6 @@ class Session {
     })
 
     try {
-      if (!this.egainHost) {
-        // check if session is valid, and get the session info
-        const valid = await this.checkSessionInfo()
-        if (!valid) {
-          // try to get info from customer again
-          // TODO use a different message?
-          this.addCustomerMessage('wrong-information')
-        }
-        // continue escalation
-      }
       const myLibrary = egainLibrary.get(this.egainHost)
       // create instance of ECE chat object
       const myChat = new myLibrary.Chat()
