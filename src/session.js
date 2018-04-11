@@ -125,18 +125,24 @@ class Session {
     }
   }
 
+  goodbye () {
+    if (this.isEscalated) {
+      // end ECE chat, but retain session so that we can complete survey
+      this.deescalate()
+    } else {
+      // not in ECE chat, end the session (facebook, spark, twilio clients)
+      this.endSession()
+    }
+    return
+  }
+
   addCustomerMessage (message) {
     // add message to memory
     this.addMessage('customer', message)
-    if (message.toLowerCase() === 'goodbye') {
-      if (this.isEscalated) {
-        // end ECE chat, but retain session so that we can complete survey
-        this.deescalate()
-      } else {
-        // not in ECE chat, end the session (facebook, spark, twilio clients)
-        this.endSession()
-      }
-      return
+    switch (message.toLowerCase()) {
+      case 'goodbye':
+      case 'bye':
+      this.goodbye()
     }
     // is this chat escalated to an agent?
     if (this.isEscalated) {
