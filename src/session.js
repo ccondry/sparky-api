@@ -281,21 +281,13 @@ class Session {
         break
       }
       case 'mortgage-calculator': {
+        console.log('sending mortgage-calculator command')
         if (this.type === 'sparky-ui') {
-          if (fulfillment.speech === 'calculator') {
-            this.addMessage('bot', 'Ok... Your calculator should have appeared on the left!')
-          } else {
-            this.addMessage('bot', fulfillment.speech)
-          }
-          console.log('sending mortgage-calculator command')
+          this.addMessage('bot', 'Ok... Your calculator should have appeared on the left!')
           // open mortgage calculator
           this.addCommand('mortgage-calculator')
         } else {
-          if (fulfillment.speech === 'calculator') {
-            this.addMessage('bot', 'Here is our mortgage calculator: ' + process.env.CALCULATOR_URL)
-          } else {
-            this.addMessage('bot', fulfillment.speech)
-          }
+          this.addMessage('bot', 'Here is our mortgage calculator: ' + process.env.CALCULATOR_URL)
         }
         break
       }
