@@ -9,6 +9,7 @@ router.post('/', (req, res) => {
   const to = req.body.To
   const from = req.body.From
   twilio.handleMessage(req.body).catch(e => console.error(e))
+  res.status(201).send()
 })
 
 module.exports = router
