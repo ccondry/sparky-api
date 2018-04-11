@@ -214,6 +214,10 @@ async function handleMessage (message) {
     })
     // add session to global sessions
     addSession(session)
+    // set first message as sparky
+    session.addCustomerMessage('sparky')
+    // don't do anything else
+    return
   } else {
     console.log(`existing SMS chat session with ${from}`)
   }
