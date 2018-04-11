@@ -231,8 +231,14 @@ class Session {
         if (this.dcloudSession && this.dcloudDatacenter) {
           const valid = await this.checkSessionInfo()
           if (valid) {
-            // continue conversation with bot
-            this.addCustomerMessage('instructions')
+            // check if we are isEscalating now or just showing instructions
+            if (this.isEscalating) {
+              // escalate
+              this.escalate()
+            } else {
+              // send instructions
+              this.addCustomerMessage('instructions')
+            }
           } else {
             // try to get info from customer again
             this.addCustomerMessage('wrong-information')
@@ -251,8 +257,14 @@ class Session {
         if (this.dcloudSession && this.dcloudDatacenter) {
           const valid = await this.checkSessionInfo()
           if (valid) {
-            // continue conversation with bot
-            this.addCustomerMessage('instructions')
+            // check if we are isEscalating now or just showing instructions
+            if (this.isEscalating) {
+              // escalate
+              this.escalate()
+            } else {
+              // send instructions
+              this.addCustomerMessage('instructions')
+            }
           } else {
             // try to get info from customer again
             this.addCustomerMessage('wrong-information')
@@ -333,6 +345,7 @@ class Session {
         // try to get info from customer again
         // TODO use a different message?
         this.addCustomerMessage('wrong-information')
+        this.isEscalating = true
         return
       } else {
         // continue escalation
