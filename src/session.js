@@ -133,7 +133,6 @@ class Session {
       // not in ECE chat, end the session (facebook, spark, twilio clients)
       this.endSession()
     }
-    return
   }
 
   addCustomerMessage (message) {
