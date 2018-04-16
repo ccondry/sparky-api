@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 // Requirements for Strophe Initialization
+// NOTE we are using a custom node-strophe library
 var strophe = require("node-strophe").Strophe;
 var Strophe = strophe.Strophe;
 var jquery = require('jquery');
