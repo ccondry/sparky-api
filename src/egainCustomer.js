@@ -4,12 +4,15 @@ function create ({egainHost, firstName, lastName, phone, email, visitId, subject
   const myLibrary = egainLibrary.get(egainHost)
   const customerObject = new myLibrary.Datatype.CustomerObject();
 
+  // if pkey set to email, use email as the primary key for the contact
   if (pkey === 'email') {
     customerObject.SetPrimaryKey(customerObject.PrimaryKeyParams.PRIMARY_KEY_EMAIL, email)
   } else {
+    // default to primary key = phone number
     customerObject.SetPrimaryKey(customerObject.PrimaryKeyParams.PRIMARY_KEY_PHONE, phone)
   }
 
+  // first name
   const customerFirstName = new myLibrary.Datatype.CustomerParameter();
   customerFirstName.eGainParentObject = "casemgmt";
   customerFirstName.eGainChildObject = "individual_customer_data";
@@ -24,6 +27,7 @@ function create ({egainHost, firstName, lastName, phone, email, visitId, subject
   customerFirstName.eGainValidationString = "";
   customerObject.AddCustomerParameter(customerFirstName);
 
+  // last name
   const customerLastName = new myLibrary.Datatype.CustomerParameter();
   customerLastName.eGainParentObject = "casemgmt";
   customerLastName.eGainChildObject = "individual_customer_data";
@@ -38,6 +42,7 @@ function create ({egainHost, firstName, lastName, phone, email, visitId, subject
   customerLastName.eGainValidationString = "";
   customerObject.AddCustomerParameter(customerLastName);
 
+  // email address
   const customerEmail = new myLibrary.Datatype.CustomerParameter();
   customerEmail.eGainParentObject = "casemgmt";
   customerEmail.eGainChildObject = "email_address_contact_point_data";
@@ -52,6 +57,7 @@ function create ({egainHost, firstName, lastName, phone, email, visitId, subject
   customerEmail.eGainValidationString = "";
   customerObject.AddCustomerParameter(customerEmail);
 
+  // phone number
   const customerPhone = new myLibrary.Datatype.CustomerParameter();
   customerPhone.eGainParentObject = "casemgmt";
   customerPhone.eGainChildObject = "phone_number_data";
