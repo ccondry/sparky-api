@@ -126,13 +126,16 @@ class Session {
   }
 
   goodbye () {
-    if (this.isEscalated) {
-      // end ECE chat, but retain session so that we can complete survey
-      this.deescalate()
-    } else {
-      // not in ECE chat, end the session (facebook, spark, twilio clients)
-      this.endSession()
-    }
+    // if (this.isEscalated) {
+    //   // end ECE chat, but retain session so that we can complete survey
+    //   this.deescalate()
+    // } else {
+    //   // not in ECE chat, end the session (facebook, spark, twilio clients)
+    //   this.endSession()
+    // }
+
+    // just end the session
+    this.endSession()
   }
 
   addCustomerMessage (message) {
