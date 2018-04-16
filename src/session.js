@@ -128,7 +128,7 @@ class Session {
   goodbye (message) {
     // if (this.isEscalated) {
     //   // end ECE chat, but retain session so that we can complete survey
-    this.survey = false
+    this.data.survey = false
     this.deescalate()
     // } else {
     //   // not in ECE chat, end the session (facebook, spark, twilio clients)
