@@ -331,7 +331,9 @@ class Session {
       }
       default: {
         // add bot's reply to session's messages list
-        this.addMessage('bot', fulfillment.speech)
+        for (let message of fulfillment.messages) {
+          this.addMessage('bot', message.speech)
+        }
         break
       }
     }
