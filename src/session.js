@@ -125,17 +125,19 @@ class Session {
     }
   }
 
-  goodbye () {
+  goodbye (message) {
     // if (this.isEscalated) {
     //   // end ECE chat, but retain session so that we can complete survey
-    //   this.deescalate()
+    this.survey = false
+    this.deescalate()
     // } else {
     //   // not in ECE chat, end the session (facebook, spark, twilio clients)
     //   this.endSession()
     // }
 
+    // this.processCustomerMessage(message)
     // just end the session
-    this.endSession()
+    // this.endSession()
   }
 
   addCustomerMessage (message) {
@@ -145,7 +147,7 @@ class Session {
       case 'goodbye':
       case 'bye':
       case 'ciao':
-      this.goodbye()
+      this.goodbye(message)
     }
     // is this chat escalated to an agent?
     if (this.isEscalated) {
