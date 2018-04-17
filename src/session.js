@@ -397,6 +397,13 @@ class Session {
         this.addMessage('system', 'Sorry, there are no agents available to assist you at this time. Please try again later.')
         // turn off survey
         this.data.survey = false
+        // end egain session
+        if (this.egainSession) {
+          this.egainSession.End()
+        }
+        // remove escalated flag
+        this.isEscalated = false
+        // return to current session with the bot
         break
       }
       default: {
