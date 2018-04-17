@@ -390,6 +390,24 @@ class Session {
     this.deescalate()
   }
 
+  onEgainFail (args) {
+    switch (args.StatusMessage) {
+      case 'L10N_NO_AGENTS_AVAILABLE': {
+        // tell customer that there are no agents available
+        this.addMessage('system', 'Sorry, there are no agents available to assist you at this time. Please try again later.')
+        // turn off survey
+        this.data.survey = false
+        break
+      }
+      default: {
+        // just deescalate
+        this.deescalate()
+        break
+      }
+    }
+
+  }
+
   startSurvey () {
     // egain session ended - now provide chat survey
     this.inSurvey = true

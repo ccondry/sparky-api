@@ -48,9 +48,7 @@ function create (myChat, session) {
   /* Example browser alert when there is a connection failure */
   myEventHandlers.OnConnectionFailure = function (args) {
     console.log('OnConnectionFailure', args)
-    // console.log('Oops! Something went wrong');
-    // session.addMessage('system', 'Sorry, we are unable to get an expert to help you at this time. Please try again later.')
-    session.onEgainEnd()
+    session.onEgainFail(args)
   };
   /* Example output of agent messages to a DIV named TransScript with jQuery */
   myEventHandlers.OnAgentMessageReceived = function (args) {
