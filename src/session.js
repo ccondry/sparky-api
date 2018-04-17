@@ -126,18 +126,11 @@ class Session {
   }
 
   goodbye (message) {
-    // if (this.isEscalated) {
-    //   // end ECE chat, but retain session so that we can complete survey
+    // make sure we don't offer a survey if the user has ended the session with
+    // a goodbye message
     this.data.survey = false
+    // deescalate to end the eGain session (if any) and the local session
     this.deescalate()
-    // } else {
-    //   // not in ECE chat, end the session (facebook, spark, twilio clients)
-    //   this.endSession()
-    // }
-
-    // this.processCustomerMessage(message)
-    // just end the session
-    // this.endSession()
   }
 
   addCustomerMessage (message) {
