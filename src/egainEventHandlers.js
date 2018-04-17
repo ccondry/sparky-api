@@ -38,7 +38,7 @@ function create (myChat, session) {
   myEventHandlers.OnConnectSuccess = function (args) {
     console.log('OnConnectSuccess', args)
     if (session.botEnabled) {
-      var welcomeMessage = "Ok, I'll get you connected to one of our Experts. One moment...";
+      var welcomeMessage = "Ok, I'll get you connected to one of our experts. One moment...";
       console.log(welcomeMessage);
       session.addMessage('system', welcomeMessage)
     } else {
