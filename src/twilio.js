@@ -120,7 +120,7 @@ async function handleMessage (message) {
       phone = from.slice(1)
     }
 
-    let customerData
+    let customerData = {}
     try {
       // get customer data from Context Service
       customerData = await contextService.getCustomerData(phone)
