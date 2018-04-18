@@ -11,7 +11,7 @@ async function send (session) {
       token: process.env.CS_TOKEN_GET_CUSTOMER
     }
 
-    let customers = await axios.get(`https://cxdemo.net/labconfig/api/demo/cs/customer`, {params})
+    let customers = await axios.get(`${session.csHost}/customer`, {params})
     console.log(`sendTranscript: found ${customers.data.length} matching customer(s) in Context Service`)
     if (!customers.data.length) {
       throw `no customers found matching ${session.email}`
@@ -31,7 +31,7 @@ async function send (session) {
       "mediaType": "chat",
       "dataElements":{
         "Context_Notes": "Bot Chat Transcript",
-        "Context_POD_Activity_Link": "https://sparky.cxdemo.net/",
+        "Context_POD_Activity_Link": "https://mm-chat.cxdemo.net/",
         "Context_POD_Source_Cust_Name": `${session.firstName} ${session.lastName}`,
         "Context_POD_Source_Phone": session.phone,
         "Context_POD_Source_Email": session.email,
@@ -44,7 +44,7 @@ async function send (session) {
     }
 
     // create transcript POD
-    await axios.post('https://cxdemo.net/labconfig/api/demo/cs/pod/', body)
+    await axios.post(`${session.csHost}/pod/`, body)
     console.log(`sendTranscript: successfully created POD in Context Service for ${session.email}`)
   } catch (e) {
     console.error(`sendTranscript: exception while creating transcript POD in Context Service for ${session.email}`, e)

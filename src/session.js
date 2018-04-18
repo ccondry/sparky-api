@@ -204,6 +204,9 @@ class Session {
       // set egainHost to public DNS of demo vpod
       this.egainHost = `https://${response.dns}/ece/system`
       console.log('egainHost = ', this.egainHost)
+      // set csHost to public DNS of demo vpod
+      this.csHost = `https://${response.dns}/cs`
+      console.log('csHost = ', this.csHost)
       return true
     } catch (e) {
       console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
