@@ -51,6 +51,8 @@ class Session {
     // console.log(`creating ${this.type} Sparky session ${this.id}: for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId} and survey is ${this.data.survey ? 'enabled' : 'disabled'}`)
     const logData = JSON.parse(JSON.stringify(this))
     console.log(`creating ${this.type} Sparky session:`, logData)
+    // create survey answers array
+    this.surveyAnswers = []
   }
 
   // get dCloud session information
@@ -201,12 +203,14 @@ class Session {
     try {
       const response = await this.getSessionInfo()
       // console.log('dcloud session response', response)
-      // set egainHost to public DNS of demo vpod
+      // set egainHost to public DNS of demo vpod for escalating to ECE agent
       this.egainHost = `https://${response.dns}/ece/system`
       console.log('egainHost = ', this.egainHost)
-      // set csHost to public DNS of demo vpod
+      // set csHost to public DNS of demo vpod for transcript
       this.csHost = `https://${response.dns}/cs`
       console.log('csHost = ', this.csHost)
+      // set surveyHost to public DNS of demo vpod for saving survey answers
+      this.surveyHost = `https://${response.dns}/survey`
       return true
     } catch (e) {
       console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
@@ -304,7 +308,20 @@ class Session {
         }
         break
       }
+      case 'survey-response': {
+        // save the last survey answer
+        this.surveyAnswers.push(result.parameters.survey)
+        break
+      }
       case 'survey-end': {
+        // save the last survey answer
+        this.surveyAnswers.push(result.parameters.survey)
+        // send the survey results to the node service running in the demo
+        try {
+          this.saveSurveyAnswers()
+        } catch (e) {
+          console.log('Failed to save survey answers', e.message)
+        }
         this.inSurvey = false
         // say last bot message and then end session
         this.addMessage('bot', fulfillment.speech)
@@ -338,6 +355,25 @@ class Session {
         break
       }
     }
+  }
+
+  // save survey answers to database on the demo instance
+  async saveSurveyAnswers () {
+    const url = `${this.surveyHost}`
+    // {answers: this.surveyAnswers}
+    const body = {
+      surveyId: 'SPARKY001',
+      ani: this.phone,
+      name: `${this.firstName} ${this.lastName}`,
+      q1: this.surveyAnswers[0] || '0',
+      q2: this.surveyAnswers[1] || '0'
+    }
+    const options = {
+      // headers: {
+      //   'Authorization': `Bearer ${token}`
+      // }
+    }
+    await axios.post(url, body, options)
   }
 
   async escalate (message) {

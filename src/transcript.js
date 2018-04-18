@@ -47,7 +47,7 @@ async function send (session) {
     await axios.post(`${session.csHost}/pod/`, body)
     console.log(`sendTranscript: successfully created POD in Context Service for ${session.email}`)
   } catch (e) {
-    console.error(`sendTranscript: exception while creating transcript POD in Context Service for ${session.email}`, e)
+    console.error(`sendTranscript: exception while creating transcript POD in Context Service for ${session.email}`, e.message)
     throw e
   }
 }
