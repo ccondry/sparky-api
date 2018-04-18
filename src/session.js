@@ -3,6 +3,7 @@ const egainLibrary = require('./egainLibrary.js')
 const request = require('request-promise-native')
 const egainEventHandlers = require('./egainEventHandlers')
 const transcript = require('./transcript')
+const axios = require('axios')
 
 class Session {
   constructor (type, data) {
