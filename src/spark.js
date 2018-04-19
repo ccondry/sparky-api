@@ -51,6 +51,7 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
   let session
   // find session, if exists
   session = getSession(appId, personEmail)
+  
   // did session expire?
   if (session) {
     session.checkExpiration()
