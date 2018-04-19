@@ -334,6 +334,10 @@ class Session {
       case 'survey-response': {
         // save the last survey answer
         this.surveyAnswers.push(result.parameters.surveyscore)
+        // add bot's reply to session's messages list
+        for (let message of fulfillment.messages) {
+          this.addMessage('bot', message.speech)
+        }
         break
       }
       case 'survey-end': {
