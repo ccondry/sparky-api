@@ -11,8 +11,8 @@ class Session {
     this.state = 'active'
     // set timestamp
     this.timestamp = new Date().getTime()
-    // sessions expire after 2 hours
-    this.expiry = this.timestamp + 1000 * 60 * 60 * 2
+    // sessions expire after 1 hours
+    this.expiry = this.timestamp + 1000 * process.env.SESSION_TIMEOUT
 
     this.inSurvey = false
     this.isEscalated = false
