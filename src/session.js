@@ -395,7 +395,7 @@ class Session {
     const url = `${this.surveyHost}`
     // {answers: this.surveyAnswers}
     const body = {
-      surveyId: 'SPARKY001',
+      surveyId: process.env.SURVEY_ID,
       ani: this.phone,
       name: `${this.firstName} ${this.lastName}`,
       q1: this.surveyAnswers[0] || '0',
