@@ -4,6 +4,7 @@ const request = require('request-promise-native')
 const egainEventHandlers = require('./egainEventHandlers')
 const transcript = require('./transcript')
 const axios = require('axios')
+const util = require('util')
 
 class Session {
   constructor (type, data) {
@@ -236,7 +237,7 @@ class Session {
   async processAiResponse (result) {
     const fulfillment = result.fulfillment
     // check the api.ai response message and perform the associated action
-    console.log('ai response', result)
+    console.log('ai response', util.inspect(result, false, null))
     switch (result.action) {
       case 'datacenter': {
         if (fulfillment.speech.length) {
