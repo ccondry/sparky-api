@@ -241,7 +241,10 @@ class Session {
     switch (result.action) {
       case 'datacenter': {
         if (fulfillment.speech.length) {
-          this.addMessage('bot', fulfillment.speech)
+          // add bot's reply to session's messages list
+          for (let message of fulfillment.messages) {
+            this.addMessage('bot', message.speech)
+          }
         }
         // set datacenter
         this.dcloudDatacenter = result.parameters.dc
@@ -267,7 +270,10 @@ class Session {
       case 'dcloud-session': {
         // console.log('ai response', result)
         if (fulfillment.speech.length) {
-          this.addMessage('bot', fulfillment.speech)
+          // add bot's reply to session's messages list
+          for (let message of fulfillment.messages) {
+            this.addMessage('bot', message.speech)
+          }
         }
         // set dcloud session ID
         this.dcloudSession = result.parameters.session
@@ -292,7 +298,10 @@ class Session {
       }
       case 'escalate': {
         if (fulfillment.speech !== 'escalate' && fulfillment.speech.length) {
-          this.addMessage('bot', fulfillment.speech)
+          // add bot's reply to session's messages list
+          for (let message of fulfillment.messages) {
+            this.addMessage('bot', message.speech)
+          }
         }
         // escalate request to agent
         this.escalate()
@@ -300,10 +309,11 @@ class Session {
       }
       case 'start-video': {
         if (this.type === 'sparky-ui') {
-          // make REM video call
-          if (fulfillment.speech !== 'video') {
-            this.addMessage('bot', fulfillment.speech)
+          // add bot's reply to session's messages list
+          for (let message of fulfillment.messages) {
+            this.addMessage('bot', message.speech)
           }
+          // start REM call
           this.addCommand('start-rem-video')
         } else {
           this.addMessage('bot', `I'm sorry, I'm not able to connect a video call to you from here.`)
@@ -336,8 +346,10 @@ class Session {
           console.log('Failed to save survey answers', e.message)
         }
         this.inSurvey = false
-        // say last bot message and then end session
-        this.addMessage('bot', fulfillment.speech)
+        // add bot's reply to session's messages list
+        for (let message of fulfillment.messages) {
+          this.addMessage('bot', message.speech)
+        }
         if (this.type !== 'sparky-ui') {
           // end of survey should end the session for bots other than sparky-ui
           // this.deescalate()
