@@ -311,12 +311,12 @@ class Session {
       }
       case 'survey-response': {
         // save the last survey answer
-        this.surveyAnswers.push(result.parameters.survey)
+        this.surveyAnswers.push(result.parameters.surveyscore)
         break
       }
       case 'survey-end': {
         // save the last survey answer
-        this.surveyAnswers.push(result.parameters.survey)
+        this.surveyAnswers.push(result.parameters.surveyscore)
         // send the survey results to the node service running in the demo
         try {
           this.saveSurveyAnswers()
