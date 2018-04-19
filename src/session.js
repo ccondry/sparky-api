@@ -341,14 +341,10 @@ class Session {
         break
       }
       case 'survey-end': {
+        console.log('ending survey and sending survey answers to demo now.')
         // save the last survey answer
         this.surveyAnswers.push(result.parameters.surveyscore)
-        // send the survey results to the node service running in the demo
-        try {
-          this.saveSurveyAnswers()
-        } catch (e) {
-          console.log('Failed to save survey answers', e.message)
-        }
+        // out of survey now
         this.inSurvey = false
         // add bot's reply to session's messages list
         for (let message of fulfillment.messages) {
@@ -359,6 +355,14 @@ class Session {
           // this.deescalate()
           this.endSession()
         }
+        // send the survey results to the node service running in the demo
+        try {
+          await this.saveSurveyAnswers()
+          console.log('saved survey answers')
+        } catch (e) {
+          console.log('Failed to save survey answers', e.message)
+        }
+
         break
       }
       // case 'start-survey': {
