@@ -52,12 +52,14 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
   // find session, if exists
   session = getSession(appId, personEmail)
   // did session expire?
-  if (session && new Date().getTime() > session.expiry) {
-    //remove session from sessions
-    removeSession(session)
-    // unset session var
-    session = undefined
+  if (session) {
+    session.checkExpiration()
+    if (session.hasExpired) {
+      // session has expired. unset session var
+      session = undefined
+    }
   }
+
   // if session doesn't exist, create one
   if (!session) {
     console.log('new Spark chat session')

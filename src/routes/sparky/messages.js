@@ -31,6 +31,14 @@ router.get('/', (req, res) => {
   if (sessionId && sessions[sessionId]) {
     // valid session
     const session = sessions[sessionId]
+    // did session expire?
+    session.checkExpiration()
+    if (session.hasExpired) {
+      // session has expired. return 400
+      return res.status(400).send({
+        error: 'Session has expired.'
+      })
+    }
     // return OK with session data
     return res.status(200).send(session.messages)
   } else {

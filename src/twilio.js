@@ -99,11 +99,12 @@ async function handleMessage (message) {
   // find session, if exists
   session = getSession(to, from)
   // did session expire?
-  if (session && new Date().getTime() > session.expiry) {
-    //remove session from sessions
-    removeSession(session)
-    // unset session var
-    session = undefined
+  if (session) {
+    session.checkExpiration()
+    if (session.hasExpired) {
+      // session has expired. unset session var
+      session = undefined
+    }
   }
 
   // if session doesn't exist, create one

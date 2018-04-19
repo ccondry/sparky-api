@@ -77,8 +77,8 @@ function getFacebookSession (pageId, senderId) {
   }
 }
 
-function removeFacebookSession (session) {
-  console.log(`removeFacebookSession facebookSessions[${session.data.page.id}][${session.data.userId}]`)
+function removeSession (session) {
+  console.log(`removeSession facebookSessions[${session.data.page.id}][${session.data.userId}]`)
   try {
     delete facebookSessions[session.data.page.id][session.data.userId]
     console.log(`facebookSessions`, facebookSessions)
@@ -120,11 +120,12 @@ async function handleMessage (message) {
   // find session, if exists
   session = getFacebookSession(pageId, userId)
   // did session expire?
-  if (session && new Date().getTime() > session.expiry) {
-    //remove session from sessions
-    removeFacebookSession(session)
-    // unset session var
-    session = undefined
+  if (session) {
+    session.checkExpiration()
+    if (session.hasExpired) {
+      // session has expired. unset session var
+      session = undefined
+    }
   }
   // if session doesn't exist, create one
   if (!session) {
@@ -172,7 +173,7 @@ async function handleMessage (message) {
       },
       removeSession: function () {
         console.log('onDeescalate')
-        removeFacebookSession(this)
+        removeSession(this)
       }
     })
     // add session to global Facebook sessions
@@ -210,9 +211,7 @@ async function handleMessage (message) {
             // note that user attached a file
             session.addMessage('customer', '(file attachment)')
             // just the bot here - let user know we can't do anything with them
-            const m = `I'm sorry, but I can't handle file attachments. If you would like to speak to an agent, say 'agent'.`
-            // add message to transcript
-            session.addMessage('bot', m)
+            session.addMessage('bot', process.env.MESSAGE_BOT_FILE_ATTACHMENT)
             // send message to facebook user
             sendMessage(userId, m, page)
           }

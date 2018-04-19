@@ -56,6 +56,17 @@ class Session {
     this.surveyAnswers = []
   }
 
+  checkExpiration () {
+    // did session expire?
+    if (new Date().getTime() > this.expiry) {
+      console.log('session is old and has expired. Informing user about it and removing this session.')
+      // TODO update this message
+      this.addMessage('bot', process.env.MESSAGE_SESSION_EXPIRED)
+      //remove session from sessions
+      this.endSession()
+    }
+  }
+
   // get dCloud session information
   getSessionInfo () {
     return request({
