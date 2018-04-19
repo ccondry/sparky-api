@@ -445,7 +445,7 @@ class Session {
     switch (args.StatusMessage) {
       case 'L10N_NO_AGENTS_AVAILABLE': {
         // tell customer that there are no agents available
-        this.addMessage('system', 'Sorry, there are no agents available to assist you at this time. Please try again later.')
+        this.addMessage('system', process.env.MESSAGE_SYSTEM_NO_AGENTS_AVAILABLE)
         // turn off survey
         this.data.survey = false
         // end egain session
