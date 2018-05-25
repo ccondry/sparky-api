@@ -11,7 +11,15 @@ async function send (session) {
       // token: process.env.CS_TOKEN_GET_CUSTOMER
     }
 
-    let customers = await axios.get(`${session.csHost}/customer`, {params})
+    let customers
+    try {
+      // try main server
+      customers = await axios.get(`${session.csHost}/customer`, {params})
+    } catch (e) {
+      // try backup server
+      customers = await axios.get(`${session.csBackupHost}/customer`, {params})
+    }
+
     console.log(`sendTranscript: found ${customers.data.length} matching customer(s) in Context Service`)
     if (!customers.data.length) {
       throw `no customers found matching ${session.email}`

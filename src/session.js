@@ -221,7 +221,9 @@ class Session {
       console.log('egainHost = ', this.egainHost)
       // set csHost to public DNS of demo vpod for transcript
       this.csHost = `https://${response.dns}/cs`
+      this.csBackupHost = `https://${response.dns}/cs2`
       console.log('csHost = ', this.csHost)
+      console.log('csBackupHost = ', this.csBackupHost)
       // set surveyHost to public DNS of demo vpod for saving survey answers
       this.surveyHost = `https://${response.dns}/survey`
       return true
