@@ -7,8 +7,8 @@ async function send (session) {
     // look up customer ID
     const params = {
       q: session.email,
-      field: 'query_string',
-      token: process.env.CS_TOKEN_GET_CUSTOMER
+      field: 'query_string'
+      // token: process.env.CS_TOKEN_GET_CUSTOMER
     }
 
     let customers = await axios.get(`${session.csHost}/customer`, {params})
@@ -39,8 +39,8 @@ async function send (session) {
       },
       "tags": ["transcript", "bot"],
       // "requestId":"4c26daa0-c8b5-11e7-81c3-11121369121d",
-      "fieldsets":["cisco.base.pod", "cisco.dcloud.cumulus.chat"],
-      "token": process.env.CS_TOKEN_CREATE_POD,
+      "fieldsets":["cisco.base.pod", "cisco.dcloud.cumulus.chat"]
+      // "token": process.env.CS_TOKEN_CREATE_POD,
     }
 
     // create transcript POD
