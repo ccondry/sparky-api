@@ -28,7 +28,7 @@ async function send (session) {
 
     const body = {
       "customerId": customer.customerId,
-      "mediaType": "chat",
+      "mediaType": process.env.TRANSCRIPT_MEDIA_TYPE || "chat",
       "dataElements":{
         "Context_Notes": "Bot Chat Transcript",
         "Context_POD_Activity_Link": "https://mm-chat.cxdemo.net/",
