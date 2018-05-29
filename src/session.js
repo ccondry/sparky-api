@@ -151,10 +151,8 @@ class Session {
   addCustomerMessage (message) {
     // add message to memory
     this.addMessage('customer', message)
-    switch (message.toLowerCase()) {
-      case 'goodbye':
-      case 'bye':
-      case 'ciao':
+    // detect any goodbye messages that would end the session
+    if (process.env.GOODBYE_MESSAGES.toLowerCase().split(',').includes(message.toLowerCase()) {
       this.goodbye(message)
     }
     // is this chat escalated to an agent?
