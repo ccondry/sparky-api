@@ -141,6 +141,7 @@ class Session {
   }
 
   goodbye (message) {
+    console.log(`${this.id} goodbye message received. ending chat without survey.`)
     // make sure we don't offer a survey if the user has ended the session with
     // a goodbye message
     this.data.survey = false
