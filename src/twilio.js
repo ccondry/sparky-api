@@ -21,7 +21,7 @@ function getLookupNumber (from, to) {
   if (pnFrom.getNumber('regionCode') === pnTo.getNumber('regionCode')) {
     // customer region === SMS region
     return pn.getNumber('significant')
-  } else if (to === '+15402962308') {
+  } else if (to === process.env.TWILIO_APJ_NUMBER) {
     // not in same region, but using APJ SMS number
     return pn.getNumber('significant')
   } else {
