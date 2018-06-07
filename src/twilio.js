@@ -15,17 +15,20 @@ const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN)
 const contextService = require('./context-service')
 
 // get dCloud session information
-function getDcloudSession (from) {
+function getDcloudSession (from, to) {
   console.log('getting dcloud session info for', from)
-  const pn = PhoneNumber(from)
+  const pnFrom = PhoneNumber(from)
+  const pnTo = PhoneNumber(to)
+  // check if user is in same country as SMS number, and look up using only
+  // significant digits
   let phone
-  if (pn.getNumber('regionCode') === 'US') {
-    // use US phone number without +1
+  if (pnFrom.getNumber('regionCode') === pnTo.getNumber('regionCode')) {
     phone = pn.getNumber('significant')
   } else {
-    // use non-US number without +
+    // remove +
     phone = from.slice(1)
   }
+
   return request({
     method: 'GET',
     url: `https://mm.cxdemo.net/api/v1/phones/${phone}`,
@@ -132,7 +135,7 @@ async function handleMessage (message) {
 
     let dcloudSession = {}
     try {
-      dcloudSession = await getDcloudSession(from)
+      dcloudSession = await getDcloudSession(from, to)
     } catch (e) {
       console.error('Error getting dCloud phone number registration info', e.message)
     }
