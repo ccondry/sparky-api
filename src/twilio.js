@@ -19,6 +19,7 @@ function getDcloudSession (from, to) {
   console.log('getting dcloud session info for', from)
   const pnFrom = PhoneNumber(from)
   const pnTo = PhoneNumber(to)
+  // TODO check if user phone region and demo datacenter is in same region, then strip country code for lookup
   // check if user is in same country as SMS number, and look up using only
   // significant digits
   let phone
