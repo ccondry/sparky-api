@@ -14,21 +14,26 @@ const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN)
 
 const contextService = require('./context-service')
 
+function getLookupNumber (from, to) {
+  const pnFrom = PhoneNumber(from)
+  const pnTo = PhoneNumber(to)
+  // check if customer is in same country as SMS number
+  if (pnFrom.getNumber('regionCode') === pnTo.getNumber('regionCode')) {
+    // customer region === SMS region
+    return pn.getNumber('significant')
+  } else if (to === '+15402962308') {
+    // not in same region, but using APJ SMS number
+    return pn.getNumber('significant')
+  } else {
+    // customer is messaging to a foreign SMS number, so just remove the +
+    return from.slice(1)
+  }
+}
+
 // get dCloud session information
 function getDcloudSession (from, to) {
   console.log('getting dcloud session info for', from)
-  const pnFrom = PhoneNumber(from)
-  const pnTo = PhoneNumber(to)
-  // TODO check if user phone region and demo datacenter is in same region, then strip country code for lookup
-  // check if user is in same country as SMS number, and look up using only
-  // significant digits
-  let phone
-  if (pnFrom.getNumber('regionCode') === pnTo.getNumber('regionCode')) {
-    phone = pn.getNumber('significant')
-  } else {
-    // remove +
-    phone = from.slice(1)
-  }
+  const phone = getLookupNumber(from, to)
 
   return request({
     method: 'GET',
@@ -114,16 +119,8 @@ async function handleMessage (message) {
   // if session doesn't exist, create one
   if (!session) {
     console.log('new Twilio SMS chat session')
-    // remove + from phone number
-    const pn = PhoneNumber(from)
-    let phone
-    if (pn.getNumber('regionCode') === 'US') {
-      // use US phone number without +1
-      phone = pn.getNumber('significant')
-    } else {
-      // use non-US number without +
-      phone = from.slice(1)
-    }
+    // get the appropriate part of the phone number to use for lookups
+    const phone = getLookupNumber(from, to)
 
     let customerData = {}
     try {
