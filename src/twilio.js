@@ -21,8 +21,8 @@ function getLookupNumber (from, to) {
   if (pnFrom.getNumber('regionCode') === pnTo.getNumber('regionCode')) {
     // customer region === SMS region
     return pnFrom.getNumber('significant')
-  } else if (to === process.env.TWILIO_APJ_NUMBER) {
-    // not in same region, but using APJ SMS number
+  } else if (to === process.env.TWILIO_APJ_NUMBER && pnFrom.getNumber('regionCode') === 'SG') {
+    // Singapore customer using the APJ SMS number (which is not in Singapore)
     return pnFrom.getNumber('significant')
   } else {
     // customer is messaging to a foreign SMS number, so just remove the +
