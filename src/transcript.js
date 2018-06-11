@@ -54,7 +54,8 @@ async function send (session) {
       body,
       qs: {
         q: `query_string:${session.email}`
-      }
+      },
+      json: true
     })
     console.log(`sendTranscript: successfully created transcript activity in Context Service for ${session.email}`)
   } catch (e) {
