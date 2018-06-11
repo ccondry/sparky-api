@@ -59,10 +59,10 @@ async function send (session) {
         json: true
       })
     } catch (e2) {
-      console.log('send transcript to csHost failed. trying csHostBackup...')
+      console.log('send transcript to csHost failed. trying csBackupHost...')
       try {
         await request({
-          url: `${session.csHostBackup}/transcript/activity`,
+          url: `${session.csBackupHost}/transcript/activity`,
           method: 'POST',
           body,
           qs: {
@@ -71,7 +71,7 @@ async function send (session) {
           json: true
         })
       } catch (e3) {
-        console.log('failed to send transcript to csHostBackup', e3)
+        console.log('failed to send transcript to csBackupHost', e3)
       }
     }
     console.log(`sendTranscript: successfully created transcript activity in Context Service for ${session.email}`)
