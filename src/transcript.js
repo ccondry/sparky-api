@@ -71,7 +71,7 @@ async function send (session) {
           json: true
         })
       } catch (e3) {
-        console.log('failed to send transcript to csBackupHost', e3)
+        console.log('failed to send transcript to csBackupHost', e3.message)
         throw e3
       }
     }
