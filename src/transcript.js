@@ -48,15 +48,32 @@ async function send (session) {
     }
 
     // create transcript activity
-    await request({
-      url: `${session.csHost}/activity`,
-      method: 'POST',
-      body,
-      qs: {
-        q: `query_string:${session.email}`
-      },
-      json: true
-    })
+    try {
+      await request({
+        url: `${session.csHost}/transcript/activity`,
+        method: 'POST',
+        body,
+        qs: {
+          q: `query_string:${session.email}`
+        },
+        json: true
+      })
+    } catch (e2) {
+      console.log('send transcript to csHost failed. trying csHostBackup...')
+      try {
+        await request({
+          url: `${session.csHostBackup}/transcript/activity`,
+          method: 'POST',
+          body,
+          qs: {
+            q: `query_string:${session.email}`
+          },
+          json: true
+        })
+      } catch (e3) {
+        console.log('failed to send transcript to csHostBackup', e3)
+      }
+    }
     console.log(`sendTranscript: successfully created transcript activity in Context Service for ${session.email}`)
   } catch (e) {
     console.error(`sendTranscript: exception while creating transcript activity in Context Service for ${session.email}`, e.message)
