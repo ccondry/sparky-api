@@ -1,4 +1,4 @@
-const axios = require('axios')
+const request = require('request-promise-native')
 
 // looks up customer in Context Service and creates a new
 // Context Service POD with current chat transcript
@@ -48,7 +48,14 @@ async function send (session) {
     }
 
     // create transcript activity
-    await axios.post(`${session.csHost}/activity`, body)
+    await request({
+      url: `${session.csHost}/activity`,
+      method: 'POST',
+      body,
+      qs: {
+        q: `query_string:${session.email}`
+      }
+    })
     console.log(`sendTranscript: successfully created transcript activity in Context Service for ${session.email}`)
   } catch (e) {
     console.error(`sendTranscript: exception while creating transcript activity in Context Service for ${session.email}`, e.message)
