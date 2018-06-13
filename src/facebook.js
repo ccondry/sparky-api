@@ -13,6 +13,9 @@ async function findPage (id) {
   if (page !== null) {
     return page
   }
+
+function getKnownUser (pageId, userId) {
+  return db.findOne('facebook.users', {pageId, userId})
 }
 
 async function registerPage (id, token, aiToken, entryPointId) {
@@ -178,9 +181,24 @@ async function handleMessage (message) {
     })
     // add session to global Facebook sessions
     addFacebookSession(session)
-    // set first message as sparky-fb
-    session.addCustomerMessage('sparky-fb')
-    return
+
+    // getKnownUsers (pageId, '1731829546905168')
+    try {
+      const knownUser = await getKnownUser (pageId, userId)
+      if (knownUser) {
+      console.log(`${session.id} - I recognize this facebook user as`, knownUser)
+      console.log(`${session.id} - setting known user's dcloud datacenter and session and sending them 'sparky' message.`, knownUser)
+      this.dcloudSession = knownUser.session
+      this.dcloudDatacenter = knownUser.datacenter
+      // send regular welcome message, since we know this user's dCloud datacenter and session ID
+      session.addCustomerMessage('sparky')
+      }
+    } catch (e2) {
+      // set first message as sparky-fb, to ask for dCloud datacenter and session ID
+      session.addCustomerMessage('sparky-fb')
+    } finally {
+      return
+    }
   } else {
     console.log('existing facebook chat session')
 
