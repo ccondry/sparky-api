@@ -208,21 +208,25 @@ class Session {
 
   // check the dcloud session info using datacenter and session ID, and respond accordingly
   async checkSessionInfo () {
+    console.log(`${this.id} - checking dCloud session info...`)
     if (!this.dcloudDatacenter || !this.dcloudSession) {
+      console.log(`${this.id} - dCloud session and datacenter are not set.`)
       // not set yet
       return false
     }
     try {
+      console.log(`${this.id} - dCloud session and datacenter are set. Looking up session info from mm.cxdemo.net.`)
       const response = await this.getSessionInfo()
+      console.log(`${this.id} - found dCloud session and datacenter information`)
       // console.log('dcloud session response', response)
       // set egainHost to public DNS of demo vpod for escalating to ECE agent
       this.egainHost = `https://${response.dns}/ece/system`
-      console.log('egainHost = ', this.egainHost)
+      console.log(`${this.id} - egainHost = ${this.egainHost}`)
       // set csHost to public DNS of demo vpod for transcript
       this.csHost = `https://${response.dns}/cs`
       this.csBackupHost = `https://${response.dns}/cs2`
-      console.log('csHost = ', this.csHost)
-      console.log('csBackupHost = ', this.csBackupHost)
+      console.log(`${this.id} - csHost = ${this.csHost}`)
+      console.log(`${this.id} - csBackupHost = ${this.csBackupHost}`)
       // set surveyHost to public DNS of demo vpod for saving survey answers
       this.surveyHost = `https://${response.dns}/survey`
       return true
