@@ -13,7 +13,7 @@ function find (collection, query) {
         if (connectError) reject(connectError)
         db.collection(collection).find(query).toArray(function (queryError, result) {
           if (queryError) reject(queryError)
-          console.log(`mongodb retrieved ${result.length} records from ${collection} collection`)
+          // console.log(`mongodb retrieved ${result.length} records from ${collection} collection`)
           resolve(result)
         })
       })
@@ -30,7 +30,7 @@ function findOne (collection, query) {
       MongoClient.connect(url, function(err, db) {
         db.collection(collection).findOne(query, function (err, result) {
           if (err) reject(err)
-          console.log(`mongodb retrieved record from ${collection} collection`)
+          // console.log(`mongodb retrieved record from ${collection} collection`)
           resolve(result)
         })
       })
@@ -55,7 +55,7 @@ function upsert (collection, query, data) {
               console.log('queryError', queryError)
               return reject(queryError)
             } else {
-              console.log('doc', doc)
+              // console.log('doc', doc)
               return resolve(doc)
             }
           }
