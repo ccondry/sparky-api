@@ -8,11 +8,9 @@ const entities = new Entities()
 
 const facebookSessions = {}
 
-async function findPage (id) {
-  const page = db.findOne('facebook.pages', {id})
-  if (page !== null) {
-    return page
-  }
+function findPage (id) {
+  return db.findOne('facebook.pages', {id})
+}
 
 function getKnownUser (pageId, userId) {
   return db.findOne('facebook.users', {pageId, userId})
