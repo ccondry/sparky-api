@@ -210,7 +210,7 @@ class Session {
   async checkSessionInfo () {
     console.log(`${this.id} - checking dCloud session info...`)
     if (!this.dcloudDatacenter || !this.dcloudSession) {
-      console.log(`${this.id} - dCloud session and datacenter are not set.`)
+      console.log(`${this.id} - dCloud session and datacenter are not set correctly. dcloudDatacenter = ${this.dcloudDatacenter} and dcloudSession = ${this.dcloudSession}`)
       // not set yet
       return false
     }
