@@ -188,6 +188,8 @@ async function handleMessage (message) {
       console.log(`${session.id} - setting known user's dcloud datacenter and session and sending them 'sparky' message.`, knownUser)
       this.dcloudSession = knownUser.session
       this.dcloudDatacenter = knownUser.datacenter
+      // get session info
+      session.getSessionInfo()
       // send regular welcome message, since we know this user's dCloud datacenter and session ID
       session.addCustomerMessage('sparky')
       }
