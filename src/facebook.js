@@ -185,7 +185,7 @@ async function handleMessage (message) {
       const knownUser = await getKnownUser (pageId, userId)
       if (knownUser) {
         console.log(`${session.id} - I recognize this facebook user as`, knownUser)
-        console.log(`${session.id} - setting known user's dcloud datacenter and session and sending them 'sparky' message.`, knownUser)
+        console.log(`${session.id} - setting known user's dcloud datacenter and session and sending them 'sparky' message.`)
         this.dcloudSession = knownUser.session
         this.dcloudDatacenter = knownUser.datacenter
         // get session info
