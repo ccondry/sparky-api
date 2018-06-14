@@ -190,11 +190,17 @@ async function handleMessage (message) {
         session.dcloudDatacenter = knownUser.datacenter
         // get session info
         session.checkSessionInfo()
-        // send regular welcome message, since we know this user's dCloud datacenter and session ID
+        // send regular welcome message, since we know this user's
+        // dCloud datacenter and session ID
         session.addCustomerMessage('sparky')
+      } else {
+        // user not known, so set first message as sparky-fb, to ask for
+        // dCloud datacenter and session ID
+        session.addCustomerMessage('sparky-fb')
       }
     } catch (e2) {
-      // set first message as sparky-fb, to ask for dCloud datacenter and session ID
+      // couldn't find known users, so set first message as sparky-fb, to ask
+      // for dCloud datacenter and session ID
       session.addCustomerMessage('sparky-fb')
     } finally {
       return
