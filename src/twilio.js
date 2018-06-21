@@ -156,8 +156,6 @@ async function handleMessage (message) {
     } catch (e) {
       console.error('Error getting dCloud session info', e)
     }
-    console.log('process.env.TWILIO_APJ_NUMBER = ', process.env.TWILIO_APJ_NUMBER)
-    console.log('process.env.TWILIO_BACKUP_NUMBER = ', process.env.TWILIO_BACKUP_NUMBER)
     // create session and store in sessions global
     session = new Session('twilio', {
       type: 'twilio',
@@ -181,10 +179,7 @@ async function handleMessage (message) {
           // console.log('smsResponse', smsResponse)
           console.log(`SMS sent to ${from}`)
         } catch (e) {
-          console.log('process.env.TWILIO_APJ_NUMBER = ', process.env.TWILIO_APJ_NUMBER)
-          console.log('process.env.TWILIO_BACKUP_NUMBER = ', process.env.TWILIO_BACKUP_NUMBER)
           console.error(`failed to send SMS to customer ${this.data.from} using ${this.data.to}. Retrying with backup number ${this.data.backupNumber}`)
-          console.log(`this.to = ${this.data.to}. this.from = ${this.data.from}`)
           // unavailable using the current number?
           if (e.status === 400 && e.code === 21612) {
             // update this session to use the backup US number
