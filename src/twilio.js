@@ -185,14 +185,14 @@ async function handleMessage (message) {
           // console.log('smsResponse', smsResponse)
           console.log(`SMS sent to ${from}`)
         } catch (e) {
-          console.error(`failed to send SMS to customer at ${this.to}. retrying with backup number ${process.env.TWILIO_BACKUP_NUMBER}`)
-          console.log(`this.to = ${this.to}. this.from = ${this.from}`)
+          console.error(`failed to send SMS to customer at ${this.data.to}. retrying with backup number ${process.env.TWILIO_BACKUP_NUMBER}`)
+          console.log(`this.to = ${this.data.to}. this.from = ${this.data.from}`)
           // unavailable using the current number?
           if (e.status === 400 && e.code === 21612) {
             // update this session to use the backup US number
             updateSessionFrom(session, process.env.TWILIO_BACKUP_NUMBER)
             // try again
-            const smsResponse = await sendMessage(this.to, this.from, entities.decode(message))
+            const smsResponse = await sendMessage(this.data.to, this.data.from, entities.decode(message))
           }
         }
       },
