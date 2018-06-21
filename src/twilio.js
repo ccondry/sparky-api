@@ -87,6 +87,17 @@ function removeSession (session) {
   }
 }
 
+function updateSessionFrom (session, newFrom) {
+  try {
+    // copy new
+    sessions[session.data.to][newFrom] = sessions[session.data.to][session.data.from]
+    // delete old
+    delete sessions[session.data.to][session.data.from]
+  } catch (e) {
+    console.error(`failed to remove Twilio SMS session sessions[${session.data.to}][${session.data.from}]`, e)
+  }
+}
+
 function addSession (session) {
   const to = session.data.to
   const from = session.data.from
@@ -170,11 +181,18 @@ async function handleMessage (message) {
       onAddMessage: async function (type, message) {
         // send messages to SMS user, and decode HTML characters
         try {
-          const smsResponse = await sendMessage(to, from, entities.decode(message))
+          const smsResponse = await sendMessage(this.to, this.from, entities.decode(message))
           // console.log('smsResponse', smsResponse)
           console.log(`SMS sent to ${from}`)
         } catch (e) {
           console.error(e)
+          // unavailable using the current number?
+          if (e.status === 400 && e.code === 21612) {
+            // update this session to use the backup US number
+            updateSessionFrom(session, process.env.TWILIO_BACKUP_NUMBER)
+            // try again
+            const smsResponse = await sendMessage(this.to, this.from, entities.decode(message))
+          }
         }
       },
       removeSession: function () {
