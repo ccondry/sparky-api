@@ -187,7 +187,7 @@ async function handleMessage (message) {
           // console.log('smsResponse', smsResponse)
           console.log(`SMS sent to ${from}`)
         } catch (e) {
-          console.error(`failed to send SMS to customer at ${this.data.to}. retrying with backup number ${process.env.TWILIO_BACKUP_NUMBER}`)
+          console.error(`failed to send SMS to customer ${this.data.from} using ${this.data.to}. Retrying with backup number ${process.env.TWILIO_BACKUP_NUMBER}`)
           console.log(`this.to = ${this.data.to}. this.from = ${this.data.from}`)
           // unavailable using the current number?
           if (e.status === 400 && e.code === 21612) {
@@ -197,7 +197,7 @@ async function handleMessage (message) {
               // try again
               const smsResponse2 = await sendMessage(this.data.to, this.data.from, entities.decode(message))
             } catch (e2) {
-              console.error(`failed to send SMS to customer at ${this.data.to} from backup number ${this.data.from}. fix me!`)
+              console.error(`failed to send SMS to customer at ${this.data.form} from backup number ${this.data.to}. fix me!`)
             }
           }
         }
