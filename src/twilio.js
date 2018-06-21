@@ -87,12 +87,12 @@ function removeSession (session) {
   }
 }
 
-function updateSessionFrom (session, newFrom) {
+function updateSessionTo (session, newTo) {
   try {
     // update data on the session
-    session.data.from = newFrom
+    session.data.to = newTo
     // copy session to new element
-    sessions[session.data.to][newFrom] = sessions[session.data.to][session.data.from]
+    sessions[newTo][session.data.from] = sessions[session.data.to][session.data.from]
     // delete old session element
     delete sessions[session.data.to][session.data.from]
   } catch (e) {
@@ -193,7 +193,7 @@ async function handleMessage (message) {
           if (e.status === 400 && e.code === 21612) {
             // update this session to use the backup US number
             try {
-              updateSessionFrom(session, process.env.TWILIO_BACKUP_NUMBER)
+              updateSessionTo(session, process.env.TWILIO_BACKUP_NUMBER)
               // try again
               const smsResponse2 = await sendMessage(this.data.to, this.data.from, entities.decode(message))
             } catch (e2) {
