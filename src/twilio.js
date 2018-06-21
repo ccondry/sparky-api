@@ -88,16 +88,9 @@ function removeSession (session) {
 }
 
 function updateSessionTo (session, newTo) {
-  try {
-    // delete old session element
-    delete sessions[session.data.to][session.data.from]
-    // copy session to new element
-    sessions[newTo][session.data.from] = session
-    // update 'to' data in the session itself
-    session.data.to = newTo
-  } catch (e) {
-    console.error(`failed to remove Twilio SMS session sessions[${session.data.to}][${session.data.from}]`, e)
-  }
+  removeSession(session)
+  session.data.to = newTo
+  addSession(session)
 }
 
 function addSession (session) {
