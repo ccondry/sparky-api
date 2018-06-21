@@ -11,7 +11,6 @@ const sessions = {}
 
 const twilio = require('twilio')
 const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN)
-const backupNumber = process.env.TWILIO_BACKUP_NUMBER
 const contextService = require('./context-service')
 
 function getLookupNumber (from, to) {
@@ -173,6 +172,7 @@ async function handleMessage (message) {
       dcloudDatacenter: dcloudSession.datacenter,
       botEnabled: true,
       survey: true,
+      backupNumber: process.env.TWILIO_BACKUP_NUMBER,
       onAddMessage: async function (type, message) {
         // send messages to SMS user, and decode HTML characters
         try {
@@ -180,13 +180,13 @@ async function handleMessage (message) {
           // console.log('smsResponse', smsResponse)
           console.log(`SMS sent to ${from}`)
         } catch (e) {
-          console.error(`failed to send SMS to customer ${this.data.from} using ${this.data.to}. Retrying with backup number ${backupNumber}`)
+          console.error(`failed to send SMS to customer ${this.data.from} using ${this.data.to}. Retrying with backup number ${this.data.backupNumber}`)
           console.log(`this.to = ${this.data.to}. this.from = ${this.data.from}`)
           // unavailable using the current number?
           if (e.status === 400 && e.code === 21612) {
             // update this session to use the backup US number
             try {
-              updateSessionTo(session, backupNumber)
+              updateSessionTo(session, this.data.backupNumber)
               // try again
               const smsResponse2 = await sendMessage(this.data.to, this.data.from, entities.decode(message))
             } catch (e2) {
