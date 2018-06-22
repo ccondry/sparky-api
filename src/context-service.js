@@ -1,27 +1,52 @@
 const axios = require('axios')
 
 async function getCustomerData(phone) {
+  console.log('customer lookup failed on csHost with query_string:' + phone)
   // try to match up the phone number with a user's info
   const customerData = {}
-  // try Context Service first
-  const params = {
-    q: phone,
-    field: 'query_string',
-    token: process.env.CS_TOKEN_GET_CUSTOMER
+  let customers
+  try {
+    // try main CS url
+    customers = await request({
+      url: `${session.csHost}/customer`,
+      method: 'GET',
+      qs: {
+        q: `query_string:${phone}`
+      },
+      json: true
+    })
+  } catch (e2) {
+    // try backup CS url
+    console.log('customer lookup failed on csHost. trying csBackupHost...')
+    try {
+      customers = await request({
+        url: `${session.csBackupHost}/customer`,
+        method: 'GET',
+        qs: {
+          q: `query_string:${phone}`
+        },
+        json: true
+      })
+    } catch (e3) {
+      console.log('customer lookup failed on csBackupHost', e3.message)
+      throw e3
+    }
   }
-  const customers = await axios.get(`https://cxdemo.net/labconfig/api/demo/cs/customer`, {params})
-  console.log(`Sparky - Context Service  - getContextCustomerData - found ${customers.data.length} matching customer(s) in Context Service`)
-  if (!customers.data.length) {
-    throw `no Context Service customers found matching ${phone}`
+
+  let customer
+  if (customers.length < 1) {
+    throw 'no customers found matching ' + phone
   }
-  // get customer ID from Context Service
-  console.log('Sparky - Context Service - getCustomerData - chose first Context Service customer -', customers.data[0].customerId)
-  const customer = customers.data[0]
-  // get customer data
-  customerData.firstName = customer.Context_First_Name
-  customerData.lastName = customer.Context_Last_Name
-  customerData.email = customer.Context_Work_Email
-  return customerData
+  if (customers.length > 1) {
+    console.log('more than one customer found. choosing first customer and hoping for the best.')
+    // choose first customer
+    customer = customers[0]
+  } else {
+    console.log('found customer matching ', phone)
+    customer = customers[0]
+  }
+
+  return customer
 }
 
 module.exports = {

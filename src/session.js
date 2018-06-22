@@ -28,7 +28,7 @@ class Session {
     // run this callback when messages are added
     this.onAddMessage = data.onAddMessage
     // resolve this promise to get user data
-    this.getCustomerData = data.getCustomerData
+    // this.getCustomerData = data.getCustomerData
     // this.apiAiToken = data.apiAiToken || process.env.API_AI_TOKEN
     // just use the one static token
     this.apiAiToken = process.env.API_AI_TOKEN
