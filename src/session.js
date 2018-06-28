@@ -12,8 +12,8 @@ class Session {
     this.state = 'active'
     // set timestamp
     this.timestamp = new Date().getTime()
-    // sessions expire after 1 hours
-    this.expiry = this.timestamp + 1000 * process.env.SESSION_TIMEOUT
+    // sessions expiry
+    this.resetExpiration()
 
     this.inSurvey = false
     this.isEscalated = false
@@ -66,6 +66,11 @@ class Session {
       //remove session from sessions
       this.endSession()
     }
+  }
+
+  resetExpiration () {
+    // reset expiry to current time + configured timeout value
+    this.expiry = new Date().getTime() + 1000 * process.env.SESSION_TIMEOUT
   }
 
   // get dCloud session information
@@ -150,6 +155,8 @@ class Session {
   }
 
   addCustomerMessage (message) {
+    // reset session expiration
+    this.resetExpiration()
     // add message to memory
     this.addMessage('customer', message)
     // detect any goodbye messages that would end the session
