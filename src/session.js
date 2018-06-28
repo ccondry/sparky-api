@@ -249,7 +249,6 @@ class Session {
   async processAiResponse (result) {
     const fulfillment = result.fulfillment
     // check the api.ai response message and perform the associated action
-    console.log('ai response', util.inspect(result, false, null))
     switch (result.action) {
       case 'datacenter': {
         if (fulfillment.speech.length) {
