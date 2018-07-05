@@ -19,6 +19,7 @@ async function send (session) {
       "state": "active",
       "mediaType": process.env.TRANSCRIPT_MEDIA_TYPE || "chat",
       "tags": ["transcript", "bot"],
+      "contributors": [],
       "dataElements": [
         {
           "Context_Notes": "Bot Chat Transcript",
