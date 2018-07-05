@@ -60,7 +60,7 @@ class Session {
   checkExpiration () {
     // did session expire?
     if (new Date().getTime() > this.expiry) {
-      console.log('session is old and has expired. Informing user about it and removing this session.')
+      console.log(`${this.id} - session is old and has expired. Informing user about it and remove this session.`)
       // TODO update this message
       this.addMessage('bot', process.env.MESSAGE_SESSION_EXPIRED)
       //remove session from sessions
@@ -138,10 +138,10 @@ class Session {
   endSession () {
     // call custom removeSession handler
     if (this.removeSession && typeof this.removeSession === 'function') {
-      console.log('calling removeSession handler')
+      console.log(`${this.id} - calling removeSession handler`)
       this.removeSession.call(this)
     } else {
-      console.log('removeSession not a function. removeSession =', this.removeSession)
+      console.log(`${this.id} - removeSession not a function. removeSession =`, this.removeSession)
     }
   }
 
@@ -165,7 +165,7 @@ class Session {
     }
     // is this chat escalated to an agent?
     if (this.isEscalated) {
-      console.log('this chat is escalated already. sending message to ECE agent.')
+      console.log(`${this.id} - this chat is escalated already. sending message to ECE agent.`)
       // send message to eGain agent
       this.egainSession.SendMessageToAgent(message)
     } else if (this.botEnabled === false) {
@@ -187,7 +187,7 @@ class Session {
       this.processAiResponse(response.result)
 
     } catch (e) {
-      console.error('exception during processCustomerMessage', e.message)
+      console.error(`${this.id} exception during processCustomerMessage`, e.message)
     }
   }
 
@@ -238,7 +238,7 @@ class Session {
       this.surveyHost = `https://${response.dns}/survey`
       return true
     } catch (e) {
-      console.error(`error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
+      console.error(`${this.id} - error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
       // reset the session info to null
       this.dcloudDatacenter = null
       this.dcloudSession = null
@@ -332,7 +332,7 @@ class Session {
         break
       }
       case 'mortgage-calculator': {
-        console.log('sending mortgage-calculator command')
+        console.log(`${this.id} - sending mortgage-calculator command`)
         if (this.type === 'sparky-ui') {
           this.addMessage('bot', 'Ok... Your calculator should have appeared on the left!')
           // open mortgage calculator
@@ -352,7 +352,7 @@ class Session {
         break
       }
       case 'survey-end': {
-        console.log('ending survey and sending survey answers to demo now.')
+        console.log(`${this.id} - ending survey and sending survey answers to demo now`)
         // save the last survey answer
         this.surveyAnswers.push(result.parameters.surveyscore)
         // out of survey now

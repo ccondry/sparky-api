@@ -2,41 +2,41 @@ function create (myChat, session) {
   let myEventHandlers = myChat.GetEventHandlers()
 
   myEventHandlers.OnConnectionInitialized = function (args) {
-    console.log('OnConnectionInitialized', args)
+    console.log(`${session.id} - eGain OnConnectionInitialized. XEgainSession =`, args.XEgainSession)
   }
   myEventHandlers.OnConnectionPaused = function (args) {
-    console.log('OnConnectionPaused', args)
+    console.log(`${session.id} - eGain OnConnectionPaused`, args)
   }
   myEventHandlers.OnConnectionResumed = function (args) {
-    console.log('OnConnectionResumed', args)
+    console.log(`${session.id} - eGain OnConnectionResumed`, args)
   }
   myEventHandlers.OnConnectionAttached = function (args) {
-    console.log('OnConnectionAttached', args)
+    console.log(`${session.id} - eGain OnConnectionAttached`, args)
   }
   myEventHandlers.OnConnectionAttachedFailure = function (args) {
-    console.log('OnConnectionAttachedFailure', args)
+    console.log(`${session.id} - eGain OnConnectionAttachedFailure`, args)
   }
   myEventHandlers.OnDuplicateSession = function (args) {
-    console.log('OnDuplicateSession', args)
+    console.log(`${session.id} - eGain OnDuplicateSession`, args)
     session.onEgainEnd()
   }
   myEventHandlers.OnSysemMessageReceived = function (args) {
-    console.log('OnSysemMessageReceived', args)
+    console.log(`${session.id} - eGain OnSysemMessageReceived`, args)
   }
   myEventHandlers.OnGetQueueCurrentStatus = function (args) {
-    console.log('OnGetQueueCurrentStatus', args)
+    console.log(`${session.id} - eGain OnGetQueueCurrentStatus`, args)
   }
   myEventHandlers.OnMessagePropertyLoad = function (args) {
-    console.log('OnMessagePropertyLoad', args)
+    console.log(`${session.id} - eGain OnMessagePropertyLoad`, args)
   }
   myEventHandlers.OnErrorOccured = function (args) {
-    console.log('OnErrorOccured', args)
+    console.log(`${session.id} - eGain OnErrorOccured`, args)
   }
 
 
   /* Example browser alert when chat is connected */
   myEventHandlers.OnConnectSuccess = function (args) {
-    console.log('OnConnectSuccess', args)
+    console.log(`${session.id} - eGain OnConnectSuccess`, args)
     if (session.botEnabled) {
       var welcomeMessage = "Ok, I'll get you connected to one of our experts. One moment...";
       console.log(welcomeMessage);
@@ -47,23 +47,22 @@ function create (myChat, session) {
   }
   /* Example browser alert when there is a connection failure */
   myEventHandlers.OnConnectionFailure = function (args) {
-    console.log('OnConnectionFailure', args)
+    console.log(`${session.id} - eGain OnConnectionFailure`, args)
     session.onEgainFail(args)
   };
   /* Example output of agent messages to a DIV named TransScript with jQuery */
   myEventHandlers.OnAgentMessageReceived = function (args) {
-    // console.log('OnAgentMessageReceived', args)
-    console.log("Agent Message Received: " + args.Message)
+    console.log(`${session.id} - eGain OnAgentMessageReceived`, args.Message)
     session.addMessage('agent', args.Message)
   };
   /* Example output of system messages to the same DIV */
   myEventHandlers.OnSystemMessageReceived = function (args) {
-    console.log("System Message Received: " + args.Message)
+    console.log(`${session.id} - eGain OnSystemMessageReceived`, args.Message)
     session.addMessage('system', args.Message)
   }
   /* Example browser console.log when an error occurs */
   myEventHandlers.OnErrorOccurred = function (args) {
-    console.log('OnErrorOccurred', args);
+    console.log(`${session.id} - eGain OnErrorOccurred`, args)
     // session.addMessage('system', args.toString())
     if (args.status === 'error') {
       session.addMessage('system', `I'm sorry, but we're having trouble connecting to an agent. Please try again later.`)
@@ -74,17 +73,17 @@ function create (myChat, session) {
   }
   /* Example browser console.log when agents are not available */
   myEventHandlers.OnAgentsNotAvailable = function (args) {
-    console.log('Sorry no agents available', args);
+    console.log(`${session.id} - eGain OnAgentsNotAvailable`, args)
     session.addMessage('system', args.toString())
   };
   /* Example browser console.log when the chat is completed */
   myEventHandlers.OnConnectionComplete = function () {
-    console.log("Chat with eGain agent complete.")
+    console.log(`${session.id} - eGain OnConnectionComplete`, args)
     session.onEgainEnd()
   };
   /* Example of adding message in transcript when customer attachment invite is sent to server */
   myEventHandlers.OnCustomerAttachmentNotificationSent = function (args) {
-    console.log('OnCustomerAttachmentNotificationSent args =', args)
+    console.log(`${session.id} - eGain OnCustomerAttachmentNotificationSent`, args)
     const message = "Waiting for agent to accept attachment"
     // send command for sparky-ui chat client to accept
     session.addMessage('system', message)
@@ -92,7 +91,7 @@ function create (myChat, session) {
   }
   /* Example of uploading attachment to chat server when agent accepts attachment invite */
   myEventHandlers.OnAttachmentAcceptedByAgent = function (args) {
-    console.log('OnAttachmentAcceptedByAgent args =', args)
+    console.log(`${session.id} - eGain OnAttachmentAcceptedByAgent`, args)
     // TODO implement something else here?
     // file.uniqueFileId = args.uniqueFileId
     // myChat.UploadAttachment(file, args.agentName)
@@ -101,7 +100,7 @@ function create (myChat, session) {
 
   /* Example of sending notification to chat server when customer accepts attachment invite */
   myEventHandlers.OnAttachmentInviteReceived = function (args) {
-    console.log('OnAttachmentInviteReceived args =', args)
+    console.log(`${session.id} - eGain OnAttachmentInviteReceived`, args)
     session.addMessage('system', `${args.Attachment.AgentName} has sent you a file: ${args.Attachment.Name}`)
     // var acceptBtn = document.createElement('input');
     // acceptBtn.type = "button";
@@ -115,6 +114,7 @@ function create (myChat, session) {
 
   /* Example of downloading file when attachment is fetched from server */
   myEventHandlers.OnGetAttachment = function(args){
+    console.log(`${session.id} - eGain OnGetAttachment`, args)
     // if (typeof fileName !== 'undefine' && fileName !== null) {
     //   if ((/\.(gif|jpg|jpeg|tiff|png)$/i).test(fileName)) {
     //     myChat.GetAttachmentImage(args.fileId, args.uniqueFileId);
@@ -131,12 +131,11 @@ function create (myChat, session) {
   }
   /* Example of downloading file when attachment thumbnail is fetched from server */
   myEventHandlers.OnGetAttachmentImageThumbnail = function(args){
+    console.log(`${session.id} - eGain OnGetAttachmentImageThumbnail`, args)
     // var thumbnailElement = document.createElement('img');
     // thumbnailElement.src = args.data;
     // $('#messages ul').append("<br />");
     // $('#messages ul').append(thumbnailElement);
-    console.log('OnGetAttachmentImageThumbnail args =', args)
-    console.log('OnGetAttachmentImageThumbnail src =', args.src)
     session.addCommand('show-thumbnail', args.src)
   }
 
