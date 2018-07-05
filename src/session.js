@@ -269,11 +269,11 @@ class Session {
               this.escalate()
             } else {
               // send instructions
-              this.addCustomerMessage('instructions')
+              this.processCustomerMessage('instructions')
             }
           } else {
             // try to get info from customer again
-            this.addCustomerMessage('wrong-information')
+            this.processCustomerMessage('wrong-information')
           }
         }
         break
@@ -298,11 +298,11 @@ class Session {
               this.escalate()
             } else {
               // send instructions
-              this.addCustomerMessage('instructions')
+              this.processCustomerMessage('instructions')
             }
           } else {
             // try to get info from customer again
-            this.addCustomerMessage('wrong-information')
+            this.processCustomerMessage('wrong-information')
           }
         }
         break
@@ -427,7 +427,7 @@ class Session {
       if (!valid) {
         // try to get info from customer again
         // TODO use a different message?
-        this.addCustomerMessage('wrong-information')
+        this.processCustomerMessage('wrong-information')
         this.isEscalating = true
         return
       } else {
