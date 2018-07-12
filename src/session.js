@@ -127,7 +127,7 @@ class Session {
     }
     if (this.smSession) {
       // end SocialMiner connection for UCCX
-      this.smSession.end()
+      this.smSession.stopPolling()
     }
     // remove escalated flag
     this.isEscalated = false
@@ -465,7 +465,7 @@ class Session {
     } catch (e) {
       console.log(`${this.id} - failed to send transcript:`, e.message)
     }
-    
+
     if (this.demo && this.demo.toLowerCase() === 'uccx') {
       // escalate to SM on UCCX demo
       this.escalateToSocialMiner(message)
