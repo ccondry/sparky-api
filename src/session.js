@@ -251,7 +251,7 @@ class Session {
       console.log(`${this.id} - csHost = ${this.csHost}`)
       this.csBackupHost = `https://${response.dns}/cs2`
       console.log(`${this.id} - csBackupHost = ${this.csBackupHost}`)
-      this.smHost = `https://${response.dns}/ccp`
+      this.smHost = `https://${response.dns}/sm/ccp`
       console.log(`${this.id} - smHost = ${this.smHost}`)
       this.demo = response.demo
       console.log(`${this.id} - demo = ${this.demo}`)
@@ -465,7 +465,7 @@ class Session {
     } catch (e) {
       console.log(`${this.id} - failed to send transcript:`, e.message)
     }
-    
+
     if (this.demo && this.demo.toLowerCase() === 'uccx') {
       // escalate to SM on UCCX demo
       this.escalateToSocialMiner(message)
