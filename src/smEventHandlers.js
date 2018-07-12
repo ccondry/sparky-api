@@ -43,6 +43,7 @@ function create (uccx, session) {
     },
     onChatCreated () {
       console.log(session.id, 'chat created')
+      session.addMessage('system', `Ok, I'll get you connected to one of our experts. One moment...`)
     },
     onStopPolling () {
       console.log(session.id, 'polling stopped')
