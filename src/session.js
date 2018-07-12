@@ -480,9 +480,9 @@ class Session {
 
     // set up UCCX chat system
     try {
-      console.log(this.id, 'setting up uccx chat client...')
+      console.log(this.id, 'setting up uccx chat client to', this.smHost, '...')
       const uccx = new uccxChatClient({
-        urlBase: process.env.UCCX_CHAT_BASE_URL,
+        urlBase: this.smHost,
         form: process.env.UCCX_CHAT_FORM_ID,
         csq: process.env.UCCX_CHAT_CSQ,
         title: 'Facebook Messenger',
