@@ -37,7 +37,7 @@
     "request-promise-native": "^1.0.5",
     "sax": "^1.2.1",
     "twilio": "^3.12.0",
-    "uccx-chat-client": "file:../uccx-chat-client",
+    "uccx-chat-client": "^0.1.2",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {}
