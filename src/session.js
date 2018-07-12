@@ -486,8 +486,10 @@ class Session {
         form: process.env.UCCX_CHAT_FORM_ID,
         csq: process.env.UCCX_CHAT_CSQ,
         title: 'Facebook Messenger',
-        customerName: 'Facebook Messenger',
-        author: `${this.firstName} ${this.lastName}`
+        customerName: `${this.firstName} ${this.lastName}`,
+        author: `${this.firstName} ${this.lastName}`,
+        customerEmail: this.email,
+        customerPhone: this.phone
       })
       console.log(this.id, 'uccx chat client created. setting up handlers...')
       uccx.setHandlers(smEventHandlers.create(uccx, this))
