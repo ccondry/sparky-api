@@ -458,6 +458,14 @@ class Session {
       }
     }
 
+    // send the chat transcript to Context Service
+    try {
+      await transcript.send(this)
+      console.log(`${this.id} - transcript sent.`)
+    } catch (e) {
+      console.log(`${this.id} - failed to send transcript:`, e.message)
+    }
+    
     if (this.demo && this.demo.toLowerCase() === 'uccx') {
       // escalate to SM on UCCX demo
       this.escalateToSocialMiner(message)
@@ -469,14 +477,6 @@ class Session {
 
   escalateToSocialMiner(message) {
     console.log(`${this.id} - escalating to SocialMiner agent`)
-    // send the chat transcript to Context Service
-    transcript.send(this)
-    .then(e => {
-      console.log(`${this.id} - transcript sent.`)
-    })
-    .catch(e => {
-      console.log(`${this.id} - failed to send transcript:`, e.message)
-    })
 
     // set up UCCX chat system
     try {
@@ -507,14 +507,6 @@ class Session {
 
   escalateToEgain (message) {
     console.log(`${this.id} - escalating to eGain/ECE agent`)
-    // send the chat transcript to Context Service
-    transcript.send(this)
-    .then(e => {
-      console.log(`${this.id} - transcript sent.`)
-    })
-    .catch(e => {
-      console.log(`${this.id} - failed to send transcript:`, e.message)
-    })
     // console.log('escalate session:', this)
     // build customer object for connection to eGain
     const customerObject = require('./egainCustomer').create({
