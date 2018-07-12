@@ -5,6 +5,8 @@ const egainEventHandlers = require('./egainEventHandlers')
 const transcript = require('./transcript')
 const axios = require('axios')
 const util = require('util')
+const uccxChatClient = require('uccx-chat-client')
+const smEventHandlers = require('./smEventHandlers')
 
 class Session {
   constructor (type, data) {
@@ -120,7 +122,12 @@ class Session {
     console.log(`deescalate session`)
     // try to end eGain session
     if (this.egainSession) {
+      // end eGain session for PCCE
       this.egainSession.End()
+    }
+    if (this.smSession) {
+      // end SocialMiner connection for UCCX
+      this.smSession.end()
     }
     // remove escalated flag
     this.isEscalated = false
@@ -165,9 +172,7 @@ class Session {
     }
     // is this chat escalated to an agent?
     if (this.isEscalated) {
-      console.log(`${this.id} - this chat is escalated already. sending message to ECE agent.`)
-      // send message to eGain agent
-      this.egainSession.SendMessageToAgent(message)
+      this.sendEscalatedMessage(message)
     } else if (this.botEnabled === false) {
       // if bot disabled, escalate directly to an agent
       this.escalate(message)
@@ -175,6 +180,18 @@ class Session {
       // console.log('getting bot response...')
       // let bot handle the response
       this.processCustomerMessage(message)
+    }
+  }
+
+  sendEscalatedMessage (message) {
+    if (this.demo && this.demo.toLowerCase() === 'uccx') {
+      // send to uccx session
+      console.log(`${this.id} - sending message to UCCX agent.`)
+      this.smSession.sendMessage(message)
+    } else {
+      // send message to eGain agent
+      console.log(`${this.id} - sending message to ECE agent.`)
+      this.egainSession.SendMessageToAgent(message)
     }
   }
 
@@ -231,9 +248,15 @@ class Session {
       console.log(`${this.id} - egainHost = ${this.egainHost}`)
       // set csHost to public DNS of demo vpod for transcript
       this.csHost = `https://${response.dns}/cs`
-      this.csBackupHost = `https://${response.dns}/cs2`
       console.log(`${this.id} - csHost = ${this.csHost}`)
+      this.csBackupHost = `https://${response.dns}/cs2`
       console.log(`${this.id} - csBackupHost = ${this.csBackupHost}`)
+      this.smHost = `https://${response.dns}/ccp`
+      console.log(`${this.id} - smHost = ${this.smHost}`)
+      this.demo = response.demo
+      console.log(`${this.id} - demo = ${this.demo}`)
+      this.demoVersion = response.version
+      console.log(`${this.id} - demo version = ${this.demoVersion}`)
       // set surveyHost to public DNS of demo vpod for saving survey answers
       this.surveyHost = `https://${response.dns}/survey`
       return true
@@ -421,7 +444,7 @@ class Session {
   }
 
   async escalate (message) {
-    if (!this.egainHost) {
+    if (!this.demo) {
       // check if session is valid, and get the session info
       const valid = await this.checkSessionInfo()
       if (!valid) {
@@ -434,8 +457,62 @@ class Session {
         // continue escalation
       }
     }
+
+    if (this.demo && this.demo.toLowerCase() === 'uccx') {
+      // escalate to SM on UCCX demo
+      this.escalateToSocialMiner(message)
+    } else {
+      // default to PCCE
+      this.escalateToEgain(message)
+    }
+  }
+
+  escalateToSocialMiner(message) {
+    console.log(`${this.id} - escalating to SocialMiner agent`)
     // send the chat transcript to Context Service
-    transcript.send(this).catch(e => {})
+    transcript.send(this)
+    .then(e => {
+      console.log(`${this.id} - transcript sent.`)
+    })
+    .catch(e => {
+      console.log(`${this.id} - failed to send transcript:`, e.message)
+    })
+
+    // set up UCCX chat system
+    try {
+      console.log(this.id, 'setting up uccx chat client...')
+      const uccx = new uccxChatClient({
+        urlBase: process.env.UCCX_CHAT_BASE_URL,
+        form: process.env.UCCX_CHAT_FORM_ID,
+        csq: process.env.UCCX_CHAT_CSQ,
+        title: 'Facebook Messenger',
+        customerName: 'Facebook Messenger',
+        author: `${this.firstName} ${this.lastName}`
+      })
+      console.log(this.id, 'uccx chat client created. setting up handlers...')
+      uccx.setHandlers(smEventHandlers.create(uccx, this))
+      console.log(this.id, 'uccx chat handlers set up.')
+      // save a reference to SocialMiner session
+      this.smSession = uccx
+      // start chat session
+      this.smSession.start()
+      // set escalated flag
+      this.isEscalated = true
+    } catch (e) {
+      console.error('error starting UCCX chat', e)
+    }
+  }
+
+  escalateToEgain (message) {
+    console.log(`${this.id} - escalating to eGain/ECE agent`)
+    // send the chat transcript to Context Service
+    transcript.send(this)
+    .then(e => {
+      console.log(`${this.id} - transcript sent.`)
+    })
+    .catch(e => {
+      console.log(`${this.id} - failed to send transcript:`, e.message)
+    })
     // console.log('escalate session:', this)
     // build customer object for connection to eGain
     const customerObject = require('./egainCustomer').create({
