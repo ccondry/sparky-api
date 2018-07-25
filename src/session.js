@@ -175,6 +175,7 @@ class Session {
       this.sendEscalatedMessage(message)
     } else if (this.botEnabled === false) {
       // if bot disabled, escalate directly to an agent
+      console.log(`${this.id} - bot disabled. Escalating directly to agent.`)
       this.escalate(message)
     } else {
       // console.log('getting bot response...')
@@ -467,9 +468,11 @@ class Session {
     }
 
     if (this.demo && this.demo.toLowerCase() === 'uccx') {
+      console.log(`${this.id} - Escalating to UCCX agent`)
       // escalate to SM on UCCX demo
       this.escalateToSocialMiner(message)
     } else {
+      console.log(`${this.id} - Escalating to PCCE agent`)
       // default to PCCE
       this.escalateToEgain(message)
     }
