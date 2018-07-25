@@ -1,0 +1,2 @@
+# Allow 'administrator' user to restart sparky-api service
+administrator ALL=NOPASSWD: /bin/systemctl restart sparky-api.service
