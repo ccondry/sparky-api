@@ -16,9 +16,17 @@ router.post('/', (req, res) => {
   // store new session in sessions global
   sessions[session.id] = session
 
-  // start conversation off by sending message 'sparky' as the customer, to get
-  // the initial configured message from the AI bot
-  session.processCustomerMessage('sparky')
+  // check if bot is disabled
+  if (!session.botEnabled) {
+    // bot is disabled - escalate right away
+    session.escalate()
+  } else {
+    // bot is enabled (default)
+    // start conversation off by sending message 'sparky' as the customer, to get
+    // the initial configured message from the AI bot
+    session.processCustomerMessage('sparky')
+  }
+
   // generate uuid and return to client
   return res.status(200).send({sessionId: session.id})
 })

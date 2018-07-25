@@ -132,7 +132,7 @@ class Session {
     // remove escalated flag
     this.isEscalated = false
     // start survey if enabled and not started already
-    if (this.data.survey) {
+    if (this.data.survey && this.botEnabled) {
       if (!this.inSurvey) {
         this.startSurvey()
       }
@@ -484,8 +484,17 @@ class Session {
     // set up UCCX chat system
     try {
       console.log(this.id, 'setting up uccx chat client to', this.smHost, '...')
-      const form = this.botEnabled ? process.env.UCCX_CHAT_BOT_FORM_ID : process.env.UCCX_CHAT_FORM_ID
-      const csq = this.botEnabled ? process.env.UCCX_CHAT_BOT_CSQ : process.env.UCCX_CHAT_CSQ
+      let form
+      let csq
+      if (this.type === 'facebook') {
+        // facebook chat
+        form = process.env.UCCX_CHAT_FACEBOOK_FORM_ID
+        csq = process.env.UCCX_CHAT_FACEBOOK_CSQ
+      } else {
+        // not facebook chat
+        form = this.botEnabled ? process.env.UCCX_CHAT_BOT_FORM_ID : process.env.UCCX_CHAT_FORM_ID
+        csq = this.botEnabled ? process.env.UCCX_CHAT_BOT_CSQ : process.env.UCCX_CHAT_CSQ
+      }
       const uccx = new uccxChatClient({
         urlBase: this.smHost,
         form,

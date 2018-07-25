@@ -43,7 +43,7 @@ function create (uccx, session) {
     },
     onChatCreated () {
       console.log(session.id, 'chat created')
-      session.addMessage('system', `Ok, I'll get you connected to one of our experts. One moment...`)
+      session.addMessage('system', `Welcome to Cumulus, please wait while we connect you with a customer care representative`)
     },
     onStopPolling () {
       console.log(session.id, 'polling stopped')
