@@ -79,7 +79,7 @@ class Session {
   getSessionInfo () {
     return request({
       method: 'GET',
-      url: `https://mm.cxdemo.net/api/v1/datacenters/${this.dcloudDatacenter.toUpperCase()}/sessions/${this.dcloudSession}`,
+      url: `${process.env.API_BASE}/api/v1/datacenters/${this.dcloudDatacenter.toUpperCase()}/sessions/${this.dcloudSession}`,
       json: true
     })
   }
@@ -240,7 +240,7 @@ class Session {
       return false
     }
     try {
-      console.log(`${this.id} - dCloud session and datacenter are set. Looking up session info from mm.cxdemo.net.`)
+      console.log(`${this.id} - dCloud session and datacenter are set. Looking up session info from ${process.env.API_BASE}.`)
       const response = await this.getSessionInfo()
       console.log(`${this.id} - found dCloud session and datacenter information`)
       // console.log('dcloud session response', response)
@@ -486,8 +486,8 @@ class Session {
       console.log(this.id, 'setting up uccx chat client to', this.smHost, '...')
       const uccx = new uccxChatClient({
         urlBase: this.smHost,
-        form: process.env.UCCX_CHAT_FORM_ID,
-        csq: process.env.UCCX_CHAT_CSQ,
+        form: process.env.UCCX_CHAT_BOT_FORM_ID,
+        csq: process.env.UCCX_CHAT_BOT_CSQ,
         title: 'Facebook Messenger',
         customerName: `${this.firstName} ${this.lastName}`,
         author: `${this.firstName} ${this.lastName}`,
