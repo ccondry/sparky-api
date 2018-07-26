@@ -514,6 +514,8 @@ class Session {
       this.smSession.start()
       // set escalated flag
       this.isEscalated = true
+      // tell customer we are finding an agent
+      this.addMessage('system', `Please wait while we connect you with a customer care representative...`)
     } catch (e) {
       console.error('error starting UCCX chat', e)
     }
