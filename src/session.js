@@ -487,16 +487,44 @@ class Session {
       let form
       let csq
       let title
-      if (this.type === 'facebook') {
-        // facebook chat
-        form = process.env.UCCX_CHAT_FACEBOOK_FORM_ID
-        csq = process.env.UCCX_CHAT_FACEBOOK_CSQ
-        title = 'Facebook Messenger'
-      } else {
-        // not facebook chat
-        form = this.botEnabled ? process.env.UCCX_CHAT_BOT_FORM_ID : process.env.UCCX_CHAT_FORM_ID
-        csq = this.botEnabled ? process.env.UCCX_CHAT_BOT_CSQ : process.env.UCCX_CHAT_CSQ
-        title = 'Chat Bot'
+      // set the form, csq, and title based on session type
+      switch (this.type) {
+        case 'facebook': {
+          // facebook chat
+          form = process.env.UCCX_CHAT_FACEBOOK_FORM_ID || '100000'
+          csq = process.env.UCCX_CHAT_FACEBOOK_CSQ || 'Chat_Csq28'
+          title = 'Facebook Messenger'
+          break
+        }
+        case 'twilio': {
+          // twilio
+          form = process.env.UCCX_SMS_FORM_ID || '100000'
+          csq = process.env.UCCX_SMS_CSQ || 'Chat_Csq2'
+          title = 'SMS'
+          break
+        }
+        case 'spark': {
+          // Webex Teams (spark)
+          form = process.env.UCCX_TEAMS_FORM_ID || '100000'
+          csq = process.env.UCCX_TEAMS_CSQ || 'Chat_Csq2'
+          title = 'Webex Teams'
+          break
+        }
+        default: {
+          // web chat or other
+          if (this.botEnabled) {
+            // bot enabled
+            form = process.env.UCCX_CHAT_BOT_FORM_ID || '100000'
+            csq = process.env.UCCX_CHAT_BOT_CSQ || 'Chat_Csq_31'
+            title = 'Chat Bot'
+          } else {
+            // bot disabled
+            form = process.env.UCCX_CHAT_FORM_ID || '100000'
+            csq = process.env.UCCX_CHAT_CSQ || 'Chat_Csq3'
+            title = 'Chat Bot'
+          }
+          break
+        }
       }
       const uccx = new uccxChatClient({
         urlBase: this.smHost,
