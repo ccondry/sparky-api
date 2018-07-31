@@ -33,7 +33,7 @@
     "mongodb": "^2.2.34",
     "node-strophe": "git+https://github.com/juxe/node-strophe.git",
     "query-string": "^5.1.0",
-    "request": "^2.79.0",
+    "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
     "sax": "^1.2.1",
     "twilio": "^3.12.0",
