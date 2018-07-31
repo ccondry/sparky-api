@@ -20,43 +20,50 @@ function findPage (id) {
 
 // Accepts POST requests at /webhook endpoint for Facebook
 router.post('/webhook', async function (req, res) {
-  // Parse the request body from the POST
-  let body = req.body;
-  console.log("Facebook webhook event:" + JSON.stringify(body))
-  // Check the webhook event is from a Page subscription
-  if (body.object === 'page') {
-    // process potentially multiple webhook data entries from facebook
-    for (let entry of body.entry) {
-      // process each message in the set
-      for (let message of entry.messaging) {
-        // find page info in database
-        const page = await findPage(message.recipient.id)
-        // is this for the instant demo or scheduled demos?
-        if (page.persistentDemo) {
-          // instant demo
-          // forward the request to the instant demo public DNS address
-          const instantResponse = await request({
-            uri: process.env.PERSISTENT_DEMO_FACEBOOK_WEBHOOK,
-            method: 'POST',
-            body,
-            resolveWithFullResponse: true
-          }).then
-          // don't process further messages - the instant demo server should
-          // process them instead. Return its response to facebook.
-          return res.status(instantResponse.statusCode).send(instantResponse.body)
-        } else {
-          // scheduled demo
-          // process each message, and wait for it
-          await fb.handleMessage(message).catch(e => console.error(e))
+  try {
+    // Parse the request body from the POST
+    let body = req.body;
+    console.log("Facebook webhook event:" + JSON.stringify(body))
+    // Check the webhook event is from a Page subscription
+    if (body.object === 'page') {
+      // process potentially multiple webhook data entries from facebook
+      for (let entry of body.entry) {
+        // process each message in the set
+        for (let message of entry.messaging) {
+          // find page info in database
+          const page = await findPage(message.recipient.id)
+          // is this for the instant demo or scheduled demos?
+          if (page.persistentDemo) {
+            // instant demo
+            // forward the request to the instant demo public DNS address
+            const instantResponse = await request({
+              url: process.env.PERSISTENT_DEMO_FACEBOOK_WEBHOOK,
+              method: 'POST',
+              body: req.body,
+              json: true,
+              resolveWithFullResponse: true
+            })
+
+            // don't process further messages - the instant demo server should
+            // process them instead. Return its response to facebook.
+            return res.status(instantResponse.statusCode).send(instantResponse.body)
+          } else {
+            // scheduled demo
+            // process each message, and wait for it
+            await fb.handleMessage(message).catch(e => console.error(e))
+          }
         }
       }
+      // Return a '200 OK' response to all events
+      return res.status(200).send('EVENT_RECEIVED');
+    } else {
+      console.log('this facebook webhook event is not from a Page. ignoring.')
+      // Return a '200 OK'
+      return res.status(200).send('EVENT_RECEIVED');
     }
-    // Return a '200 OK' response to all events
-    return res.status(200).send('EVENT_RECEIVED');
-  } else {
-    console.log('this facebook webhook event is not from a Page. ignoring.')
-    // Return a '200 OK'
-    return res.status(200).send('EVENT_RECEIVED');
+  } catch (e) {
+    console.error('faild during processing of facebook webhook', e.message)
+    return res.status(500).send()
   }
 })
 
