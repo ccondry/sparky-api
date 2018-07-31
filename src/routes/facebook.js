@@ -32,7 +32,7 @@ router.post('/webhook', async function (req, res) {
         // find page info in database
         const page = await findPage(message.recipient.id)
         // is this for the instant demo or scheduled demos?
-        if (page.instantDemo) {
+        if (page.persistentDemo) {
           // instant demo
           // forward the request to the instant demo public DNS address
           const instantResponse = await request({
