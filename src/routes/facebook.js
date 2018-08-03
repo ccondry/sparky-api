@@ -34,14 +34,20 @@ router.post('/webhook', async function (req, res) {
           const page = await findPage(message.recipient.id)
           // should this message be forwarded?
           if (page.forward) {
-            // forward the request to the url in database
-            const instantResponse = await request({
-              url: page.forward,
-              method: 'POST',
-              body: req.body,
-              json: true,
-              resolveWithFullResponse: true
-            })
+            console.log('Forwarding Facebook webhook event to', page.forward)
+            try {
+              // forward the request to the url in database
+              const instantResponse = await request({
+                url: page.forward,
+                method: 'POST',
+                body: req.body,
+                json: true,
+                resolveWithFullResponse: true
+              })
+            } catch (e) {
+              console.error('Failed to forward Facebook webhook event to', page.forward, e.message)
+              return res.status(500).send()
+            }
 
             // return the response from the destination server back to Facebook
             return res.status(instantResponse.statusCode).send(instantResponse.body)
