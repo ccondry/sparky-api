@@ -1,6 +1,6 @@
 {
   "name": "sparky-api",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Sparky - an ECE chat bot using api.ai",
   "main": "src/index.js",
   "scripts": {
