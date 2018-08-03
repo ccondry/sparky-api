@@ -32,23 +32,21 @@ router.post('/webhook', async function (req, res) {
         for (let message of entry.messaging) {
           // find page info in database
           const page = await findPage(message.recipient.id)
-          // is this for the instant demo or scheduled demos?
-          if (page.persistentDemo) {
-            // instant demo
-            // forward the request to the instant demo public DNS address
+          // should this message be forwarded?
+          if (page.forward) {
+            // forward the request to the url in database
             const instantResponse = await request({
-              url: process.env.PERSISTENT_DEMO_FACEBOOK_WEBHOOK,
+              url: page.forward,
               method: 'POST',
               body: req.body,
               json: true,
               resolveWithFullResponse: true
             })
 
-            // don't process further messages - the instant demo server should
-            // process them instead. Return its response to facebook.
+            // return the response from the destination server back to Facebook
             return res.status(instantResponse.statusCode).send(instantResponse.body)
           } else {
-            // scheduled demo
+            // process locally
             // process each message, and wait for it
             await fb.handleMessage(message).catch(e => console.error(e))
           }
