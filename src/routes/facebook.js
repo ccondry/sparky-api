@@ -66,7 +66,7 @@ router.post('/webhook', async function (req, res) {
       return res.status(200).send('EVENT_RECEIVED')
     }
   } catch (e) {
-    console.error('faild during processing of facebook webhook', e.message)
+    console.error('Failed during processing of facebook webhook', e.message)
     return res.status(500).send()
   }
 })
