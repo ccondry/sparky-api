@@ -59,11 +59,11 @@ router.post('/webhook', async function (req, res) {
         }
       }
       // Return a '200 OK' response to all events
-      return res.status(200).send('EVENT_RECEIVED');
+      return res.status(200).send('EVENT_RECEIVED')
     } else {
       console.log('this facebook webhook event is not from a Page. ignoring.')
       // Return a '200 OK'
-      return res.status(200).send('EVENT_RECEIVED');
+      return res.status(200).send('EVENT_RECEIVED')
     }
   } catch (e) {
     console.error('faild during processing of facebook webhook', e.message)
