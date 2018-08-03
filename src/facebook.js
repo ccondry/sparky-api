@@ -66,7 +66,7 @@ async function sendMessage(id, text, page) {
       }
     })
   } catch (e) {
-    console.log('facebook.sendMessage - Error sending message:', e);
+    console.error('facebook.sendMessage - Error sending message:', e.message)
   }
 }
 
