@@ -44,13 +44,12 @@ router.post('/webhook', async function (req, res) {
                 json: true,
                 resolveWithFullResponse: true
               })
+              // return the response from the destination server back to Facebook
+              return res.status(instantResponse.statusCode).send(instantResponse.body)
             } catch (e) {
               console.error('Failed to forward Facebook webhook event to', page.forward, e.message)
               return res.status(500).send()
             }
-
-            // return the response from the destination server back to Facebook
-            return res.status(instantResponse.statusCode).send(instantResponse.body)
           } else {
             // process locally
             // process each message, and wait for it
