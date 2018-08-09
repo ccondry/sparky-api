@@ -43,7 +43,7 @@ async function handleWebhook (body) {
       console.log('response.data', response.data)
       await handleMessage(app, response.data)
     } catch (e) {
-      console.error('error during Webex Teams handleWebhook', e)
+      console.error('error during Webex Teams handleWebhook', e.message)
     }
   } else {
     console.log(`Webex Teams webhook received, but it was not direct room type. room type = ${roomType}`)
@@ -99,11 +99,7 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
       onAddMessage: function (type, message) {
         // send messages to Spark user, and decode HTML characters
         sendMessage(personEmail, entities.decode(message), app).catch(e => {
-          const error = {
-            status: e.response.status,
-            data: e.response.data
-          }
-          console.error('Error sending Webex Teams message: ', error)
+          console.error('Error sending Webex Teams message: ', e.message)
         })
       },
       removeSession: function () {
@@ -200,7 +196,7 @@ function removeSession (session) {
     // console.log(`sessions`, sessions)
   } catch (e) {
     // do nothing
-    console.error(e)
+    console.error(e.message)
   }
 }
 
