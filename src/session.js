@@ -531,7 +531,7 @@ class Session {
         form,
         csq,
         title,
-        // customerName: `${this.firstName} ${this.lastName}`,
+        customerName: `${this.firstName} ${this.lastName}`,
         author: `${this.firstName} ${this.lastName}`,
         // author: '',
         customerEmail: this.email,
