@@ -6,7 +6,7 @@ const spark = require('../spark')
 
 // webex teams webhook receiver
 router.post('/webhook', async (req, res) => {
-  console.log(`Cisco Webex Teams webhook event on webhook ID ${req.body.id}`)
+  console.log(`Webex Teams webhook event:`, req.body)
   if (validateRequest(req, process.env.TEAMS_PAYLOAD_SECRET)) {
     console.log('Webex Teams webhook event validated.')
     try {
