@@ -30,8 +30,8 @@ app.use('/api/vi/ai', require('./routes/ai'))
 app.use('/api/v1/facebook', require('./routes/facebook'))
 // Twilio webhook
 app.use('/api/v1/twilio', require('./routes/twilio'))
-// Cisco Spark webhooks
-app.use('/api/v1/spark', require('./routes/spark'))
+// Cisco Webex Teams webhooks
+app.use('/api/v1/teams', require('./routes/teams'))
 
 // listen on port defined in .env
 const server = app.listen(process.env.PORT || 5000, () => {

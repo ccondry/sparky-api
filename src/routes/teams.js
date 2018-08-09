@@ -4,10 +4,10 @@ const router = express.Router()
 const crypto = require('crypto')
 const spark = require('../spark')
 
-// Accepts POST requests at /webhook endpoint for Facebook
-router.post('/message-events', (req, res) => {
-  // console.log(`Cisco Spark webhook event on webhook ID ${req.body.id}`)
-  if (validateRequest(req, process.env.spark_bot_webhook_secret)) {
+// webex teams webhook receiver
+router.post('/webhook', (req, res) => {
+  console.log(`Cisco Webex Teams webhook event on webhook ID ${req.body.id}`, req.body, req.headers)
+  if (validateRequest(req, process.env.TEAMS_PAYLOAD_SECRET)) {
     spark.handleWebhook(req.body).catch(e => console.error(e))
     return res.status(202).send()
   } else {

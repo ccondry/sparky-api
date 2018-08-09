@@ -51,7 +51,7 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
   let session
   // find session, if exists
   session = getSession(appId, personEmail)
-  
+
   // did session expire?
   if (session) {
     session.checkExpiration()
@@ -73,6 +73,10 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
     let botEnabled = true
     // enable survey by default
     let survey = true
+    // check if app.survey is set, and use that value if so
+    if (typeof app.survey === 'boolean') {
+      survey = app.survey
+    }
     // create session and store in sessions global
     session = new Session('spark', {
       appId,
@@ -114,30 +118,30 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
   // were there any attachments?
   if (files && files.length) {
     // process attachments to send to agent
-    files.forEach(file => {
-      // are we escalated to an eGain agent?
-      if (session.isEscalated) {
-        // download the file locally and get a public URL for it
-        // const attachmentUrl = await saveAttachment(file, app)
-        // TODO generate a real URL here
-        const attachmentUrl = 'https://gribgcdrqn.localtunnel.me/api/v1/attachment/123'
-        // send the file to the agent in eGain
-        session.egainSession._sendCustomerAttachmentNotification(attachmentUrl, `${session.firstName} ${session.lastName}`)
-      } else {
-        console.log(`${session.firstName} ${session.lastName} sent a file attachment.`)
-        // note that user attached a file
-        session.addMessage('customer', '(file attachment)')
-        // just the bot here - let user know we can't do anything with them
-        const m = `I'm sorry, but I can't handle file attachments. If you would like to speak to an agent, say 'agent'.`
-        // add message
-        session.addMessage('bot', m)
-      }
-    })
+    // files.forEach(file => {
+    //   // are we escalated to an eGain agent?
+    //   if (session.isEscalated) {
+    //     // download the file locally and get a public URL for it
+    //     // const attachmentUrl = await saveAttachment(file, app)
+    //     // TODO generate a real URL here
+    //     const attachmentUrl = 'https://gribgcdrqn.localtunnel.me/api/v1/attachment/123'
+    //     // send the file to the agent in eGain
+    //     session.egainSession._sendCustomerAttachmentNotification(attachmentUrl, `${session.firstName} ${session.lastName}`)
+    //   } else {
+    //     console.log(`${session.firstName} ${session.lastName} sent a file attachment.`)
+    //     // note that user attached a file
+    //     session.addMessage('customer', '(file attachment)')
+    //     // just the bot here - let user know we can't do anything with them
+    //     const m = `I'm sorry, but I can't handle file attachments. If you would like to speak to an agent, say 'agent'.`
+    //     // add message
+    //     session.addMessage('bot', m)
+    //   }
+    // })
   }
 }
 
 function findApp (id) {
-  return db.findOne('spark.apps', {id})
+  return db.findOne('teams.bots', {id})
 }
 
 // async function registerPage (id, token, aiToken, entryPointId) {
