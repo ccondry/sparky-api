@@ -5,12 +5,17 @@ const crypto = require('crypto')
 const spark = require('../spark')
 
 // webex teams webhook receiver
-router.post('/webhook', (req, res) => {
+router.post('/webhook', async (req, res) => {
   console.log(`Cisco Webex Teams webhook event on webhook ID ${req.body.id}`)
   if (validateRequest(req, process.env.TEAMS_PAYLOAD_SECRET)) {
     console.log('Webex Teams webhook event validated.')
-    spark.handleWebhook(req.body).catch(e => console.error(e))
-    return res.status(202).send()
+    try {
+      await spark.handleWebhook(req.body).catch(e => console.error(e))
+      return res.status(202).send()
+    } catch (e) {
+      console.log('Failed during handleWebhook of Webex Teams event:', e.message)
+      return res.status(500).send()
+    }
   } else {
     console.log('Webex Teams webhook event failed validation. Returning 401.')
     return res.status(401).send()
