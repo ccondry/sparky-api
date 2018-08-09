@@ -563,7 +563,8 @@ class Session {
       lastName: this.lastName,
       email: this.email,
       phone: this.phone,
-      subject: message
+      subject: message,
+      pkey: !this.phone.length ? 'email' : 'phone'
       // visitId: this.visitId
     })
 
