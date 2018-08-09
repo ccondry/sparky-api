@@ -15,10 +15,10 @@ const dbName = 'teams.bots'
 async function handleWebhook (body) {
   console.log('inside spark.handleWebhook')
   // ignore messages that we sent
-  if (body.actorId === body.createdBy) {
-    console.log('Webex Teams message from self. ignoring.')
-    return
-  }
+  // if (body.actorId === body.createdBy) {
+  //   console.log('Webex Teams message from self. ignoring.')
+  //   return
+  // }
   // find app config in database
   console.log('Webex Teams webhook - searching for app')
   const app = await findApp(body.appId)
