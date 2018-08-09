@@ -7,20 +7,26 @@ const entities = new Entities()
 const axios = require('axios')
 
 const sessions = {}
+// name of mongodb collection
+const dbName = 'teams.bots'
 
 // handle incoming Spark webhooks - retrieve the message and pass info
 // to the handleMessage function
 async function handleWebhook (body) {
+  console.log('inside spark.handleWebhook')
   // ignore messages that we sent
   if (body.actorId === body.createdBy) {
+    console.log('Webex Teams message from self. ignoring.')
     return
   }
   // find app config in database
+  console.log('Webex Teams webhook - searching for app')
   const app = await findApp(body.appId)
   // console.log('app', app)
   if (app === null || !app.token) {
-    throw `Spark app ${appId} not registered. Please register this Spark app with a Spark access token and Spark bot ID.`
+    throw new Error(`Webex Teams app ${appId} not registered. Please register this Teams app with a Teams access token and Teams bot ID in the '${dbName}' database.`)
   }
+  console.log('Webex Teams webhook - app found.')
   // req.body.data.roomType = 'direct'
   // console.log('Spark webhook', body)
   const roomType = body.data.roomType
@@ -37,16 +43,16 @@ async function handleWebhook (body) {
       console.log('response.data', response.data)
       await handleMessage(app, response.data)
     } catch (e) {
-      console.error('error during Spark handleWebhook', e)
+      console.error('error during Webex Teams handleWebhook', e)
     }
   } else {
-    console.log(`Spark webhook received, but it was not direct room type. room type = ${roomType}`)
+    console.log(`Webex Teams webhook received, but it was not direct room type. room type = ${roomType}`)
   }
 }
 
 async function handleMessage (app, {text, personEmail, personId, roomId, files}) {
   const appId = app.id
-  console.log(`message received from Spark user ${personEmail} on app ID ${appId}:`, text)
+  console.log(`message received from Webex Teams user ${personEmail} on app ID ${appId}:`, text)
 
   let session
   // find session, if exists
@@ -63,13 +69,13 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
 
   // if session doesn't exist, create one
   if (!session) {
-    console.log('new Spark chat session')
+    console.log('new Webex Teams chat session')
     // get user info
     const user = await getSenderInfo(personId, app.token)
     // console.log('found Spark user info', user.data)
     const firstName = user.data.firstName
     const lastName = user.data.lastName
-    console.log(`new Spark chat session is for ${firstName} ${lastName}`)
+    console.log(`new Webex Teams chat session is for ${firstName} ${lastName}`)
     let botEnabled = true
     // enable survey by default
     let survey = true
@@ -97,7 +103,7 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
             status: e.response.status,
             data: e.response.data
           }
-          console.error('Error sending Spark message: ', error)
+          console.error('Error sending Webex Teams message: ', error)
         })
       },
       removeSession: function () {
@@ -108,7 +114,7 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
     // add session to global sessions
     addSession(session)
   } else {
-    console.log(`existing Spark chat session with ${session.email}`)
+    console.log(`existing Webex Teams chat session with ${session.email}`)
   }
   // was there text in the message?
   if (text) {
@@ -117,6 +123,7 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
   }
   // were there any attachments?
   if (files && files.length) {
+    console.log(`Webex Teams webhook had file attachments - but I'm not prepared to handle those yet.`)
     // process attachments to send to agent
     // files.forEach(file => {
     //   // are we escalated to an eGain agent?
@@ -141,7 +148,7 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
 }
 
 function findApp (id) {
-  return db.findOne('teams.bots', {id})
+  return db.findOne(dbName, {id})
 }
 
 // async function registerPage (id, token, aiToken, entryPointId) {
@@ -166,7 +173,7 @@ function getSenderInfo(personId, token) {
 // send facebook message from page to user
 async function sendMessage(toPersonEmail, text, {token}) {
   if (!text || text.length === 0) {
-    return console.log(`Not sending empty string to Spark.`)
+    return console.log(`Not sending empty string to Webex Teams.`)
   }
   const url = `https://api.ciscospark.com/v1/messages`
   const body = {toPersonEmail, text}
@@ -187,7 +194,7 @@ function getSession (appId, email) {
 }
 
 function removeSession (session) {
-  console.log(`remove Spark session [${session.data.appId}][${session.email}]`)
+  console.log(`remove Webex Teams session [${session.data.appId}][${session.email}]`)
   try {
     delete sessions[session.data.appId][session.email]
     // console.log(`sessions`, sessions)
