@@ -24,7 +24,7 @@ async function handleWebhook (body) {
   const app = await findApp(body.appId)
   // console.log('app', app)
   if (app === null || !app.token) {
-    throw new Error(`Webex Teams app ${appId} not registered. Please register this Teams app with a Teams access token and Teams bot ID in the '${dbName}' database.`)
+    throw new Error(`Webex Teams app ${body.appId} not registered. Please register this Teams app with a Teams access token and Teams bot ID in the '${dbName}' database.`)
   }
   console.log('Webex Teams webhook - app found.')
   // req.body.data.roomType = 'direct'
