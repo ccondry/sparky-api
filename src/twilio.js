@@ -17,10 +17,10 @@ function getLookupNumber (from, to) {
   const pnFrom = PhoneNumber(from)
   const pnTo = PhoneNumber(to)
   // check if customer is in same country as SMS number
-  if (pnFrom.getNumber('regionCode') === pnTo.getNumber('regionCode')) {
+  if (pnFrom.getRegionCode() === pnTo.getRegionCode()) {
     // customer region === SMS region
     return pnFrom.getNumber('significant')
-  } else if (to === process.env.TWILIO_APJ_NUMBER && pnFrom.getNumber('regionCode') === 'SG') {
+  } else if (to === process.env.TWILIO_APJ_NUMBER && pnFrom.getRegionCode() === 'SG') {
     // Singapore customer using the APJ SMS number (which is not in Singapore)
     return pnFrom.getNumber('significant')
   } else {
