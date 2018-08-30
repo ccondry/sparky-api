@@ -31,10 +31,8 @@ class Session {
     this.onAddMessage = data.onAddMessage
     // resolve this promise to get user data
     // this.getCustomerData = data.getCustomerData
-    // this.apiAiToken = data.apiAiToken || process.env.API_AI_TOKEN
-    // just use the one static token
-    this.apiAiToken = process.env.API_AI_TOKEN
 
+    this.apiAiToken = data.apiAiToken || process.env.API_AI_TOKEN
     this.entryPointId = data.entryPointId || process.env.ENTRY_POINT_ID
 
     // dCloud session information
