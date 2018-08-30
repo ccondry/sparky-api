@@ -57,6 +57,11 @@ class Session {
     console.log(`${this.id} - new ${this.type} session created for ${this.email}`)
     // create survey answers array
     this.surveyAnswers = []
+
+    // if we have dcloud session and datacenter info, check the session info now
+    if (this.dcloudSession && this.dcloudDatacenter) {
+      this.checkSessionInfo()
+    }
   }
 
   checkExpiration () {
@@ -260,12 +265,33 @@ class Session {
       console.log(`${this.id} - demo version = ${this.demoVersion}`)
       // set surveyHost to public DNS of demo vpod for saving survey answers
       this.surveyHost = `https://${response.dns}/survey`
+
+      // get any extra configuration the user has set up on their demo
+      this.demoConfig = response.configuration || {}
+      console.log(this.id, 'demo configuration', this.demoConfig)
+
+      // apply any demo configs for chat bots
+      if (this.demoConfig.chatBotToken) {
+        this.apiAiToken = this.demoConfig.chatBotToken
+      }
+      if (this.demoConfig.language) {
+        this.language = this.demoConfig.language
+      }
+      if (this.demoConfig.chatBotEnabled) {
+        this.botEnabled = this.demoConfig.chatBotEnabled
+      }
+      if (this.demoConfig.chatBotSurveyEnabled) {
+        this.survey = this.demoConfig.chatBotSurveyEnabled
+      }
+
+      // success
       return true
     } catch (e) {
       console.error(`${this.id} - error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
       // reset the session info to null
       this.dcloudDatacenter = null
       this.dcloudSession = null
+      // failed
       return false
     }
   }
