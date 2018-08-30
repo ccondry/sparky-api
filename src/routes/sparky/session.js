@@ -4,7 +4,7 @@ const Session = require('../../session')
 const sessions = require('../../sessions')
 
 // get new session ID for sparky-ui client
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   // console.log('request to create new session: ', req.body)
 
   // set up function to remove session when it has expired, etc.
@@ -13,6 +13,10 @@ router.post('/', (req, res) => {
   }
   // create session and store in sessions global
   const session = new Session('sparky-ui', req.body)
+  // wait for the checkSessionInfo method to finish, so that any custom config
+  // is applied before we start the chat bot
+  await session.checkSessionPromise
+
   // store new session in sessions global
   sessions[session.id] = session
 

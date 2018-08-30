@@ -58,7 +58,7 @@ class Session {
 
     // if we have dcloud session and datacenter info, check the session info now
     if (this.dcloudSession && this.dcloudDatacenter) {
-      this.checkSessionInfo()
+      this.checkSessionPromise = this.checkSessionInfo()
     }
   }
 
