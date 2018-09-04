@@ -1618,27 +1618,26 @@ eGainLibrary = function (librarySettings) {
             // console.log('__dirname', __dirname)
             fs.readFile(path.resolve(__dirname + '/../', messagingPropertyUrl), 'utf8', function (err,data) {
                 if (err) {
-                    return console.log(err);
+                    //return console.log(err);
+                    console.log('failed to read messageing properties file', messagingPropertyUrl, err)
+                    console.log('Attempting to load default messaging properties file instead', messagingPropertyUrl, err.message)
+
+                    // load default messaging properties
+                    var defaultMessagingPropertyUrl = _eGainContextPath + 'l10n/messaging_en_US.properties'
+                    fs.readFile(path.resolve(__dirname + '/../', defaultMessagingPropertyUrl), 'utf8', function (err2, data2) {
+                      if (err2) {
+                        console.log('failed to read default messageing properties file', defaultMessagingPropertyUrl, err2.message)
+                      } else {
+                        // successfully loaded default messaging properties
+                        _connection.eGainMessagingProperty = "\n" + data2;
+                      }
+                    })
+                } else {
+                  // successfully loaded specified messaging properties
+                  _connection.eGainMessagingProperty = "\n" + data;
                 }
-                //console.log(data);
-                _connection.eGainMessagingProperty = "\n" + data;
-                //_connection.eGainMessagingProperty = _connection.eGainMessagingProperty + "\n" + data;
-                //if (_onCallBackMessagePropertyLoad !== null && _onCallBackMessagePropertyLoad !== undefined) {
-                //    _onCallBackMessagePropertyLoad(data);
-                //}
-            });
-//            $.ajax({
-//                url: messagingPropertyUrl,
-//                type: 'GET',
-//                dataType: 'text',
-//                success: function (data) {
-//                    _connection.eGainMessagingProperty = data;
-//                    if (_onMessagePropertyLoad !== null && _onMessagePropertyLoad !== undefined) {
-//                        _onMessagePropertyLoad(data);
-//                    }
-//                }
-//            });
-        };
+              });
+            }
 
         this._start = function () {
             connectionObj.Start(onConnect);
@@ -2609,10 +2608,25 @@ eGainLibrary = function (librarySettings) {
             // console.log('__dirname', __dirname)
             fs.readFile(path.resolve(__dirname + '/../', messagingPropertyUrl), 'utf8', function (err,data) {
                 if (err) {
-                    return console.log(err);
+                    //return console.log(err);
+                    console.log('failed to read messageing properties file', messagingPropertyUrl, err)
+                    console.log('Attempting to load default messaging properties file instead', messagingPropertyUrl, err.message)
+
+                    // load default messaging properties
+                    var defaultMessagingPropertyUrl = _eGainContextPath + 'l10n/messaging_en_US.properties'
+                    fs.readFile(path.resolve(__dirname + '/../', defaultMessagingPropertyUrl), 'utf8', function (err2, data2) {
+                      if (err2) {
+                        console.log('failed to read default messageing properties file', defaultMessagingPropertyUrl, err2.message)
+                      } else {
+                        // successfully loaded default messaging properties
+                        _connection.eGainMessagingProperty = "\n" + data2;
+                      }
+                    })
+                } else {
+                  // successfully loaded specified messaging properties
+                  _connection.eGainMessagingProperty = "\n" + data;
                 }
                 //console.log(data);
-                _connection.eGainMessagingProperty = "\n" + data;
 //                _connection.eGainMessagingProperty = _connection.eGainMessagingProperty + "\n" + data;
 //                if (_onCallBackMessagePropertyLoad !== null && _onCallBackMessagePropertyLoad !== undefined) {
 //                    _onCallBackMessagePropertyLoad(data);
