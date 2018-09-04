@@ -99,7 +99,7 @@ class Session {
   // add new message to session
   addMessage (type, message) {
     // if message is not empty string
-    if (message.length) {
+    if (message && message.length) {
       // push message to array
       this.messages.push({
         text: message,
