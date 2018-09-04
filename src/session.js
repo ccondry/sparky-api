@@ -25,10 +25,14 @@ class Session {
     this.email = data.email
     this.firstName = data.firstName
     this.lastName = data.lastName
+
+    // set language and country (region)
     this.language = data.language || process.env.DEFAULT_LANGUAGE || 'en'
-    this.country = data.country || process.env.DEFAULT_COUNTRY || 'US'
+    this.region = data.region || process.env.DEFAULT_REGION || 'US'
+
+    this.languageCode = `${this.language.toLowerCase()}_${this.region.toUpperCase()}`
     // set localization object
-    this.localization = localization[`${this.language.toLowerCase()}_${this.country.toUpperCase()}`]
+    this.localization = localization[this.languageCode]
 
     // run this callback at de-escalation time
     this.removeSession = data.removeSession
@@ -280,8 +284,8 @@ class Session {
       if (this.demoConfig.language) {
         this.language = this.demoConfig.language
       }
-      if (this.demoConfig.country) {
-        this.country = this.demoConfig.country
+      if (this.demoConfig.region) {
+        this.region = this.demoConfig.region
       }
       if (this.demoConfig.chatBotEnabled) {
         this.botEnabled = this.demoConfig.chatBotEnabled
@@ -289,6 +293,8 @@ class Session {
       if (this.demoConfig.chatBotSurveyEnabled) {
         this.survey = this.demoConfig.chatBotSurveyEnabled
       }
+      // update localization
+      this.localization = localization[this.languageCode]
 
       // success
       return true
