@@ -235,7 +235,7 @@ async function handleMessage (message) {
             // note that user attached a file
             session.addMessage('customer', '(file attachment)')
             // just the bot here - let user know we can't do anything with them
-            session.addMessage('bot', process.env.MESSAGE_BOT_FILE_ATTACHMENT)
+            session.addMessage('bot', session.localization.botFileAttachment)
             // send message to facebook user
             sendMessage(userId, m, page)
           }

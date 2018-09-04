@@ -7,6 +7,7 @@ const axios = require('axios')
 const util = require('util')
 const uccxChatClient = require('uccx-chat-client')
 const smEventHandlers = require('./smEventHandlers')
+const localization = require('./localization')
 
 class Session {
   constructor (type, data) {
@@ -25,7 +26,10 @@ class Session {
     this.firstName = data.firstName
     this.lastName = data.lastName
     this.language = data.language || process.env.DEFAULT_LANGUAGE || 'en'
-    this.country = data.coundry || process.env.DEFAULT_COUNTRY || 'US'
+    this.country = data.country || process.env.DEFAULT_COUNTRY || 'US'
+    // set localization object
+    this.localization = localization[`${this.language.toLowerCase()}_${this.country.toUpperCase()}`]
+
     // run this callback at de-escalation time
     this.removeSession = data.removeSession
     // run this callback when messages are added
@@ -68,7 +72,7 @@ class Session {
     if (new Date().getTime() > this.expiry) {
       console.log(`${this.id} - session is old and has expired. Informing user about it and remove this session.`)
       // TODO update this message
-      this.addMessage('bot', process.env.MESSAGE_SESSION_EXPIRED)
+      this.addMessage('bot', this.sessionExpired)
       //remove session from sessions
       this.endSession()
     }
@@ -379,18 +383,18 @@ class Session {
           // start REM call
           this.addCommand('start-rem-video')
         } else {
-          this.addMessage('bot', `I'm sorry, I'm not able to connect a video call to you from here.`)
+          this.addMessage('bot', this.localization.noVideo)
         }
         break
       }
       case 'mortgage-calculator': {
         console.log(`${this.id} - sending mortgage-calculator command`)
         if (this.type === 'sparky-ui') {
-          this.addMessage('bot', 'Ok... Your calculator should have appeared on the left!')
+          this.addMessage('bot', this.localization.calculatorAppeared)
           // open mortgage calculator
           this.addCommand('mortgage-calculator')
         } else {
-          this.addMessage('bot', 'Here is our mortgage calculator: ' + process.env.CALCULATOR_URL)
+          this.addMessage('bot', this.localization.calculator + ' ' + process.env.CALCULATOR_URL)
         }
         break
       }
@@ -575,7 +579,8 @@ class Session {
       // set escalated flag
       this.isEscalated = true
       // tell customer we are finding an agent
-      this.addMessage('system', `Please wait while we connect you with a customer care representative...`)
+      // this.addMessage('system', `Please wait while we connect you with a customer care representative...`)
+      this.addMessage('system', this.localization.welcomeMessage)
     } catch (e) {
       console.error('error starting UCCX chat', e)
     }
@@ -601,7 +606,7 @@ class Session {
       // create instance of ECE chat object
       const myChat = new myLibrary.Chat()
       // build ECE chat event handlers
-      const myEventHandlers = egainEventHandlers.create(myChat, this)
+      const myEventHandlers = egainEventHandlers.create(myChat, this, this.localization)
       // init the ECE chat object
       myChat.Initialize(this.entryPointId, this.language, this.country, myEventHandlers, 'aqua', 'v11')
       // set ECE chat customer object
@@ -625,7 +630,7 @@ class Session {
     switch (args.StatusMessage) {
       case 'L10N_NO_AGENTS_AVAILABLE': {
         // tell customer that there are no agents available
-        this.addMessage('system', process.env.MESSAGE_SYSTEM_NO_AGENTS_AVAILABLE)
+        this.addMessage('system', this.localization.noAgentsAvailable)
         // turn off survey
         this.data.survey = false
         // end egain session
