@@ -25,6 +25,7 @@ class Session {
     this.firstName = data.firstName
     this.lastName = data.lastName
     this.language = data.language || process.env.DEFAULT_LANGUAGE || 'en'
+    this.country = data.coundry || process.env.DEFAULT_COUNTRY || 'US'
     // run this callback at de-escalation time
     this.removeSession = data.removeSession
     // run this callback when messages are added
@@ -274,6 +275,9 @@ class Session {
       }
       if (this.demoConfig.language) {
         this.language = this.demoConfig.language
+      }
+      if (this.demoConfig.country) {
+        this.country = this.demoConfig.country
       }
       if (this.demoConfig.chatBotEnabled) {
         this.botEnabled = this.demoConfig.chatBotEnabled
@@ -599,7 +603,7 @@ class Session {
       // build ECE chat event handlers
       const myEventHandlers = egainEventHandlers.create(myChat, this)
       // init the ECE chat object
-      myChat.Initialize(this.entryPointId, this.language, 'US', myEventHandlers, 'aqua', 'v11')
+      myChat.Initialize(this.entryPointId, this.language, this.country, myEventHandlers, 'aqua', 'v11')
       // set ECE chat customer object
       myLibrary.SetCustomer(customerObject)
       // start chat with ECE system
