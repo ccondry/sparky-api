@@ -280,23 +280,30 @@ class Session {
       // apply any demo configs for chat bots
       if (this.demoConfig.chatBotToken) {
         this.apiAiToken = this.demoConfig.chatBotToken
+        console.log(this.id, '- used dCloud session config to update apiAiToken to', this.apiAiToken)
       }
       if (this.demoConfig.language) {
         this.language = this.demoConfig.language
+        console.log(this.id, '- used dCloud session config to update language to', this.language)
       }
       if (this.demoConfig.region) {
         this.region = this.demoConfig.region
+        console.log(this.id, '- used dCloud session config to update region to', this.region)
       }
       if (this.demoConfig.chatBotEnabled) {
         this.botEnabled = this.demoConfig.chatBotEnabled
+        console.log(this.id, '- used dCloud session config to update botEnabled to', this.botEnabled)
       }
       if (this.demoConfig.chatBotSurveyEnabled) {
         this.survey = this.demoConfig.chatBotSurveyEnabled
+        console.log(this.id, '- used dCloud session config to update survey to', this.survey)
       }
       // update language code
       this.languageCode = `${this.language.toLowerCase()}_${this.region.toUpperCase()}`
+      console.log(this.id, '- used dCloud session config to update languageCode to', this.languageCode)
       // update localization object
       this.localization = localization[this.languageCode]
+      console.log(this.id, '- used dCloud session config to update localization to', this.localization)
 
       // success
       return true
