@@ -293,7 +293,9 @@ class Session {
       if (this.demoConfig.chatBotSurveyEnabled) {
         this.survey = this.demoConfig.chatBotSurveyEnabled
       }
-      // update localization
+      // update language code
+      this.languageCode = `${this.language.toLowerCase()}_${this.region.toUpperCase()}`
+      // update localization object
       this.localization = localization[this.languageCode]
 
       // success
