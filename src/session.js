@@ -621,7 +621,7 @@ class Session {
       // create instance of ECE chat object
       const myChat = new myLibrary.Chat()
       // build ECE chat event handlers
-      const myEventHandlers = egainEventHandlers.create(myChat, this, this.localization)
+      const myEventHandlers = egainEventHandlers.create(myChat, this)
       // init the ECE chat object
       myChat.Initialize(this.entryPointId, this.language, this.region, myEventHandlers, 'aqua', 'v11')
       // set ECE chat customer object

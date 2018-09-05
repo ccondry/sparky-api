@@ -1,4 +1,4 @@
-function create (myChat, session, localization) {
+function create (myChat, session) {
   let myEventHandlers = myChat.GetEventHandlers()
 
   myEventHandlers.OnConnectionInitialized = function (args) {
@@ -39,7 +39,7 @@ function create (myChat, session, localization) {
     console.log(`${session.id} - eGain OnConnectSuccess`, args)
     if (session.botEnabled) {
       // console.log(welcomeMessage)
-      session.addMessage('system', localization.welcomeMessage)
+      session.addMessage('system', session.localization.welcomeMessage)
     } else {
       // do nothing
     }
@@ -64,7 +64,7 @@ function create (myChat, session, localization) {
     console.log(`${session.id} - eGain OnErrorOccurred`, args)
     // session.addMessage('system', args.toString())
     if (args.status === 'error') {
-      session.addMessage('system', localization.errorMessage)
+      session.addMessage('system', session.localization.errorMessage)
       // session.onEgainEnd()
       session.deescalate(args.message)
     } else if (args.status === 'log') {
@@ -84,7 +84,7 @@ function create (myChat, session, localization) {
   myEventHandlers.OnCustomerAttachmentNotificationSent = function (args) {
     console.log(`${session.id} - eGain OnCustomerAttachmentNotificationSent`, args)
     // send command for sparky-ui chat client to accept
-    session.addMessage('system', localization.waitingAcceptAttachment)
+    session.addMessage('system', session.localization.waitingAcceptAttachment)
     session.addCommand('accept-attachment')
   }
   /* Example of uploading attachment to chat server when agent accepts attachment invite */
@@ -93,13 +93,13 @@ function create (myChat, session, localization) {
     // TODO implement something else here?
     // file.uniqueFileId = args.uniqueFileId
     // myChat.UploadAttachment(file, args.agentName)
-    session.addMessage('system', localization.acceptedAttachment)
+    session.addMessage('system', session.localization.acceptedAttachment)
   }
 
   /* Example of sending notification to chat server when customer accepts attachment invite */
   myEventHandlers.OnAttachmentInviteReceived = function (args) {
     console.log(`${session.id} - eGain OnAttachmentInviteReceived`, args)
-    session.addMessage('system', `${args.Attachment.AgentName} ${localization.attachmentReceived}: ${args.Attachment.Name}`)
+    session.addMessage('system', `${args.Attachment.AgentName} ${session.localization.attachmentReceived}: ${args.Attachment.Name}`)
     // var acceptBtn = document.createElement('input');
     // acceptBtn.type = "button";
     // acceptBtn.value = "Accept";
