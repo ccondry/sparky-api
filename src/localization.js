@@ -8,7 +8,7 @@ module.exports = {
     sessionExpired: "Your previous session has ended.",
     botFileAttachment: "I'm sorry, but I can't handle file attachments. If you would like to speak to an agent, say 'agent'.",
     noAgentsAvailable: "Sorry, there are no agents available to assist you at this time. Please try again later.",
-    calculatorAppeared: "'Ok... Your calculator should have appeared on the left!'",
+    calculatorAppeared: "Ok... Your calculator should have appeared on the left!",
     calculator: "Here is our mortgage calculator:",
     noVideo: "I'm sorry, I'm not able to connect a video call to you from here.",
     ccxPleaseWait: "Please wait while we connect you with a customer care representative..."
@@ -22,7 +22,7 @@ module.exports = {
     sessionExpired: "Sua sessão anterior foi fianlizada.",
     botFileAttachment: "Desculpe, não posso aceitar anexos. Se deseja falar com um agente diga 'agente'.",
     noAgentsAvailable: "Desculpe, não temos atendentes para lhe ajudar agora. Por favor, tente mais tarde.",
-    calculatorAppeared: "'Ok... uma calculadora vai aparecer aqui ao lado!'",
+    calculatorAppeared: "Ok... uma calculadora vai aparecer aqui ao lado!",
     calculator: "Aqui está sua calculadora:",
     noVideo: "Desculpe, não posso lhe conectar a uma video chamada.",
     ccxPleaseWait: "Um momento, vou procurar um agente da Ativos disponível..."
@@ -36,7 +36,7 @@ module.exports = {
     sessionExpired: "Your previous session has ended.",
     botFileAttachment: "I'm sorry, but I can't handle file attachments. If you would like to speak to an agent, say 'agent'.",
     noAgentsAvailable: "Sorry, there are no agents available to assist you at this time. Please try again later.",
-    calculatorAppeared: "'Ok... Your calculator should have appeared on the left!'",
+    calculatorAppeared: "Ok... Your calculator should have appeared on the left!",
     calculator: "Here is our mortgage calculator:",
     noVideo: "I'm sorry, I'm not able to connect a video call to you from here.",
     ccxPleaseWait: "Please wait while we connect you with a customer care representative..."
