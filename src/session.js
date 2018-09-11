@@ -256,22 +256,32 @@ class Session {
       const response = await this.getSessionInfo()
       console.log(`${this.id} - found dCloud session and datacenter information`)
       // console.log('dcloud session response', response)
+
+      // check if public address type is configured to use DNS
+      if (process.env.PUBLIC_ADDRESS_TYPE.toLowerCase() === 'dns') {
+        // use public DNS address of demo
+        this.publicAddress = response.dns
+      } else {
+        // default to use public IP address of demo, to avoid DNS resolution
+        this.publicAddress = response.publicIp
+      }
+
       // set egainHost to public DNS of demo vpod for escalating to ECE agent
-      this.egainHost = `https://${response.dns}/ece/system`
+      this.egainHost = `https://${this.publicAddress}/ece/system`
       console.log(`${this.id} - egainHost = ${this.egainHost}`)
       // set csHost to public DNS of demo vpod for transcript
-      this.csHost = `https://${response.dns}/cs`
+      this.csHost = `https://${this.publicAddress}/cs`
       console.log(`${this.id} - csHost = ${this.csHost}`)
-      this.csBackupHost = `https://${response.dns}/cs2`
+      this.csBackupHost = `https://${this.publicAddress}/cs2`
       console.log(`${this.id} - csBackupHost = ${this.csBackupHost}`)
-      this.smHost = `https://${response.dns}/ccp`
+      this.smHost = `https://${this.publicAddress}/ccp`
       console.log(`${this.id} - smHost = ${this.smHost}`)
       this.demo = response.demo
       console.log(`${this.id} - demo = ${this.demo}`)
       this.demoVersion = response.version
       console.log(`${this.id} - demo version = ${this.demoVersion}`)
       // set surveyHost to public DNS of demo vpod for saving survey answers
-      this.surveyHost = `https://${response.dns}/survey`
+      this.surveyHost = `https://${this.publicAddress}/survey`
 
       // get any extra configuration the user has set up on their demo
       this.demoConfig = response.configuration || {}
