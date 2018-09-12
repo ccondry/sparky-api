@@ -583,7 +583,7 @@ class Session {
           break
         }
       }
-      const uccx = new uccxChatClient({
+      const chatData = {
         urlBase: this.smHost,
         form,
         csq,
@@ -593,7 +593,9 @@ class Session {
         // author: '',
         customerEmail: this.email,
         customerPhone: this.phone
-      })
+      }
+      console.log(this.id, 'uccx chat client initializing with data:', chatData)
+      const uccx = new uccxChatClient(chatData)
       console.log(this.id, 'uccx chat client created. setting up handlers...')
       uccx.setHandlers(smEventHandlers.create(uccx, this))
       console.log(this.id, 'uccx chat handlers set up.')
