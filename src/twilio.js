@@ -2,8 +2,8 @@ const request = require('request-promise-native')
 const Session = require('./session.js')
 // console.log('Session', Session)
 const db = require('./mongodb')
-const Entities = require('html-entities').AllHtmlEntities
-const entities = new Entities()
+// const Entities = require('html-entities').AllHtmlEntities
+// const entities = new Entities()
 // const hydra = require('./hydra')
 const PhoneNumber = require('awesome-phonenumber')
 
@@ -12,7 +12,7 @@ const sessions = {}
 const twilio = require('twilio')
 const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN)
 const contextService = require('./context-service')
-
+const striptags = require('striptags')
 
 function getLookupNumber (from, to) {
   const pnFrom = PhoneNumber(from)
@@ -63,6 +63,8 @@ function sendMessage(from, to, body) {
     console.log(`Not sending empty string to SMS.`)
     return
   }
+  // strip HTML from body
+  body = striptags(body)
 
   return client.messages.create({
     body,
@@ -176,9 +178,9 @@ async function handleMessage (message) {
       onAddMessage: async function (type, message) {
         // send messages to SMS user, and decode HTML characters
         try {
-          const decodedMessage = entities.decode(message)
-          console.log('sending decoded SMS message:', decodedMessage)
-          const smsResponse = await sendMessage(to, from, decodedMessage)
+          // const decodedMessage = entities.decode(message)
+          // console.log('sending decoded SMS message:', decodedMessage)
+          const smsResponse = await sendMessage(to, from, message)
           // console.log('smsResponse', smsResponse)
           console.log(`SMS sent to ${from}`)
         } catch (e) {
@@ -189,8 +191,8 @@ async function handleMessage (message) {
             try {
               updateSessionTo(session, this.data.backupNumber)
               // try again
-              const decodedMessage = entities.decode(message)
-              const smsResponse2 = await sendMessage(this.data.to, this.data.from, decodedMessage)
+              // const decodedMessage = entities.decode(message)
+              const smsResponse2 = await sendMessage(this.data.to, this.data.from, message)
             } catch (e2) {
               console.error(`failed to send SMS to customer at ${this.data.form} from backup number ${this.data.to}. fix me!`)
             }
