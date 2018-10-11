@@ -2,10 +2,10 @@ const request = require('request-promise-native')
 const Session = require('./session.js')
 // console.log('Session', Session)
 const db = require('./mongodb')
-const Entities = require('html-entities').AllHtmlEntities
-const entities = new Entities()
+// const Entities = require('html-entities').AllHtmlEntities
+// const entities = new Entities()
 // const hydra = require('./hydra')
-
+const striptags = require('striptags')
 const facebookSessions = {}
 
 function findPage (id) {
@@ -49,13 +49,14 @@ function getSenderInfo(sender_psid, page) {
 }
 
 // send facebook message from page to user
-async function sendMessage(id, text, page) {
+async function sendMessage(id, message, page) {
   if (!text || text.length === 0) {
     console.log(`Not sending empty string to Facebook.`)
     return
   }
   const access_token = page.token
   try {
+    const text = striptags(message)
     await request({
       url: 'https://graph.facebook.com/v2.6/me/messages',
       qs: {access_token},
@@ -169,10 +170,10 @@ async function handleMessage (message) {
       firstName,
       lastName,
       onAddMessage: function (type, message) {
-        const decodedMessage = entities.decode(message)
-        console.log('sending decoded Facebook message:', decodedMessage)
+        // const decodedMessage = entities.decode(message)
+        // console.log('sending decoded Facebook message:', decodedMessage)
         // send messages to facebook user, and decode HTML characters
-        sendMessage(userId, decodedMessage, page)
+        sendMessage(userId, message, page)
       },
       removeSession: function () {
         console.log('onDeescalate')
