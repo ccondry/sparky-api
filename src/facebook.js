@@ -169,8 +169,10 @@ async function handleMessage (message) {
       firstName,
       lastName,
       onAddMessage: function (type, message) {
+        const decodedMessage = entities.decode(message)
+        console.log('sending decoded Facebook message:', decodedMessage)
         // send messages to facebook user, and decode HTML characters
-        sendMessage(userId, entities.decode(message), page)
+        sendMessage(userId, decodedMessage, page)
       },
       removeSession: function () {
         console.log('onDeescalate')
