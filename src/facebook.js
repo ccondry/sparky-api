@@ -50,7 +50,7 @@ function getSenderInfo(sender_psid, page) {
 
 // send facebook message from page to user
 async function sendMessage(id, message, page) {
-  if (!text || text.length === 0) {
+  if (!message || message.length === 0) {
     console.log(`Not sending empty string to Facebook.`)
     return
   }
