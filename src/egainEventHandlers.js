@@ -51,12 +51,12 @@ function create (myChat, session) {
   };
   /* Example output of agent messages to a DIV named TransScript with jQuery */
   myEventHandlers.OnAgentMessageReceived = function (args) {
-    console.log(`${session.id} - eGain OnAgentMessageReceived`, args.Message)
+    console.log(`${session.id} - eGain OnAgentMessageReceived`)
     session.addMessage('agent', args.Message)
   };
   /* Example output of system messages to the same DIV */
   myEventHandlers.OnSystemMessageReceived = function (args) {
-    console.log(`${session.id} - eGain OnSystemMessageReceived`, args.Message)
+    console.log(`${session.id} - eGain OnSystemMessageReceived`)
     session.addMessage('system', args.Message)
   }
   /* Example browser console.log when an error occurs */
