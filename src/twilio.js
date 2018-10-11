@@ -13,6 +13,7 @@ const twilio = require('twilio')
 const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN)
 const contextService = require('./context-service')
 
+
 function getLookupNumber (from, to) {
   const pnFrom = PhoneNumber(from)
   const pnTo = PhoneNumber(to)
@@ -175,7 +176,9 @@ async function handleMessage (message) {
       onAddMessage: async function (type, message) {
         // send messages to SMS user, and decode HTML characters
         try {
-          const smsResponse = await sendMessage(to, from, entities.decode(message))
+          const decodedMessage = entities.decode(message)
+          console.log('sending decoded SMS message:', decodedMessage)
+          const smsResponse = await sendMessage(to, from, decodedMessage)
           // console.log('smsResponse', smsResponse)
           console.log(`SMS sent to ${from}`)
         } catch (e) {
@@ -186,7 +189,8 @@ async function handleMessage (message) {
             try {
               updateSessionTo(session, this.data.backupNumber)
               // try again
-              const smsResponse2 = await sendMessage(this.data.to, this.data.from, entities.decode(message))
+              const decodedMessage = entities.decode(message)
+              const smsResponse2 = await sendMessage(this.data.to, this.data.from, decodedMessage)
             } catch (e2) {
               console.error(`failed to send SMS to customer at ${this.data.form} from backup number ${this.data.to}. fix me!`)
             }
