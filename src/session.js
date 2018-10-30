@@ -109,7 +109,7 @@ class Session {
       // if this is a bot/system/agent message, send it to the customer on facebook
       if (type !== 'customer') {
         // match the Incoming log message format
-        console.log('Outgoing:', JSON.stringify({text: message, sessionId: this.id}))
+        console.log(this.id, '- outgoing message')
         if (this.onAddMessage && typeof this.onAddMessage === 'function') {
           this.onAddMessage.call(this, type, message)
         }
