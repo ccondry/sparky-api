@@ -30,6 +30,8 @@ app.use('/api/vi/ai', require('./routes/ai'))
 app.use('/api/v1/facebook', require('./routes/facebook'))
 // Twilio webhook
 app.use('/api/v1/twilio', require('./routes/twilio'))
+// Whatsapp webhook
+app.use('/api/v1/whatsapp', require('./routes/whatsapp'))
 // Cisco Webex Teams webhooks
 app.use('/api/v1/teams', require('./routes/teams'))
 
