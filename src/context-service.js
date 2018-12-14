@@ -1,4 +1,4 @@
-const axios = require('axios')
+const request = require('request-promise-native')
 
 async function getCustomerData(phone) {
   console.log('customer lookup failed on csHost with query_string:' + phone)
