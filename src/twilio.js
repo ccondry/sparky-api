@@ -37,7 +37,7 @@ function getDcloudSession (from, to) {
 
   return request({
     method: 'GET',
-    url: `https://mm.cxdemo.net/api/v1/phones/${phone}`,
+    url: `${process.env.API_BASE}/api/v1/phones/${phone}`,
     headers: {
       authorization: 'Bearer ' + process.env.DCLOUD_API_TOKEN
     },
@@ -49,7 +49,7 @@ function getDcloudSession (from, to) {
 function getAnswers (phone) {
   return request({
     method: 'GET',
-    url: `https://mm.cxdemo.net/api/v1/answers/${phone}`,
+    url: `${process.env.API_BASE}/api/v1/answers/${phone}`,
     headers: {
       'Authorization': `Bearer ${process.env.DCLOUD_API_TOKEN}`
     },
