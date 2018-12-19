@@ -197,7 +197,7 @@ class Session {
   }
 
   sendEscalatedMessage (message) {
-    if (this.demo && this.demo.toLowerCase() === 'uccx') {
+    if (this.demo === 'uccx') {
       // send to uccx session
       console.log(`${this.id} - sending message to UCCX agent.`)
       this.smSession.sendMessage(message)
@@ -524,7 +524,7 @@ class Session {
       console.log(`${this.id} - failed to send transcript:`, e.message)
     }
 
-    if (this.demo && this.demo.toLowerCase() === 'uccx') {
+    if (this.demo && this.demo === 'uccx') {
       console.log(`${this.id} - Escalating to UCCX agent`)
       // escalate to SM on UCCX demo
       this.escalateToSocialMiner(message)
