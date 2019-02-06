@@ -228,6 +228,7 @@ class Session {
   }
 
   queryAi (text) {
+    console.log(this.id, '- querying api.api.ai using token', this.apiAiToken)
     // figure out a response using AI
     return request({
       method: 'POST',
