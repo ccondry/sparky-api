@@ -23,6 +23,7 @@ class Session {
     this.messages = []
     this.phone = data.phone
     this.email = data.email
+    this.username = data.username
     this.firstName = data.firstName
     this.lastName = data.lastName
 
@@ -88,12 +89,17 @@ class Session {
   }
 
   // get dCloud session information
-  getSessionInfo () {
-    return request({
+  getSessionInfo (username) {
+    const options = {
       method: 'GET',
       url: `${process.env.API_BASE}/api/v1/datacenters/${this.dcloudDatacenter.toUpperCase()}/sessions/${this.dcloudSession}`,
       json: true
-    })
+    }
+    // attach username as query string, if defined
+    if (username) {
+      options.qs = {username}
+    }
+    return request(options)
   }
 
   // add new message to session
@@ -253,7 +259,7 @@ class Session {
     }
     try {
       console.log(`${this.id} - dCloud session and datacenter are set. Looking up session info from ${process.env.API_BASE}.`)
-      const response = await this.getSessionInfo()
+      const response = await this.getSessionInfo(this.username)
       console.log(`${this.id} - found dCloud session and datacenter information`)
       // console.log('dcloud session response', response)
 
