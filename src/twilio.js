@@ -210,6 +210,9 @@ async function handleMessage (message) {
     })
     // add session to global sessions
     addSession(session)
+    // wait for the checkSessionInfo method to finish, so that any custom config
+    // is applied before we start the chat bot
+    await session.checkSessionPromise
     // set first message as sparky
     session.addCustomerMessage('sparky')
     // don't do anything else
