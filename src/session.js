@@ -367,6 +367,32 @@ class Session {
     })
   }
 
+  async checkInstantDemoCustomer (aiMessage) {
+    // is this an instant demo? then we might need to look up the
+    // username inside the demo session
+    console.log(this.id, '- this is an instant demo. Checking user registration...')
+
+    // check if the customer is registered in the instant demo system
+    const phoneIsRegistered = await getCustomerIsRegistered(this.phone)
+    const emailIsRegistered = await getCustomerIsRegistered(this.email)
+
+    // parse responses
+    const isRegistered = phoneIsRegistered.exists || emailIsRegistered.exists
+
+    if (isRegistered) {
+      // is registered
+      console.log(datacenter, id, 'instant demo - customer phone or email is already registered. Continue with bot script.')
+      // if aiMessage passed, start dialog with that message
+      if (aiMessage) {
+        this.processCustomerMessage(aiMessage)
+      }
+    } else {
+      // not registered - ask customer to register
+      console.log(datacenter, id, 'instant demo - customer phone and email are not registered. Requesting that customer register now.')
+      this.processCustomerMessage('registration')
+    }
+  }
+
   async processAiResponse (result) {
     const fulfillment = result.fulfillment
     // check the api.ai response message and perform the associated action
@@ -388,6 +414,8 @@ class Session {
             if (this.isEscalating) {
               // escalate
               this.escalate()
+            } else if (this.isInstantDemo) {
+              this.checkInstantDemoCustomer()
             } else {
               // send instructions
               this.processCustomerMessage('instructions')
@@ -418,25 +446,7 @@ class Session {
               // escalate
               this.escalate()
             } else if (this.isInstantDemo) {
-              // is this an instant demo? then we might need to look up the
-              // username inside the demo session
-              console.log(this.id, '- this is an instant demo. Checking user registration...')
-
-              // check if the customer is registered in the instant demo system
-              const phoneIsRegistered = await getCustomerIsRegistered(this.phone)
-              const emailIsRegistered = await getCustomerIsRegistered(this.email)
-
-              // parse responses
-              const isRegistered = phoneIsRegistered.exists || emailIsRegistered.exists
-
-              if (isRegistered) {
-                // is registered - continue normally
-                console.log(datacenter, id, 'instant demo - customer phone or email is already registered. Continue with bot script.')
-              } else {
-                // not registered - ask customer to register
-                console.log(datacenter, id, 'instant demo - customer phone and email are not registered. Requesting that customer register now.')
-                this.processCustomerMessage('registration')
-              }
+              this.checkInstantDemoCustomer()
             } else {
               // send instructions
               this.processCustomerMessage('instructions')

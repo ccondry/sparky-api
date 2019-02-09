@@ -157,6 +157,8 @@ async function handleMessage (message) {
       firstName = answers.userName.split(' ')[0]
       lastName = answers.userName.substring(firstName.length)
       email = answers.emailAddress
+      // get instant demo username from the POD ID that user entered into the
+      // settings screen of the mobile app
       username = answers.podId
     } catch (e) {
       console.error('Error getting dCloud session info', e)
@@ -213,10 +215,18 @@ async function handleMessage (message) {
     // wait for the checkSessionInfo method to finish, so that any custom config
     // is applied before we start the chat bot
     await session.checkSessionPromise
-    // set first message as sparky
-    session.addCustomerMessage('sparky')
-    // don't do anything else
-    return
+    // check if session is an instant demo
+    if (session.isInstantDemo) {
+      // make sure customer is registered, then send sparky message to AI
+      this.checkInstantDemoCustomer('sparky')
+      // don't do anything else
+      return
+    } else {
+      // set first message to AI as sparky, to trigger dialog with customer
+      session.addCustomerMessage('sparky')
+      // don't do anything else
+      return
+    }
   } else {
     console.log(`existing SMS chat session with ${from}`)
   }
