@@ -791,6 +791,20 @@ class Session {
         // return to current session with the bot
         break
       }
+      case 'L10N_SYSTEM_CANNOT_ASSIGN_AGENT': {
+        // tell customer that there are no agents available
+        this.addMessage('system', this.localization.cannotAssignAgent)
+        // turn off survey
+        this.data.survey = false
+        // end egain session
+        if (this.egainSession) {
+          this.egainSession.End()
+        }
+        // remove escalated flag
+        this.isEscalated = false
+        // return to current session with the bot
+        break
+      }
       default: {
         // just deescalate
         this.deescalate()
