@@ -209,7 +209,7 @@ class Session {
         // done registering
         this.isRegistering = false
         // send welcome message
-        return this.processCustomerMessage('sparky')
+        this.processCustomerMessage('sparky')
       })
       .catch(e => {
         console.error(this.id, '- failed attempt to register instant demo phone', contact, 'with', username)
