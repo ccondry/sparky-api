@@ -218,7 +218,7 @@ async function handleMessage (message) {
     // check if session is an instant demo
     if (session.isInstantDemo) {
       // make sure customer is registered, then send sparky message to AI
-      this.checkInstantDemoCustomer('sparky')
+      session.checkInstantDemoCustomer('sparky')
       // don't do anything else
       return
     } else {
