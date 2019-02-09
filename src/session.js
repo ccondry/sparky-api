@@ -190,6 +190,8 @@ class Session {
     }
     // detect registration message for instant demo
     if (this.isRegistering) {
+      // contact is the phone number associated with this session
+      const contact = this.phone
       console.log(this.id, '- trying to register user with phone number', contact, '- customer message was', message)
       // try to register user with the contents of their message
       // check if message contained spaces
@@ -198,8 +200,6 @@ class Session {
         // tell user invalid username and ask for their username again
         return this.processCustomerMessage('dcloud-user-register-correctly')
       }
-      // contact is the phone number associated with this session
-      const contact = this.phone
       // username is the message that user sent (hopefully)
       const username = message.toLowerCase()
       // register customer
