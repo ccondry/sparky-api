@@ -214,7 +214,9 @@ class Session {
       .catch(e => {
         console.error(this.id, '- failed attempt to register instant demo phone', contact, 'with', username)
         // tell user there was an error
-        return this.processCustomerMessage('dcloud-error')
+        this.processCustomerMessage('dcloud-error')
+        // end session
+        this.endSession
       })
       return
     }
