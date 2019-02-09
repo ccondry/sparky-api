@@ -356,7 +356,7 @@ class Session {
   }
 
   async getCustomerIsRegistered (contact) {
-    const resposne = await request({
+    const response = await request({
       baseUrl: 'https://' + this.publicAddress,
       method: 'GET',
       url: '/api/v1/pcce/app/customer/' + contact,
