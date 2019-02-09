@@ -372,25 +372,29 @@ class Session {
       // is this an instant demo? then we might need to look up the
       // username inside the demo session
       console.log(this.id, '- this is an instant demo. Checking user registration...')
-      // check if the customer is registered in the instant demo system
+      // check if the customer phone is registered in the instant demo system
       const phoneIsRegistered = await this.getCustomerIsRegistered(this.phone)
-      const emailIsRegistered = await this.getCustomerIsRegistered(this.email)
-
-      // parse responses
-      const isRegistered = phoneIsRegistered.exists || emailIsRegistered.exists
-
-      if (isRegistered) {
+      if (phoneIsRegistered) {
         // is registered
-        console.log(this.id, '- instant demo - customer phone or email is already registered. Continue with bot script.')
+        console.log(this.id, '- instant demo - customer phone is already registered. Continue with bot script.')
         // if aiMessage passed, start dialog with that message
         if (aiMessage) {
-          this.processCustomerMessage(aiMessage)
+          return this.processCustomerMessage(aiMessage)
         }
-      } else {
-        // not registered - ask customer to register
-        console.log(this.id, 'instant demo - customer phone and email are not registered. Requesting that customer register now.')
-        this.processCustomerMessage('registration')
       }
+      // check if customer email is registered in the instant demo
+      const emailIsRegistered = await this.getCustomerIsRegistered(this.email)
+      if (emailIsRegistered) {
+        // is registered
+        console.log(this.id, '- instant demo - customer email is already registered. Continue with bot script.')
+        // if aiMessage passed, start dialog with that message
+        if (aiMessage) {
+          return this.processCustomerMessage(aiMessage)
+        }
+      }
+      // not registered - ask customer to register
+      console.log(this.id, 'instant demo - customer phone and email are not registered. Requesting that customer register now.')
+      return this.processCustomerMessage('registration')
     } catch (e) {
       throw e
     }
