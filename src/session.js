@@ -291,6 +291,9 @@ class Session {
       // dCloud demo version (11.6v2, 11.6v3)
       this.demoVersion = response.version
       console.log(`${this.id} - demo version = ${this.demoVersion}`)
+      // is this an instant demo session? (multi-user session)
+      this.isInstantDemo = response.instant === true || response.instant === 'true'
+      console.log(`${this.id} - demo version = ${this.demoVersion}`)
       // set surveyHost to public DNS of demo vpod for saving survey answers
       this.surveyHost = `https://${this.publicAddress}/survey`
 
