@@ -341,6 +341,32 @@ class Session {
     }
   }
 
+  // register customer in instant demo
+  registerCustomer ({username, contact}) {
+    return request({
+      baseUrl: 'https://' + this.publicIp,
+      method: 'POST',
+      url: '/api/v1/pcce/app/customer',
+      headers: {
+        authorization: 'Bearer ' + process.env.INSTANT_DEMO_TOKEN
+      },
+      json: true,
+      body: {username, contact}
+    })
+  }
+
+  getCustomerIsRegistered (contact) {
+    return  request({
+      baseUrl: 'https://' + this.publicIp,
+      method: 'GET',
+      url: '/api/v1/pcce/app/customer/' + contac,
+      headers: {
+        authorization: 'Bearer ' + process.env.INSTANT_DEMO_TOKEN
+      },
+      json: true
+    })
+  }
+
   async processAiResponse (result) {
     const fulfillment = result.fulfillment
     // check the api.ai response message and perform the associated action
