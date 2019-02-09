@@ -187,9 +187,9 @@ async function handleMessage (message) {
           // console.log('sending decoded SMS message:', decodedMessage)
           const smsResponse = await sendMessage(to, from, message)
           // console.log('smsResponse', smsResponse)
-          console.log(`SMS sent to ${from}`)
+          console.log(this.id, `- SMS sent to ${from}`)
         } catch (e) {
-          console.error(`failed to send SMS to customer ${this.data.from} using ${this.data.to}. Retrying with backup number ${this.data.backupNumber}`)
+          console.error(this.id, `failed to send SMS to customer ${this.data.from} using ${this.data.to}. Retrying with backup number ${this.data.backupNumber}`)
           // unavailable using the current number?
           if (e.status === 400 && e.code === 21612) {
             // update this session to use the backup US number
@@ -199,13 +199,13 @@ async function handleMessage (message) {
               // const decodedMessage = entities.decode(message)
               const smsResponse2 = await sendMessage(this.data.to, this.data.from, message)
             } catch (e2) {
-              console.error(`failed to send SMS to customer at ${this.data.form} from backup number ${this.data.to}. fix me!`)
+              console.error(this.id, `failed to send SMS to customer at ${this.data.form} from backup number ${this.data.to}. fix me!`)
             }
           }
         }
       },
       removeSession: function () {
-        console.log('removeSession')
+        console.log(this.id, 'removeSession')
         // remove this session from global sessions
         removeSession(this)
       }
@@ -228,7 +228,7 @@ async function handleMessage (message) {
       return
     }
   } else {
-    console.log(`existing SMS chat session with ${from}`)
+    console.log(session.id, `- existing SMS chat session with ${from}`)
   }
   // was there text in the message?
   if (body) {
