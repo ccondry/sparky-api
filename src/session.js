@@ -460,7 +460,7 @@ class Session {
               this.escalate()
             } else if (this.isInstantDemo) {
               try {
-                this.checkInstantDemoCustomer()
+                this.checkInstantDemoCustomer('sparky')
               } catch (e) {
                 console.error(this.id, '- failed to check instant demo customer', e.message)
               }
@@ -495,7 +495,7 @@ class Session {
               this.escalate()
             } else if (this.isInstantDemo) {
               try {
-                this.checkInstantDemoCustomer()
+                this.checkInstantDemoCustomer('sparky')
               } catch (e) {
                 console.error(this.id, '- failed to check instant demo customer', e.message)
               }
