@@ -61,7 +61,7 @@ class Session {
       this.data.survey = true
     }
     // console.log(`creating ${this.type} Sparky session ${this.id}: for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId} and survey is ${this.data.survey ? 'enabled' : 'disabled'}`)
-    const logData = JSON.parse(JSON.stringify(this))
+    // const logData = JSON.parse(JSON.stringify(this))
     console.log(this.id, '- new', this.type, 'session created for', this.email)
     // create survey answers array
     this.surveyAnswers = []
