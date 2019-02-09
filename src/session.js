@@ -243,6 +243,7 @@ class Session {
   }
 
   async processCustomerMessage (text) {
+    console.log(this.id, '- processing customer message:', text)
     try {
       // figure out a response using AI
       const response = await this.queryAi(text)
