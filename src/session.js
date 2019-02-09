@@ -356,7 +356,7 @@ class Session {
   }
 
   getCustomerIsRegistered (contact) {
-    return  request({
+    const resposne = await request({
       baseUrl: 'https://' + this.publicAddress,
       method: 'GET',
       url: '/api/v1/pcce/app/customer/' + contact,
@@ -365,6 +365,8 @@ class Session {
       },
       json: true
     })
+    // parse response
+    return response.exists
   }
 
   async checkInstantDemoCustomer (aiMessage) {
