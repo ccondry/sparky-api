@@ -190,9 +190,11 @@ class Session {
     }
     // detect registration message for instant demo
     if (this.isRegistering) {
+      console.log(this.id, '- trying to register user with phone number', contact, '- customer message was', message)
       // try to register user with the contents of their message
       // check if message contained spaces
       if (message.trim().indexOf(' ') >= 0) {
+        console.log(this.id, '- trying to register user with phone number', contact, 'but their message contained spaces. Responding with request for user to re-enter their username.')
         // tell user invalid username and ask for their username again
         return this.processCustomerMessage('dcloud-user-register-correctly')
       }
@@ -203,6 +205,7 @@ class Session {
       // register customer
       this.registerCustomer({username, contact})
       .then(r => {
+        console.log(this.id, '- register user successful with phone number', contact, 'and username', username)
         // done registering
         this.isRegistering = false
         // send welcome message
