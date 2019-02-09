@@ -188,6 +188,34 @@ class Session {
     if (process.env.GOODBYE_MESSAGES.toLowerCase().split(',').includes(message.toLowerCase())) {
       this.goodbye(message)
     }
+    // detect registration message for instant demo
+    if (this.isRegistering) {
+      // try to register user with the contents of their message
+      // check if message contained spaces
+      if (message.trim().indexOf(' ')) {
+        // tell user invalid username and ask for their username again
+        return this.processCustomerMessage('dcloud-user-register-correctly')
+      }
+      // contact is the phone number associated with this session
+      const contact = this.phone
+      // username is the message that user sent (hopefully)
+      const username = message.toLowerCase()
+      // register customer
+      this.registerCustomer({username, contact})
+      .then(r => {
+        // done registering
+        this.isRegistering = false
+        // send welcome message
+        return this.processCustomerMessage('sparky')
+      })
+      .catch(e => {
+        console.error(this.id, '- failed attempt to register instant demo phone', contact, 'with', username)
+        // tell user there was an error
+        return this.processCustomerMessage('dcloud-error')
+      })
+      return
+    }
+
     // is this chat escalated to an agent?
     if (this.isEscalated) {
       this.sendEscalatedMessage(message)
@@ -396,6 +424,9 @@ class Session {
       }
       // not registered - ask customer to register
       console.log(this.id, 'instant demo - customer phone and email are not registered. Requesting that customer register now.')
+      // set session state to isRegistering
+      this.isRegistering = true
+      // send keyword to AI to send AI response to customer asking customer to register
       return this.processCustomerMessage('dcloud-user-register')
     } catch (e) {
       throw e
