@@ -293,7 +293,7 @@ class Session {
       console.log(`${this.id} - demo version = ${this.demoVersion}`)
       // is this an instant demo session? (multi-user session)
       this.isInstantDemo = response.instant === true || response.instant === 'true'
-      console.log(`${this.id} - demo version = ${this.demoVersion}`)
+      console.log(`${this.id} - instant demo = ${this.isInstantDemo}`)
       // set surveyHost to public DNS of demo vpod for saving survey answers
       this.surveyHost = `https://${this.publicAddress}/survey`
 
