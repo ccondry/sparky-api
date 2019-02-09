@@ -396,7 +396,7 @@ class Session {
       }
       // not registered - ask customer to register
       console.log(this.id, 'instant demo - customer phone and email are not registered. Requesting that customer register now.')
-      return this.processCustomerMessage('registration')
+      return this.processCustomerMessage('dcloud-user-register')
     } catch (e) {
       throw e
     }
