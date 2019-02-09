@@ -355,7 +355,7 @@ class Session {
     })
   }
 
-  getCustomerIsRegistered (contact) {
+  async getCustomerIsRegistered (contact) {
     const resposne = await request({
       baseUrl: 'https://' + this.publicAddress,
       method: 'GET',
