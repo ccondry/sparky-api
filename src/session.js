@@ -344,7 +344,7 @@ class Session {
   // register customer in instant demo
   registerCustomer ({username, contact}) {
     return request({
-      baseUrl: 'https://' + this.publicIp,
+      baseUrl: 'https://' + this.publicAddress,
       method: 'POST',
       url: '/api/v1/pcce/app/customer',
       headers: {
@@ -357,7 +357,7 @@ class Session {
 
   getCustomerIsRegistered (contact) {
     return  request({
-      baseUrl: 'https://' + this.publicIp,
+      baseUrl: 'https://' + this.publicAddress,
       method: 'GET',
       url: '/api/v1/pcce/app/customer/' + contact,
       headers: {
