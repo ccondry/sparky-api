@@ -413,17 +413,17 @@ class Session {
         }
       }
       // check if customer email is registered in the instant demo
-      const emailIsRegistered = await this.getCustomerIsRegistered(this.email)
-      if (emailIsRegistered) {
-        // is registered
-        console.log(this.id, '- instant demo - customer email is already registered. Continue with bot script.')
-        // if aiMessage passed, start dialog with that message
-        if (aiMessage) {
-          return this.processCustomerMessage(aiMessage)
-        }
-      }
+      // const emailIsRegistered = await this.getCustomerIsRegistered(this.email)
+      // if (emailIsRegistered) {
+      //   // is registered
+      //   console.log(this.id, '- instant demo - customer email is already registered. Continue with bot script.')
+      //   // if aiMessage passed, start dialog with that message
+      //   if (aiMessage) {
+      //     return this.processCustomerMessage(aiMessage)
+      //   }
+      // }
       // not registered - ask customer to register
-      console.log(this.id, 'instant demo - customer phone and email are not registered. Requesting that customer register now.')
+      console.log(this.id, 'instant demo - customer phone is not registered. Requesting that customer register now. Customer phone =', this.phone)
       // set session state to isRegistering
       this.isRegistering = true
       // send keyword to AI to send AI response to customer asking customer to register
