@@ -359,7 +359,7 @@ class Session {
     return  request({
       baseUrl: 'https://' + this.publicIp,
       method: 'GET',
-      url: '/api/v1/pcce/app/customer/' + contac,
+      url: '/api/v1/pcce/app/customer/' + contact,
       headers: {
         authorization: 'Bearer ' + process.env.INSTANT_DEMO_TOKEN
       },
