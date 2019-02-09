@@ -373,8 +373,8 @@ class Session {
     console.log(this.id, '- this is an instant demo. Checking user registration...')
 
     // check if the customer is registered in the instant demo system
-    const phoneIsRegistered = await getCustomerIsRegistered(this.phone)
-    const emailIsRegistered = await getCustomerIsRegistered(this.email)
+    const phoneIsRegistered = await this.getCustomerIsRegistered(this.phone)
+    const emailIsRegistered = await this.getCustomerIsRegistered(this.email)
 
     // parse responses
     const isRegistered = phoneIsRegistered.exists || emailIsRegistered.exists
