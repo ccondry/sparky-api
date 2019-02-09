@@ -192,7 +192,7 @@ class Session {
     if (this.isRegistering) {
       // try to register user with the contents of their message
       // check if message contained spaces
-      if (message.trim().indexOf(' ')) {
+      if (message.trim().indexOf(' ') >= 0) {
         // tell user invalid username and ask for their username again
         return this.processCustomerMessage('dcloud-user-register-correctly')
       }
