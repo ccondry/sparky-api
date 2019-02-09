@@ -180,7 +180,7 @@ class Session {
   }
 
   addCustomerMessage (message) {
-    // reset session expiration
+    // reset chat session expiration
     this.resetExpiration()
     // add message to memory
     this.addMessage('customer', message)
