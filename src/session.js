@@ -279,12 +279,16 @@ class Session {
       // set csHost to public DNS of demo vpod for transcript
       this.csHost = `https://${this.publicAddress}/cs`
       console.log(`${this.id} - csHost = ${this.csHost}`)
+      // context service API backup
       this.csBackupHost = `https://${this.publicAddress}/cs2`
       console.log(`${this.id} - csBackupHost = ${this.csBackupHost}`)
+      // socialminer URL for this session
       this.smHost = `https://${this.publicAddress}/ccp`
       console.log(`${this.id} - smHost = ${this.smHost}`)
+      // dCloud demo identifier (pcce or uccx)
       this.demo = response.demo
       console.log(`${this.id} - demo = ${this.demo}`)
+      // dCloud demo version (11.6v2, 11.6v3)
       this.demoVersion = response.version
       console.log(`${this.id} - demo version = ${this.demoVersion}`)
       // set surveyHost to public DNS of demo vpod for saving survey answers
