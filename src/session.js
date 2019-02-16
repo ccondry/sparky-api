@@ -380,9 +380,9 @@ class Session {
     return request({
       baseUrl: 'https://' + this.publicAddress,
       method: 'POST',
-      url: '/api/v1/pcce/app/customer',
+      url: '/api/v1/pcce/public/customer',
       headers: {
-        authorization: 'Bearer ' + process.env.INSTANT_DEMO_TOKEN
+        authorization: 'Bearer ' + process.env.REGISTER_CUSTOMER_TOKEN
       },
       json: true,
       body: {userId, contact}
@@ -393,9 +393,9 @@ class Session {
     const response = await request({
       baseUrl: 'https://' + this.publicAddress,
       method: 'GET',
-      url: '/api/v1/pcce/app/customer/' + contact,
+      url: '/api/v1/pcce/public/customer/' + contact,
       headers: {
-        authorization: 'Bearer ' + process.env.INSTANT_DEMO_TOKEN
+        authorization: 'Bearer ' + process.env.GET_CUSTOMER_TOKEN
       },
       json: true
     })
