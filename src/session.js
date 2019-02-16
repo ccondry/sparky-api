@@ -23,7 +23,7 @@ class Session {
     this.messages = []
     this.phone = data.phone
     this.email = data.email
-    this.username = data.username
+    this.userId = data.userId
     this.firstName = data.firstName
     this.lastName = data.lastName
 
@@ -88,16 +88,16 @@ class Session {
     this.expiry = new Date().getTime() + 1000 * process.env.SESSION_TIMEOUT
   }
 
-  // get dCloud session information
-  getSessionInfo (username) {
+  // get dCloud session information from cumulus-api
+  getSessionInfo (userId) {
     const options = {
       method: 'GET',
       url: `${process.env.API_BASE}/api/v1/datacenters/${this.dcloudDatacenter.toUpperCase()}/sessions/${this.dcloudSession}`,
       json: true
     }
-    // attach username as query string, if defined
-    if (username) {
-      options.qs = {username}
+    // attach userId as query string, if defined
+    if (userId) {
+      options.qs = {userId}
     }
     return request(options)
   }
@@ -196,23 +196,23 @@ class Session {
       // try to register user with the contents of their message
       // check if message contained spaces
       if (message.trim().indexOf(' ') >= 0) {
-        console.log(this.id, '- trying to register user with phone number', contact, 'but their message contained spaces. Responding with request for user to re-enter their username.')
-        // tell user invalid username and ask for their username again
+        console.log(this.id, '- trying to register user with phone number', contact, 'but their message contained spaces. Responding with request for user to re-enter their user ID.')
+        // tell user invalid userId and ask for their userId again
         return this.processCustomerMessage('dcloud-user-register-correctly')
       }
-      // username is the message that user sent (hopefully)
-      const username = message.toLowerCase()
+      // user ID is the message that user sent (hopefully)
+      const userId = message
       // register customer
-      this.registerCustomer({username, contact})
+      this.registerCustomer({userId, contact})
       .then(r => {
-        console.log(this.id, '- register user successful with phone number', contact, 'and username', username)
+        console.log(this.id, '- register user successful with phone number', contact, 'and userId', userId)
         // done registering
         this.isRegistering = false
         // send welcome message
         this.processCustomerMessage('sparky')
       })
       .catch(e => {
-        console.error(this.id, '- failed attempt to register instant demo phone', contact, 'with', username)
+        console.error(this.id, '- failed attempt to register instant demo phone', contact, 'with', userId)
         // tell user there was an error
         this.processCustomerMessage('dcloud-error')
         // end session
@@ -294,7 +294,7 @@ class Session {
     }
     try {
       console.log(`${this.id} - dCloud session and datacenter are set. Looking up session info from ${process.env.API_BASE}.`)
-      const response = await this.getSessionInfo(this.username)
+      const response = await this.getSessionInfo(this.userId)
       console.log(`${this.id} - found dCloud session and datacenter information`)
       // console.log('dcloud session response', response)
 
@@ -376,7 +376,7 @@ class Session {
   }
 
   // register customer in instant demo
-  registerCustomer ({username, contact}) {
+  registerCustomer ({userId, contact}) {
     return request({
       baseUrl: 'https://' + this.publicAddress,
       method: 'POST',
@@ -385,7 +385,7 @@ class Session {
         authorization: 'Bearer ' + process.env.INSTANT_DEMO_TOKEN
       },
       json: true,
-      body: {username, contact}
+      body: {userId, contact}
     })
   }
 
@@ -406,7 +406,7 @@ class Session {
   async checkInstantDemoCustomer (aiMessage) {
     try {
       // is this an instant demo? then we might need to look up the
-      // username inside the demo session
+      // userId inside the demo session
       console.log(this.id, '- this is an instant demo. Checking user registration...')
       // check if the customer phone is registered in the instant demo system
       const phoneIsRegistered = await this.getCustomerIsRegistered(this.phone)

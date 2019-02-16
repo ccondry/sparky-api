@@ -150,7 +150,7 @@ async function handleMessage (message) {
     let firstName = undefined
     let lastName = undefined
     let email = undefined
-    let username = undefined
+    let userId = undefined
     try {
       // get dCloud answers information that user submitted (hopefully)
       answers = await getAnswers(phone)
@@ -159,7 +159,7 @@ async function handleMessage (message) {
       email = answers.emailAddress
       // get instant demo username from the POD ID that user entered into the
       // settings screen of the mobile app
-      username = answers.podId
+      userId = answers.podId
     } catch (e) {
       console.error('Error getting dCloud session info', e)
     }
@@ -169,7 +169,7 @@ async function handleMessage (message) {
       to,
       from,
       phone,
-      username,
+      userId,
       email: email || customerData.Context_Work_Email || phone,
       firstName: firstName || customerData.Context_First_Name || phone,
       lastName: lastName || customerData.Context_Last_Name || '',
