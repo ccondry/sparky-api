@@ -154,12 +154,14 @@ async function handleMessage (message) {
     try {
       // get dCloud answers information that user submitted (hopefully)
       answers = await getAnswers(phone)
-      firstName = answers.userName.split(' ')[0]
-      lastName = answers.userName.substring(firstName.length)
-      email = answers.emailAddress
       // get instant demo username from the POD ID that user entered into the
       // settings screen of the mobile app
       userId = answers.podId
+      email = answers.emailAddress
+      // first name is the string of non-space characters before the first space
+      firstName = answers.userName.split(' ')[0]
+      // last name is the rest of the userName value, after firstName
+      lastName = answers.userName.substring(firstName.length)
     } catch (e) {
       console.error('Error getting dCloud session info', e)
     }
