@@ -6,7 +6,7 @@ const db = require('../mongodb')
 // const entities = new Entities()
 // const hydra = require('./hydra')
 const PhoneNumber = require('awesome-phonenumber')
-const contextService = require('../context-service')
+// const contextService = require('../context-service')
 const twilio = require('twilio')
 const striptags = require('striptags')
 
@@ -131,13 +131,13 @@ async function handleMessage (message) {
     const phone = getLookupNumber(from, to)
 
     let customerData = {}
-    try {
-      // get customer data from Context Service
-      customerData = await contextService.getCustomerData(phone)
-    } catch (e) {
-      // failed CS lookup
-      console.log(`could not retreive Context Service data for Twilio Whatsapp from ${phone}:`, e.message)
-    }
+    // try {
+    //   // get customer data from Context Service
+    //   customerData = await contextService.getCustomerData(phone)
+    // } catch (e) {
+    //   // failed CS lookup
+    //   console.log(`could not retreive Context Service data for Twilio Whatsapp from ${phone}:`, e.message)
+    // }
 
     let dcloudSession = {}
     try {
