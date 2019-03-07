@@ -39,7 +39,7 @@ function create (myChat, session) {
     console.log(`${session.id} - eGain OnConnectSuccess`, args)
     if (session.botEnabled) {
       // console.log(welcomeMessage)
-      session.addMessage('system', session.localization.welcomeMessage)
+      // session.addMessage('system', session.localization.welcomeMessage)
     } else {
       // do nothing
     }

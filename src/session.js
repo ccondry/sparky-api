@@ -731,7 +731,7 @@ class Session {
       this.isEscalated = true
       // tell customer we are finding an agent
       // this.addMessage('system', `Please wait while we connect you with a customer care representative...`)
-      this.addMessage('system', this.localization.welcomeMessage)
+      // this.addMessage('system', this.localization.welcomeMessage)
     } catch (e) {
       console.error('error starting UCCX chat', e)
     }
