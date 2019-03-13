@@ -15,4 +15,9 @@ router.post('/webhook', (req, res) => {
   .catch(e => console.error(e))
 })
 
+// Whatsapp message delivery status from Twilio
+router.post('/status', (req, res) => {
+  console.log('WhatsApp message delivery status from Twilio:', req.body)
+})
+
 module.exports = router

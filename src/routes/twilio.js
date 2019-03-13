@@ -12,4 +12,9 @@ router.post('/', (req, res) => {
   res.status(201).send()
 })
 
+// SMS message delivery status from Twilio
+router.post('/status', (req, res) => {
+  console.log('SMS message delivery status from Twilio:', req.body)
+})
+
 module.exports = router
