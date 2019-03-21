@@ -92,7 +92,7 @@ function removeSession (session) {
 
 function addFacebookSession (session) {
   const pageId = session.data.page.id
-  const senderId = session.data.userId
+  const senderId = session.data.facebookUserId
   facebookSessions[pageId] = facebookSessions[pageId] || {}
   facebookSessions[pageId][senderId] = facebookSessions[pageId][senderId] || {}
   facebookSessions[pageId][senderId] = session
@@ -162,6 +162,7 @@ async function handleMessage (message) {
       page,
       botEnabled,
       survey,
+      facebookUserId: userId,
       apiAiToken: page.apiAiToken || page.aiToken,
       entryPointId: page.entryPointId || page.entryPointId,
       phone: userId,
