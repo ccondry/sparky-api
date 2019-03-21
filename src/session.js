@@ -333,7 +333,7 @@ class Session {
 
       // get any extra configuration the user has set up on their demo
       this.demoConfig = response.configuration || {}
-      console.log(this.id, 'demo configuration', this.demoConfig)
+      console.log(this.id, '- demo configuration', this.demoConfig)
 
       // apply any demo configs for chat bots
       if (this.demoConfig.chatBotToken) {
