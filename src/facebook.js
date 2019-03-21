@@ -163,6 +163,7 @@ async function handleMessage (message) {
       botEnabled,
       survey,
       facebookUserId: userId,
+      userId: userId,
       apiAiToken: page.apiAiToken || page.aiToken,
       entryPointId: page.entryPointId || page.entryPointId,
       phone: userId,
