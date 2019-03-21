@@ -90,6 +90,7 @@ class Session {
 
   // get dCloud session information from cumulus-api
   getSessionInfo (userId) {
+    console.log(this.id, '- getting dCloud session info for', this.dcloudDatacenter.toUpperCase(), this.dcloudSession, userId ? 'for user ' + userId : undefined)
     const options = {
       method: 'GET',
       url: `${process.env.API_BASE}/api/v1/datacenters/${this.dcloudDatacenter.toUpperCase()}/sessions/${this.dcloudSession}`,
