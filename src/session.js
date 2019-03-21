@@ -422,8 +422,10 @@ class Session {
         console.log(this.id, '- instant demo - customer phone is already registered. Continue with bot script.')
         // if aiMessage passed, start dialog with that message
         if (aiMessage) {
-          return this.processCustomerMessage(aiMessage)
+          this.processCustomerMessage(aiMessage)
         }
+        // done
+        return
       }
       // check if customer email is registered in the instant demo
       // const emailIsRegistered = await this.getCustomerIsRegistered(this.email)
