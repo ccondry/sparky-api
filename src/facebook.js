@@ -164,7 +164,6 @@ async function handleMessage (message) {
       survey,
       apiAiToken: page.apiAiToken || page.aiToken,
       entryPointId: page.entryPointId || page.entryPointId,
-      userId,
       phone: userId,
       email: userId,
       firstName,
