@@ -356,6 +356,10 @@ class Session {
         this.survey = this.demoConfig.chatBotSurveyEnabled
         console.log(this.id, '- used dCloud session config to update survey to', this.survey)
       }
+      if (this.demoConfig.chatCsqId) {
+        this.csq = this.demoConfig.chatCsqId
+        console.log(this.id, '- used dCloud session config to update UCCX chat CSQ ID to', this.csq)
+      }
       // update language code
       this.languageCode = `${this.language.toLowerCase()}_${this.region.toUpperCase()}`
       console.log(this.id, '- used dCloud session config to update languageCode to', this.languageCode)
@@ -673,21 +677,21 @@ class Session {
         case 'facebook': {
           // facebook chat
           form = process.env.UCCX_CHAT_FACEBOOK_FORM_ID || '100000'
-          csq = process.env.UCCX_CHAT_FACEBOOK_CSQ || 'Chat_Csq28'
+          csq = this.csq || process.env.UCCX_CHAT_FACEBOOK_CSQ || 'Chat_Csq28'
           title = 'Facebook Messenger'
           break
         }
         case 'twilio': {
           // twilio
           form = process.env.UCCX_SMS_FORM_ID || '100000'
-          csq = process.env.UCCX_SMS_CSQ || 'Chat_Csq2'
+          csq = this.csq || process.env.UCCX_SMS_CSQ || 'Chat_Csq2'
           title = 'SMS'
           break
         }
         case 'spark': {
           // Webex Teams (spark)
           form = process.env.UCCX_TEAMS_FORM_ID || '100000'
-          csq = process.env.UCCX_TEAMS_CSQ || 'Chat_Csq2'
+          csq = this.csq || process.env.UCCX_TEAMS_CSQ || 'Chat_Csq2'
           title = 'Webex Teams'
           break
         }
@@ -696,12 +700,12 @@ class Session {
           if (this.botEnabled) {
             // bot enabled
             form = process.env.UCCX_CHAT_BOT_FORM_ID || '100000'
-            csq = process.env.UCCX_CHAT_BOT_CSQ || 'Chat_Csq_31'
+            csq = this.csq || process.env.UCCX_CHAT_BOT_CSQ || 'Chat_Csq_31'
             title = 'Chat Bot'
           } else {
             // bot disabled
             form = process.env.UCCX_CHAT_FORM_ID || '100000'
-            csq = process.env.UCCX_CHAT_CSQ || 'Chat_Csq3'
+            csq = this.csq || process.env.UCCX_CHAT_CSQ || 'Chat_Csq3'
             title = 'Chat Bot'
           }
           break
