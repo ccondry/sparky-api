@@ -209,6 +209,8 @@ class Session {
         console.log(this.id, '- register user successful with phone number', contact, 'and userId', userId)
         // done registering
         this.isRegistering = false
+        // set this.userId to the message user ID
+        this.userId = userId
         // send welcome message
         this.processCustomerMessage('sparky')
       })
