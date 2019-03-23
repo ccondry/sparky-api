@@ -1,7 +1,7 @@
 const request = require('request-promise-native')
 const Session = require('./session.js')
 // console.log('Session', Session)
-const db = require('./mongodb')
+const db = require('./models/db')
 // const Entities = require('html-entities').AllHtmlEntities
 // const entities = new Entities()
 // const hydra = require('./hydra')
@@ -14,15 +14,6 @@ function findPage (id) {
 
 function getKnownUser (pageId, userId) {
   return db.findOne('facebook.users', {pageId, userId})
-}
-
-async function registerPage (id, token, aiToken, entryPointId) {
-  const page = db.upsert('facebook.pages', {pageId}, {
-    id,
-    token,
-    aiToken,
-    entryPointId
-  })
 }
 
 function handlePostback(sender, postback, page) {

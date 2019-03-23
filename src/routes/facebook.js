@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const fb = require('../facebook')
-const db = require('../mongodb')
+const db = require('../models/db')
 const request = require('request-promise-native')
 
 /* For Facebook Validation */

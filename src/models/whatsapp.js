@@ -1,7 +1,7 @@
 const request = require('request-promise-native')
 const Session = require('../session.js')
 // console.log('Session', Session)
-const db = require('../mongodb')
+const db = require('./db')
 // const Entities = require('html-entities').AllHtmlEntities
 // const entities = new Entities()
 // const hydra = require('./hydra')
