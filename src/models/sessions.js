@@ -3,7 +3,7 @@ const sessions = {}
 
 // set up interval to check each session for expiration each minute
 setInterval(function () {
-  console.log('checking each session expiration')
+  // console.log('checking each session expiration')
   for (const id of Object.keys(sessions)) {
     const session = sessions[id]
     session.checkExpiration().catch(e => {
