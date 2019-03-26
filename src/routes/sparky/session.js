@@ -10,10 +10,10 @@ router.post('/', async (req, res) => {
 
   // create session and store in sessions database
   const session = new Session('sparky-ui', req.body, function (message) {
-    console.log('test jimothy')
-    // do nothing during sendMessage - client will retrieve messages with GET
+    // do nothing yet during sendMessage - this function will be replaced
+    // when client connects with websocket
   })
-  
+
   // also put it in cache
   cache[session.id] = session
 

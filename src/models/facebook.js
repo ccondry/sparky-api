@@ -1,13 +1,15 @@
 const request = require('request-promise-native')
-const Session = require('./session.js')
+const Session = require('../session.js')
 // console.log('Session', Session)
-const db = require('./models/db')
+const db = require('./db')
 // const Entities = require('html-entities').AllHtmlEntities
 // const entities = new Entities()
 // const hydra = require('./hydra')
 const striptags = require('striptags')
 const facebookSessions = {}
 const localization = require('./localization')
+// global cache for chat sessions
+const cache = require('./sessions')
 
 function findPage (id) {
   return db.findOne('facebook.pages', {id})
@@ -63,21 +65,59 @@ async function sendMessage(id, message, page) {
   }
 }
 
-async function getFacebookSession (pageId, senderId) {
-  const results = await db.findOne('chat.session', {pageId, senderId})
-  if (results) {
-    return new Session('facebook', results.session, function (message) {
-      return sendMessage(senderId, message, pageId)
-    })
-  } else {
-    return null
+function onAddMessage (type, message, datetime) {
+  console.log('in facebook onAddMessage')
+  // attach handler to send messages to facebook
+  sendMessage(this.senderId, message, this.page)
+}
+
+function findInCache (pageId, senderId) {
+  // look for chat session in cache
+  const keys = Object.keys(cache)
+  for (const key of keys) {
+    const v = cache[key]
+    if (v.pageId === pageId && v.senderId === senderId) {
+      return v
+    }
+  }
+}
+// get session object from local cache, or create session object from
+// database data (if found)
+async function getSession (pageId, senderId) {
+  try {
+    const hit = findInCache(pageId, senderId)
+
+    if (hit) {
+      // found session in cache
+      return hit
+    } else {
+      // not in cache. look in database
+      const session = await db.findOne('chat.session', {pageId, senderId})
+      if (session) {
+        // generate session object from database data
+        const newSession = new Session('facebook', session, onAddMessage)
+        // add session to cache
+        cache[session.id] = newSession
+        // return the new session object
+        return newSession
+      } else {
+        console.log('facebook chat session not found in database for pageId', pageId, 'and senderId', senderId)
+        // session not found in database. return null to say not found
+        return null
+      }
+    }
+  } catch (e) {
+    console.log('error looking up session info for facebook chat for pageId', pageId, 'and senderId', senderId, ':', e.message)
+    // rethrow all errors
+    throw e
   }
 }
 
-function addFacebookSession (session) {
-  const pageId = session.data.page.id
-  const senderId = session.data.facebookUserId
-  return db.insertOne('chat.session', {pageId, senderId, session})
+function addSession (session) {
+  // add to cache
+  cache[session.id] = session
+  // add to database
+  return db.insertOne('chat.session', session)
 }
 
 // handle incoming facebook messages from users to page
@@ -102,11 +142,11 @@ async function handleMessage (message) {
 
   let session
   // find session, if exists
-  session = await getFacebookSession(pageId, userId)
+  session = await getSession(pageId, userId)
   // did session expire?
   if (session) {
-    session.checkExpiration()
-    if (session.hasExpired) {
+    const expired = await session.checkExpiration()
+    if (expired) {
       // session has expired. unset session var
       session = undefined
     }
@@ -141,6 +181,8 @@ async function handleMessage (message) {
     let survey = true
     // create session and store in sessions global
     session = new Session('facebook', {
+      senderId: userId,
+      pageId,
       page,
       botEnabled,
       survey,
@@ -152,9 +194,9 @@ async function handleMessage (message) {
       email: userId,
       firstName,
       lastName
-    })
-    // add session to database
-    addFacebookSession(session)
+    }, onAddMessage)
+    // add session to database and cache
+    addSession(session)
 
     // getKnownUsers (pageId, '1731829546905168')
     try {

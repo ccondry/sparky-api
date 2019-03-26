@@ -1,17 +1,17 @@
 const request = require('request-promise-native')
-const Session = require('./session.js')
+const Session = require('../session.js')
 // console.log('Session', Session)
 // const db = require('./models/db')
 // const Entities = require('html-entities').AllHtmlEntities
 // const entities = new Entities()
 // const hydra = require('./hydra')
 const PhoneNumber = require('awesome-phonenumber')
-
-const sessions = {}
+// global cache for chat sessions
+const cache = require('./sessions')
 
 const twilio = require('twilio')
 const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN)
-const contextService = require('./context-service')
+// const contextService = require('./context-service')
 const striptags = require('striptags')
 
 function getLookupNumber (from, to) {
@@ -73,34 +73,64 @@ function sendMessage(from, to, body) {
   })
 }
 
-function getSession (to, from) {
+
+function onAddMessage (type, message, datetime) {
+  // attach handler to send messages to facebook
+  sendMessage(this.from, this.to, message )
+}
+
+// get session object from local cache, or create session object from
+// database data (if found)
+async function getSession (to, from) {
   try {
-    return sessions[to][from]
+    // look for chat session in cache
+    const hit = cache.find(v => v.to === to && v.from === from)
+
+    if (hit) {
+      // found session in cache
+      return hit
+    } else {
+      // not in cache. look in database
+      const session = await db.findOne('chat.session', {to, from})
+      if (session) {
+        // generate session object from database data
+        const newSession = new Session('twilio', session, onAddMessage)
+        // add session to cache
+        cache[session.id] = newSession
+        // return the new session object
+        return newSession
+      } else {
+        console.log('twilio chat session not found in database for to', to, 'and from', from)
+        // session not found in database. return null to say not found
+        return null
+      }
+    }
   } catch (e) {
-    return undefined
+    console.log('error looking up session info for facebook chat for to', to, 'and from', from, ':', e.message)
+    // rethrow all errors
+    throw e
   }
 }
 
-function removeSession (session) {
-  try {
-    delete sessions[session.data.to][session.data.from]
-  } catch (e) {
-    console.error(`failed to remove Twilio SMS session sessions[${session.data.to}][${session.data.from}]`, e)
-  }
-}
-
-function updateSessionTo (session, newTo) {
-  removeSession(session)
-  session.data.to = newTo
-  addSession(session)
-}
+// function removeSession (session) {
+//   try {
+//     delete sessions[session.data.to][session.data.from]
+//   } catch (e) {
+//     console.error(`failed to remove Twilio SMS session sessions[${session.data.to}][${session.data.from}]`, e)
+//   }
+// }
+//
+// function updateSessionTo (session, newTo) {
+//   removeSession(session)
+//   session.data.to = newTo
+//   addSession(session)
+// }
 
 function addSession (session) {
-  const to = session.data.to
-  const from = session.data.from
-  sessions[to] = sessions[to] || {}
-  sessions[to][from] = sessions[to][from] || {}
-  sessions[to][from] = session
+  // add to cache
+  cache[session.id] = session
+  // add to db
+  return db.insertOne('chat.session', session)
 }
 
 // handle incoming twilio messages
@@ -131,13 +161,13 @@ async function handleMessage (message) {
     const phone = getLookupNumber(from, to)
 
     let customerData = {}
-    try {
-      // get customer data from Context Service
-      customerData = await contextService.getCustomerData(phone)
-    } catch (e) {
-      // failed CS lookup
-      console.log(`could not retreive Context Service data for Twilio SMS from ${phone}:`, e.message)
-    }
+    // try {
+    //   // get customer data from Context Service
+    //   customerData = await contextService.getCustomerData(phone)
+    // } catch (e) {
+    //   // failed CS lookup
+    //   console.log(`could not retreive Context Service data for Twilio SMS from ${phone}:`, e.message)
+    // }
 
     let dcloudSession = {}
     try {
@@ -181,7 +211,7 @@ async function handleMessage (message) {
       dcloudDatacenter: dcloudSession.datacenter,
       botEnabled: true,
       survey: true,
-      backupNumber: process.env.TWILIO_BACKUP_NUMBER,
+      // backupNumber: process.env.TWILIO_BACKUP_NUMBER,
       onAddMessage: async function (type, message) {
         // send messages to SMS user, and decode HTML characters
         try {
@@ -191,29 +221,24 @@ async function handleMessage (message) {
           // console.log('smsResponse', smsResponse)
           console.log(this.id, `- SMS sent to ${from}`)
         } catch (e) {
-          console.error(this.id, `failed to send SMS to customer ${this.data.from} using ${this.data.to}. Retrying with backup number ${this.data.backupNumber}`)
+          console.error(this.id, `failed to send SMS to customer ${this.data.from} using ${this.data.to}.`)
           // unavailable using the current number?
-          if (e.status === 400 && e.code === 21612) {
-            // update this session to use the backup US number
-            try {
-              updateSessionTo(session, this.data.backupNumber)
-              // try again
-              // const decodedMessage = entities.decode(message)
-              const smsResponse2 = await sendMessage(this.data.to, this.data.from, message)
-            } catch (e2) {
-              console.error(this.id, `failed to send SMS to customer at ${this.data.form} from backup number ${this.data.to}. fix me!`)
-            }
-          }
+          // if (e.status === 400 && e.code === 21612) {
+          //   // update this session to use the backup US number
+          //   try {
+          //     updateSessionTo(session, this.data.backupNumber)
+          //     // try again
+          //     // const decodedMessage = entities.decode(message)
+          //     const smsResponse2 = await sendMessage(this.data.to, this.data.from, message)
+          //   } catch (e2) {
+          //     console.error(this.id, `failed to send SMS to customer at ${this.data.form} from backup number ${this.data.to}. fix me!`)
+          //   }
+          // }
         }
-      },
-      removeSession: function () {
-        console.log(this.id, 'removeSession')
-        // remove this session from global sessions
-        removeSession(this)
       }
     })
     // add session to global sessions
-    addSession(session)
+    await addSession(session)
     // wait for the checkSessionInfo method to finish, so that any custom config
     // is applied before we start the chat bot
     await session.checkSessionPromise

@@ -1,4 +1,4 @@
-const localization = require('./localization')
+const localization = require('./models/localization')
 
 function create (myChat, session) {
   let myEventHandlers = myChat.GetEventHandlers()

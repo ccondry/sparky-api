@@ -39,8 +39,6 @@ async function getSession (id) {
         // console.log(id, '- chat session found in database.')
         // generate session object from database data
         const newSession = new Session('sparky-ui', session, function (type, message, datetime) {
-          // console.log('test ccondry')
-          // console.log(this.id, '- attempting to send websocket message to client:', message)
           // attach handler to send messages to web socket client
           this.websocket.send(JSON.stringify({
             datetime,

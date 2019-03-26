@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const twilio = require('../twilio')
+const twilio = require('../models/twilio')
 
 // SMS webhooks from twilio
 router.post('/', (req, res) => {

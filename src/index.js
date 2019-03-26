@@ -17,10 +17,8 @@ app.use(cors())
 
 // this version
 app.use('/api/v1/version', require('./version'))
-// session management for sparky-ui client
+// create session for sparky-ui client
 app.use('/api/v1/sparky/session', require('./routes/sparky/session'))
-// receive new customer messages from sparky-ui client
-app.use('/api/v1/sparky/messages', require('./routes/sparky/messages'))
 // TODO - build out attachments API
 app.use('/api/v1/attachment', require('./routes/attachment'))
 // TODO - use or remove this

@@ -7,7 +7,7 @@ const axios = require('axios')
 const util = require('util')
 const uccxChatClient = require('uccx-chat-client')
 const smEventHandlers = require('./smEventHandlers')
-const localization = require('./localization')
+const localization = require('./models/localization')
 const db = require('./models/db')
 const cache = require('./models/sessions')
 
@@ -93,6 +93,12 @@ class Session {
     // facebook session identifiers
     this.pageId = data.pageId
     this.senderId = data.senderId
+    // facebook page token data
+    this.page = data.page
+
+    // twilio session identifiers
+    this.to = data.to
+    this.from = data.from
   }
 
   async checkExpiration () {
@@ -164,15 +170,15 @@ class Session {
         // match the Incoming log message format
         console.log(this.id, '- outgoing', type, 'message:', message)
         if (this.onAddMessage && typeof this.onAddMessage === 'function') {
-          // console.log(this.id, '- sending message using onAddMessage...')
+          console.log(this.id, '- sending message using onAddMessage...')
           try {
             this.onAddMessage.call(this, type, message, datetime)
-            // console.log(this.id, '- message sent using onAddMessage.')
+            console.log(this.id, '- message sent using onAddMessage.')
           } catch (e) {
             console.log(this.id, '- error sending outgoing message with onAddMessage:', e)
           }
         } else {
-          // console.log(this.id, '- onAddMessage was not a function, so not sending the message with it. onAddMessage was', typeof this.onAddMessage)
+          console.log(this.id, '- onAddMessage was not a function, so not sending the message with it. onAddMessage was', typeof this.onAddMessage)
         }
       }
     } else {

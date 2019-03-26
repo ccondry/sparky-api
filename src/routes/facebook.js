@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const fb = require('../facebook')
+const fb = require('../models/facebook')
 const db = require('../models/db')
 const request = require('request-promise-native')
 
