@@ -36,6 +36,10 @@ app.use('/api/v1/whatsapp', require('./routes/whatsapp'))
 app.use('/api/v1/teams', require('./routes/teams'))
 
 // listen on port defined in .env
-const server = app.listen(process.env.PORT || 5000, () => {
+const server = app.listen(process.env.PORT || 3020, () => {
   console.log('Express server listening on port %d in %s mode', server.address().port, app.settings.env)
 })
+
+// start web socket server on same port
+const websocket = require('./models/websocket')
+websocket.start(server)

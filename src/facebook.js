@@ -7,6 +7,7 @@ const db = require('./models/db')
 // const hydra = require('./hydra')
 const striptags = require('striptags')
 const facebookSessions = {}
+const localization = require('./localization')
 
 function findPage (id) {
   return db.findOne('facebook.pages', {id})
@@ -62,31 +63,21 @@ async function sendMessage(id, message, page) {
   }
 }
 
-function getFacebookSession (pageId, senderId) {
-  try {
-    return facebookSessions[pageId][senderId]
-  } catch (e) {
-    return undefined
-  }
-}
-
-function removeSession (session) {
-  console.log(`removeSession facebookSessions[${session.data.page.id}][${session.data.facebookUserId}]`)
-  try {
-    delete facebookSessions[session.data.page.id][session.data.facebookUserId]
-    console.log(`facebookSessions`, facebookSessions)
-  } catch (e) {
-    // do nothing
-    console.error(e)
+async function getFacebookSession (pageId, senderId) {
+  const results = await db.findOne('chat.session', {pageId, senderId})
+  if (results) {
+    return new Session('facebook', results.session, function (message) {
+      return sendMessage(senderId, message, pageId)
+    })
+  } else {
+    return null
   }
 }
 
 function addFacebookSession (session) {
   const pageId = session.data.page.id
   const senderId = session.data.facebookUserId
-  facebookSessions[pageId] = facebookSessions[pageId] || {}
-  facebookSessions[pageId][senderId] = facebookSessions[pageId][senderId] || {}
-  facebookSessions[pageId][senderId] = session
+  return db.insertOne('chat.session', {pageId, senderId, session})
 }
 
 // handle incoming facebook messages from users to page
@@ -111,7 +102,7 @@ async function handleMessage (message) {
 
   let session
   // find session, if exists
-  session = getFacebookSession(pageId, userId)
+  session = await getFacebookSession(pageId, userId)
   // did session expire?
   if (session) {
     session.checkExpiration()
@@ -160,19 +151,9 @@ async function handleMessage (message) {
       phone: userId,
       email: userId,
       firstName,
-      lastName,
-      onAddMessage: function (type, message) {
-        // const decodedMessage = entities.decode(message)
-        // console.log('sending decoded Facebook message:', decodedMessage)
-        // send messages to facebook user, and decode HTML characters
-        sendMessage(userId, message, page)
-      },
-      removeSession: function () {
-        console.log('onDeescalate')
-        removeSession(this)
-      }
+      lastName
     })
-    // add session to global Facebook sessions
+    // add session to database
     addFacebookSession(session)
 
     // getKnownUsers (pageId, '1731829546905168')
@@ -230,7 +211,7 @@ async function handleMessage (message) {
             // note that user attached a file
             session.addMessage('customer', '(file attachment)')
             // just the bot here - let user know we can't do anything with them
-            session.addMessage('bot', session.localization.botFileAttachment)
+            session.addMessage('bot', localization[session.languageCode].botFileAttachment)
             // send message to facebook user
             sendMessage(userId, m, page)
           }

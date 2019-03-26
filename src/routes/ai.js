@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const sessions = require('../sessions')
+const sessions = require('../models/sessions')
 
 /* Webhook for API.ai to get response from the 3rd party API */
 router.post('/', (req, res) => {

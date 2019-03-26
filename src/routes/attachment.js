@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const sessions = require('../sessions')
+const sessions = require('../models/sessions')
 
 router.post('/', (req, res) => {
   // no session?

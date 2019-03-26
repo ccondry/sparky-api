@@ -53,7 +53,11 @@ router.post('/webhook', async function (req, res) {
           } else {
             // process locally
             // process each message, and wait for it
-            await fb.handleMessage(message).catch(e => console.error(e))
+            try {
+              await fb.handleMessage(message)
+            } catch (e) {
+              console.error('fb.handleMessage error:', e.message)
+            }
           }
         }
       }

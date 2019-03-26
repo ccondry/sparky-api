@@ -8,19 +8,41 @@ const util = require('util')
 const uccxChatClient = require('uccx-chat-client')
 const smEventHandlers = require('./smEventHandlers')
 const localization = require('./localization')
+const db = require('./models/db')
+const cache = require('./models/sessions')
 
 class Session {
-  constructor (type, data) {
-    this.id = uuidv1()
-    this.state = 'active'
+  // create a session object
+  constructor (type, data, onAddMessage) {
+    // copy data from input to this, or assign default values if properties are
+    // not found
+    if (data.id) {
+      this.id = data.id
+      // console.log(data.id, '- existing chat session data being instantiated as object.')
+    } else {
+      // new session - generate uuid
+      this.id = uuidv1()
+      console.log(this.id, '- new chat session started.')
+    }
+    this.state = data.state || 'active'
     // set timestamp
-    this.timestamp = new Date().getTime()
+    this.timestamp = data.timestamp || new Date().getTime()
+    // set createdAt for database record time-to-live
+    // this.createdAt = data.createdAt || new Date()
     // sessions expiry
-    this.resetExpiration()
+    this.expiry = data.expiry || new Date().getTime() + 1000 * Number(process.env.SESSION_TIMEOUT)
+    // set expireAt for database record time-to-live
+    if (data.expireAt) {
+      this.expireAt = data.expireAt
+    } else {
+      let d = new Date()
+      d.setSeconds(d.getSeconds() + Number(process.env.SESSION_TIMEOUT))
+      this.expireAt = d
+    }
 
-    this.inSurvey = false
-    this.isEscalated = false
-    this.messages = []
+    this.inSurvey = data.inSurvey || false
+    this.isEscalated = data.isEscalated || false
+    this.messages = data.messages || []
     this.phone = data.phone
     this.email = data.email
     this.userId = data.userId
@@ -31,14 +53,11 @@ class Session {
     this.language = data.language || process.env.DEFAULT_LANGUAGE || 'en'
     this.region = data.region || process.env.DEFAULT_REGION || 'US'
 
-    this.languageCode = `${this.language.toLowerCase()}_${this.region.toUpperCase()}`
-    // set localization object
-    this.localization = localization[this.languageCode]
+    this.languageCode = data.languageCode || `${this.language.toLowerCase()}_${this.region.toUpperCase()}`
 
-    // run this callback at de-escalation time
-    this.removeSession = data.removeSession
     // run this callback when messages are added
-    this.onAddMessage = data.onAddMessage
+    this.onAddMessage = onAddMessage
+
     // resolve this promise to get user data
     // this.getCustomerData = data.getCustomerData
 
@@ -62,30 +81,43 @@ class Session {
     }
     // console.log(`creating ${this.type} Sparky session ${this.id}: for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId} and survey is ${this.data.survey ? 'enabled' : 'disabled'}`)
     // const logData = JSON.parse(JSON.stringify(this))
-    console.log(this.id, '- new', this.type, 'session created for', this.email)
+
     // create survey answers array
-    this.surveyAnswers = []
+    this.surveyAnswers = data.surveyAnswers || []
 
     // if we have dcloud session and datacenter info, check the session info now
     if (this.dcloudSession && this.dcloudDatacenter) {
       this.checkSessionPromise = this.checkSessionInfo()
     }
+
+    // facebook session identifiers
+    this.pageId = data.pageId
+    this.senderId = data.senderId
   }
 
-  checkExpiration () {
+  async checkExpiration () {
     // did session expire?
-    if (new Date().getTime() > this.expiry) {
-      console.log(`${this.id} - session is old and has expired. Informing user about it and remove this session.`)
+    if (new Date().getTime() > this.expireAt) {
+      // expired
+      console.log(`${this.id} - session is old and has expired. Removing this session.`)
       // TODO update this message
-      this.addMessage('bot', this.sessionExpired)
-      //remove session from sessions
+      await this.addMessage('bot', this.sessionExpired)
+      // remove session from sessions
       this.endSession()
+      return true
+    } else {
+      // not expired
+      return false
     }
   }
 
   resetExpiration () {
     // reset expiry to current time + configured timeout value
-    this.expiry = new Date().getTime() + 1000 * process.env.SESSION_TIMEOUT
+    this.expiry = new Date().getTime() + 1000 * Number(process.env.SESSION_TIMEOUT)
+    // set expireAt for database record time-to-live
+    let d = new Date()
+    d.setSeconds(d.getSeconds() + Number(process.env.SESSION_TIMEOUT))
+    this.expireAt = d
   }
 
   // get dCloud session information from cumulus-api
@@ -104,21 +136,43 @@ class Session {
   }
 
   // add new message to session
-  addMessage (type, message) {
+  async addMessage (type, message) {
     // if message is not empty string
     if (message && message.length) {
       // push message to array
-      this.messages.push({
+      const datetime = new Date().toJSON()
+      const m = {
         text: message,
         type,
-        datetime: new Date().toJSON()
-      })
+        datetime
+      }
+      this.messages.push(m)
+
+      // push message to the database record also
+      let done = false
+      while (!done) {
+        try {
+          await db.updateOne('chat.session', { id: this.id }, { $push: { messages: m } })
+          done = true
+        } catch (e) {
+          console.log(this.id, '- failed to add message to database. trying again. error message was: ', e.message)
+        }
+      }
+
       // if this is a bot/system/agent message, send it to the customer on facebook
       if (type !== 'customer') {
         // match the Incoming log message format
-        console.log(this.id, '- outgoing message')
+        console.log(this.id, '- outgoing', type, 'message:', message)
         if (this.onAddMessage && typeof this.onAddMessage === 'function') {
-          this.onAddMessage.call(this, type, message)
+          // console.log(this.id, '- sending message using onAddMessage...')
+          try {
+            this.onAddMessage.call(this, type, message, datetime)
+            // console.log(this.id, '- message sent using onAddMessage.')
+          } catch (e) {
+            console.log(this.id, '- error sending outgoing message with onAddMessage:', e)
+          }
+        } else {
+          // console.log(this.id, '- onAddMessage was not a function, so not sending the message with it. onAddMessage was', typeof this.onAddMessage)
         }
       }
     } else {
@@ -161,13 +215,20 @@ class Session {
     }
   }
 
+  // remove session from the database
   endSession () {
-    // call custom removeSession handler
-    if (this.removeSession && typeof this.removeSession === 'function') {
-      console.log(`${this.id} - calling removeSession handler`)
-      this.removeSession.call(this)
-    } else {
-      console.log(`${this.id} - removeSession not a function. removeSession =`, this.removeSession)
+    try {
+      db.removeOne('chat.session', {id: this.id})
+      console.log(this.id, '- removed chat session from database.')
+      // end websocket, if any
+      if (this.websocket) {
+        console.log(this.id, '- closed chat session websocket connection.')
+        this.websocket.close()
+      }
+      // remove from cache
+      delete cache[this.id]
+    } catch (e) {
+      console.log(this.id, '- failed to remove chat session from database:', e.message)
     }
   }
 
@@ -180,7 +241,13 @@ class Session {
     this.deescalate()
   }
 
-  addCustomerMessage (message) {
+  async addCustomerMessage (message) {
+    const expired = await this.checkExpiration()
+    if (expired) {
+      // session expired - don't do anything else now, checkExpiration
+      // should have called endSession()
+      return
+    }
     // reset chat session expiration
     this.resetExpiration()
     // add message to memory
@@ -366,9 +433,6 @@ class Session {
       // update language code
       this.languageCode = `${this.language.toLowerCase()}_${this.region.toUpperCase()}`
       console.log(this.id, '- used dCloud session config to update languageCode to', this.languageCode)
-      // update localization object
-      this.localization = localization[this.languageCode]
-      console.log(this.id, '- used dCloud session config to update localization to', this.localization)
 
       // success
       return true
@@ -541,18 +605,18 @@ class Session {
           // start REM call
           this.addCommand('start-rem-video')
         } else {
-          this.addMessage('bot', this.localization.noVideo)
+          this.addMessage('bot', localization[this.languageCode].noVideo)
         }
         break
       }
       case 'mortgage-calculator': {
         console.log(`${this.id} - sending mortgage-calculator command`)
         if (this.type === 'sparky-ui') {
-          this.addMessage('bot', this.localization.calculatorAppeared)
+          this.addMessage('bot', localization[this.languageCode].calculatorAppeared)
           // open mortgage calculator
           this.addCommand('mortgage-calculator')
         } else {
-          this.addMessage('bot', this.localization.calculator + ' ' + process.env.CALCULATOR_URL)
+          this.addMessage('bot', localization[this.languageCode].calculator + ' ' + process.env.CALCULATOR_URL)
         }
         break
       }
@@ -740,7 +804,7 @@ class Session {
       this.isEscalated = true
       // tell customer we are finding an agent
       // this.addMessage('system', `Please wait while we connect you with a customer care representative...`)
-      // this.addMessage('system', this.localization.welcomeMessage)
+      // this.addMessage('system', localization[this.languageCode].welcomeMessage)
     } catch (e) {
       console.error('error starting UCCX chat', e)
     }
@@ -790,7 +854,7 @@ class Session {
     switch (args.StatusMessage) {
       case 'L10N_NO_AGENTS_AVAILABLE': {
         // tell customer that there are no agents available
-        this.addMessage('system', this.localization.noAgentsAvailable)
+        this.addMessage('system', localization[this.languageCode].noAgentsAvailable)
         // turn off survey
         this.data.survey = false
         // end egain session
@@ -804,7 +868,7 @@ class Session {
       }
       case 'L10N_SYSTEM_CANNOT_ASSIGN_AGENT': {
         // tell customer that there are no agents available
-        this.addMessage('system', this.localization.cannotAssignAgent)
+        this.addMessage('system', localization[this.languageCode].cannotAssignAgent)
         // turn off survey
         this.data.survey = false
         // end egain session

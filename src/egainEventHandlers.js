@@ -1,3 +1,5 @@
+const localization = require('./localization')
+
 function create (myChat, session) {
   let myEventHandlers = myChat.GetEventHandlers()
 
@@ -39,7 +41,7 @@ function create (myChat, session) {
     console.log(`${session.id} - eGain OnConnectSuccess`, args)
     if (session.botEnabled) {
       // console.log(welcomeMessage)
-      // session.addMessage('system', session.localization.welcomeMessage)
+      // session.addMessage('system', localization[session.languageCode].welcomeMessage)
     } else {
       // do nothing
     }
@@ -64,7 +66,7 @@ function create (myChat, session) {
     console.log(`${session.id} - eGain OnErrorOccurred`, args)
     // session.addMessage('system', args.toString())
     if (args.status === 'error') {
-      session.addMessage('system', session.localization.errorMessage)
+      session.addMessage('system', localization[session.languageCode].errorMessage)
       // session.onEgainEnd()
       session.deescalate(args.message)
     } else if (args.status === 'log') {
@@ -84,7 +86,7 @@ function create (myChat, session) {
   myEventHandlers.OnCustomerAttachmentNotificationSent = function (args) {
     console.log(`${session.id} - eGain OnCustomerAttachmentNotificationSent`, args)
     // send command for sparky-ui chat client to accept
-    session.addMessage('system', session.localization.waitingAcceptAttachment)
+    session.addMessage('system', localization[session.languageCode].waitingAcceptAttachment)
     session.addCommand('accept-attachment')
   }
   /* Example of uploading attachment to chat server when agent accepts attachment invite */
@@ -93,13 +95,13 @@ function create (myChat, session) {
     // TODO implement something else here?
     // file.uniqueFileId = args.uniqueFileId
     // myChat.UploadAttachment(file, args.agentName)
-    session.addMessage('system', session.localization.acceptedAttachment)
+    session.addMessage('system', localization[session.languageCode].acceptedAttachment)
   }
 
   /* Example of sending notification to chat server when customer accepts attachment invite */
   myEventHandlers.OnAttachmentInviteReceived = function (args) {
     console.log(`${session.id} - eGain OnAttachmentInviteReceived`, args)
-    session.addMessage('system', `${args.Attachment.AgentName} ${session.localization.attachmentReceived}: ${args.Attachment.Name}`)
+    session.addMessage('system', `${args.Attachment.AgentName} ${localization[session.languageCode].attachmentReceived}: ${args.Attachment.Name}`)
     // var acceptBtn = document.createElement('input');
     // acceptBtn.type = "button";
     // acceptBtn.value = "Accept";
