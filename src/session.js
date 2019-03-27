@@ -99,6 +99,7 @@ class Session {
     // twilio session identifiers
     this.to = data.to
     this.from = data.from
+    this.app = data.app
   }
 
   async checkExpiration () {
