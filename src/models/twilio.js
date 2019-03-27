@@ -8,9 +8,12 @@ const cache = require('./sessions')
 const db = require('./db')
 
 const twilio = require('twilio')
-const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN)
-// const contextService = require('./context-service')
+
 const striptags = require('striptags')
+
+function findApp (id) {
+  return db.findOne('twilio.app', {id})
+}
 
 function getLookupNumber (from, to) {
   const pnFrom = PhoneNumber(from)
@@ -56,7 +59,7 @@ function getAnswers (phone) {
 }
 
 // send twilio SMS to user
-function sendMessage(from, to, body) {
+function sendMessage(from, to, body, client) {
   if (!body || body.length === 0) {
     console.log(`Not sending empty string to SMS.`)
     return
@@ -72,10 +75,11 @@ function sendMessage(from, to, body) {
 }
 
 function onAddMessage (type, message, datetime) {
-  // attach handler to send messages to facebook
-  // sendMessage(this.from, this.to, message )
-  // send messages to SMS user, and decode HTML characters
-  sendMessage(this.to, this.from, message)
+  console.log('creating Twilio client with SID', this.app.sid)
+  // create Twilio client
+  const client = new twilio(this.app.sid, this.app.token)
+  // send messages to SMS user
+  sendMessage(this.to, this.from, message, client)
   .then(r => {
     console.log(this.id, `- SMS sent to ${this.from}`)
   })
@@ -168,6 +172,13 @@ async function handleMessage (message) {
         console.error('Error getting dCloud phone number registration info', e.message)
       }
 
+      // find app info in database
+      const app = await findApp(to)
+      // validate app
+      if (app === null || !app.token || !app.sid) {
+        throw `Twilio app ${to} not registered. Please register this Twilio app with a id, sid, and token.`
+      }
+
       let answers = {}
       let firstName = undefined
       let lastName = undefined
@@ -189,9 +200,9 @@ async function handleMessage (message) {
       }
       // create session and store in sessions global
       session = new Session('twilio', {
-        type: 'twilio',
         to,
         from,
+        app,
         phone,
         userId,
         email: email || phone,

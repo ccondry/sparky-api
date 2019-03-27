@@ -6,7 +6,9 @@ const PhoneNumber = require('awesome-phonenumber')
 const twilio = require('twilio')
 const striptags = require('striptags')
 
-const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN)
+function findApp (id) {
+  return db.findOne('twilio.app', {id})
+}
 
 function getLookupNumber (from, to) {
   const pnFrom = PhoneNumber(from)
@@ -52,7 +54,7 @@ function getAnswers (phone) {
 }
 
 // send twilio Whatsapp to user
-function sendMessage(from, to, body) {
+function sendMessage(from, to, body, client) {
   if (!body || body.length === 0) {
     console.log(`Not sending empty string to Whatsapp.`)
     return
@@ -62,16 +64,19 @@ function sendMessage(from, to, body) {
 
   return client.messages.create({
     body,
-    to,  // Text this number
-    from // From a valid Twilio number
+    to: 'whatsapp:' + to,  // Text this number
+    from: 'whatsapp:' + from // From a valid Twilio number
   })
 }
 
-// called from Session object, with 'this' = the session
 function onAddMessage (type, message, datetime) {
-  sendMessage(this.to, this.from, message)
+  console.log('creating Twilio client with SID', this.app.sid)
+  // create Twilio client
+  const client = new twilio(this.app.sid, this.app.token)
+  // send messages to SMS user
+  sendMessage(this.to, this.from, message, client)
   .then(r => {
-    console.log(this.id, `- Whatsapp sent to ${this.from}`)
+    console.log(this.id, `- Whatsapp message sent to ${this.from}`)
   })
   .catch(e => {
     console.error(this.id, `failed to send Whatsapp message to customer ${this.from} using ${this.to}.`)
@@ -103,7 +108,7 @@ async function getSession (to, from) {
       const session = await db.findOne('chat.session', {to, from})
       if (session) {
         // generate session object from database data
-        const newSession = new Session('whatsapp', session, onAddMessage)
+        const newSession = new Session('twilio', session, onAddMessage)
         // add session to cache
         cache[session.id] = newSession
         // return the new session object
@@ -114,7 +119,7 @@ async function getSession (to, from) {
       }
     }
   } catch (e) {
-    console.log('error looking up session info for whatsapp chat to', to, 'and from', from, ':', e.message)
+    console.log('error looking up session info for twilio SMS to', to, 'and from', from, ':', e.message)
     // rethrow all errors
     throw e
   }
@@ -139,7 +144,7 @@ async function handleMessage (message) {
     console.log(`Twilio - Whatsapp received from ${from} on ${to}`)
     let session
     // find session, if exists
-    session = getSession(to, from)
+    session = await getSession(to, from)
     // did session expire?
     if (session) {
       session.checkExpiration()
@@ -160,6 +165,12 @@ async function handleMessage (message) {
         dcloudSession = await getDcloudSession(from, to)
       } catch (e) {
         console.error('Error getting dCloud phone number registration info', e.message)
+      }
+      // find app info in database
+      const app = await findApp(to)
+      // validate app
+      if (app === null || !app.token || !app.sid) {
+        throw `Twilio app ${to} not registered. Please register this Twilio app with a id, sid, and token.`
       }
 
       let answers = {}
@@ -186,6 +197,7 @@ async function handleMessage (message) {
         type: 'whatsapp',
         to,
         from,
+        app,
         phone,
         userId,
         email: email || phone,
