@@ -676,6 +676,17 @@ class Session {
         }
         break
       }
+      case 'change-brand-url': {
+        // change the branding page background URL
+        // add bot's reply to session's messages list
+        for (let message of fulfillment.messages) {
+          this.addMessage('bot', message.speech)
+        }
+        console.log(this.id, '- sending change-brand-url command to UI with URL =', result.parameters.url)
+        // send command to UI
+        this.addCommand('change-brand-url', result.parameters.url)
+        break
+      }
       default: {
         // add bot's reply to session's messages list
         for (let message of fulfillment.messages) {
