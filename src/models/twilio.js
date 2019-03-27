@@ -1,13 +1,11 @@
 const request = require('request-promise-native')
 const Session = require('../session.js')
-// console.log('Session', Session)
-// const db = require('./models/db')
-// const Entities = require('html-entities').AllHtmlEntities
 // const entities = new Entities()
-// const hydra = require('./hydra')
 const PhoneNumber = require('awesome-phonenumber')
 // global cache for chat sessions
 const cache = require('./sessions')
+// database
+const db = require('./db')
 
 const twilio = require('twilio')
 const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN)
@@ -73,10 +71,28 @@ function sendMessage(from, to, body) {
   })
 }
 
-
 function onAddMessage (type, message, datetime) {
   // attach handler to send messages to facebook
-  sendMessage(this.from, this.to, message )
+  // sendMessage(this.from, this.to, message )
+  // send messages to SMS user, and decode HTML characters
+  sendMessage(this.to, this.from, message)
+  .then(r => {
+    console.log(this.id, `- SMS sent to ${this.from}`)
+  })
+  .catch(e => {
+    console.error(this.id, `failed to send SMS to customer ${this.from} using ${this.to}.`)
+  })
+}
+
+function findInCache (to, from) {
+  // look for chat session in cache
+  const keys = Object.keys(cache)
+  for (const key of keys) {
+    const v = cache[key]
+    if (v.to === to && v.from === from) {
+      return v
+    }
+  }
 }
 
 // get session object from local cache, or create session object from
@@ -84,8 +100,7 @@ function onAddMessage (type, message, datetime) {
 async function getSession (to, from) {
   try {
     // look for chat session in cache
-    const hit = cache.find(v => v.to === to && v.from === from)
-
+    const hit = findInCache(to, from)
     if (hit) {
       // found session in cache
       return hit
@@ -100,31 +115,16 @@ async function getSession (to, from) {
         // return the new session object
         return newSession
       } else {
-        console.log('twilio chat session not found in database for to', to, 'and from', from)
         // session not found in database. return null to say not found
         return null
       }
     }
   } catch (e) {
-    console.log('error looking up session info for facebook chat for to', to, 'and from', from, ':', e.message)
+    console.log('error looking up session info for twilio SMS to', to, 'and from', from, ':', e.message)
     // rethrow all errors
     throw e
   }
 }
-
-// function removeSession (session) {
-//   try {
-//     delete sessions[session.data.to][session.data.from]
-//   } catch (e) {
-//     console.error(`failed to remove Twilio SMS session sessions[${session.data.to}][${session.data.from}]`, e)
-//   }
-// }
-//
-// function updateSessionTo (session, newTo) {
-//   removeSession(session)
-//   session.data.to = newTo
-//   addSession(session)
-// }
 
 function addSession (session) {
   // add to cache
@@ -135,132 +135,103 @@ function addSession (session) {
 
 // handle incoming twilio messages
 async function handleMessage (message) {
-  // sms from
-  const from = message.From
-  // sms to
-  const to = message.To
-  // sms body
-  const body = message.Body
-  console.log(`Twilio - SMS received from ${from} on ${to}`)
-  let session
-  // find session, if exists
-  session = getSession(to, from)
-  // did session expire?
-  if (session) {
-    session.checkExpiration()
-    if (session.hasExpired) {
-      // session has expired. unset session var
-      session = undefined
-    }
-  }
-
-  // if session doesn't exist, create one
-  if (!session) {
-    console.log('new Twilio SMS chat session')
-    // get the appropriate part of the phone number to use for lookups
-    const phone = getLookupNumber(from, to)
-
-    let customerData = {}
-    // try {
-    //   // get customer data from Context Service
-    //   customerData = await contextService.getCustomerData(phone)
-    // } catch (e) {
-    //   // failed CS lookup
-    //   console.log(`could not retreive Context Service data for Twilio SMS from ${phone}:`, e.message)
-    // }
-
-    let dcloudSession = {}
-    try {
-      dcloudSession = await getDcloudSession(from, to)
-    } catch (e) {
-      console.error('Error getting dCloud phone number registration info', e.message)
-    }
-
-    let answers = {}
-    let firstName = undefined
-    let lastName = undefined
-    let email = undefined
-    let userId = undefined
-    try {
-      // get dCloud answers information that user submitted (hopefully)
-      answers = await getAnswers(phone)
-      // get instant demo username from the POD ID that user entered into the
-      // settings screen of the mobile app
-      userId = answers.podId
-      email = answers.emailAddress
-      // first name is the string of non-space characters before the first space
-      firstName = answers.userName.split(' ')[0]
-      // last name is the rest of the userName value, after firstName
-      lastName = answers.userName.substring(firstName.length)
-    } catch (e) {
-      console.error('Error getting dCloud session info', e)
-    }
-    // create session and store in sessions global
-    session = new Session('twilio', {
-      type: 'twilio',
-      to,
-      from,
-      phone,
-      userId,
-      email: email || customerData.Context_Work_Email || phone,
-      firstName: firstName || customerData.Context_First_Name || phone,
-      lastName: lastName || customerData.Context_Last_Name || '',
-      // apiAiToken: botConfig.aiToken,
-      // entryPointId: brandConfig.entryPointId,
-      dcloudSession: dcloudSession.session,
-      dcloudDatacenter: dcloudSession.datacenter,
-      botEnabled: true,
-      survey: true,
-      // backupNumber: process.env.TWILIO_BACKUP_NUMBER,
-      onAddMessage: async function (type, message) {
-        // send messages to SMS user, and decode HTML characters
-        try {
-          // const decodedMessage = entities.decode(message)
-          // console.log('sending decoded SMS message:', decodedMessage)
-          const smsResponse = await sendMessage(to, from, message)
-          // console.log('smsResponse', smsResponse)
-          console.log(this.id, `- SMS sent to ${from}`)
-        } catch (e) {
-          console.error(this.id, `failed to send SMS to customer ${this.data.from} using ${this.data.to}.`)
-          // unavailable using the current number?
-          // if (e.status === 400 && e.code === 21612) {
-          //   // update this session to use the backup US number
-          //   try {
-          //     updateSessionTo(session, this.data.backupNumber)
-          //     // try again
-          //     // const decodedMessage = entities.decode(message)
-          //     const smsResponse2 = await sendMessage(this.data.to, this.data.from, message)
-          //   } catch (e2) {
-          //     console.error(this.id, `failed to send SMS to customer at ${this.data.form} from backup number ${this.data.to}. fix me!`)
-          //   }
-          // }
-        }
+  try {
+    // sms from
+    const from = message.From
+    // sms to
+    const to = message.To
+    // sms body
+    const body = message.Body
+    console.log(`Twilio - SMS received from ${from} on ${to}`)
+    let session
+    // find session, if exists
+    session = await getSession(to, from)
+    // did session expire?
+    if (session) {
+      const expired = await session.checkExpiration()
+      if (expired) {
+        // session has expired. unset session var
+        session = undefined
       }
-    })
-    // add session to global sessions
-    await addSession(session)
-    // wait for the checkSessionInfo method to finish, so that any custom config
-    // is applied before we start the chat bot
-    await session.checkSessionPromise
-    // check if session is an instant demo
-    if (session.isInstantDemo) {
-      // make sure customer is registered, then send sparky message to AI
-      session.checkInstantDemoCustomer('sparky')
-      // don't do anything else
-      return
-    } else {
-      // set first message to AI as sparky, to trigger dialog with customer
-      session.addCustomerMessage('sparky')
-      // don't do anything else
-      return
     }
-  } else {
-    console.log(session.id, `- existing SMS chat session with ${from}`)
-  }
-  // was there text in the message?
-  if (body) {
-    // add message to session data
-    session.addCustomerMessage(body)
+
+    // if session doesn't exist, create one
+    if (!session) {
+      console.log('new Twilio SMS chat session')
+      // get the appropriate part of the phone number to use for lookups
+      const phone = getLookupNumber(from, to)
+
+      let dcloudSession = {}
+      try {
+        dcloudSession = await getDcloudSession(from, to)
+      } catch (e) {
+        console.error('Error getting dCloud phone number registration info', e.message)
+      }
+
+      let answers = {}
+      let firstName = undefined
+      let lastName = undefined
+      let email = undefined
+      let userId = undefined
+      try {
+        // get dCloud answers information that user submitted (hopefully)
+        answers = await getAnswers(phone)
+        // get instant demo username from the POD ID that user entered into the
+        // settings screen of the mobile app
+        userId = answers.podId
+        email = answers.emailAddress
+        // first name is the string of non-space characters before the first space
+        firstName = answers.userName.split(' ')[0]
+        // last name is the rest of the userName value, after firstName
+        lastName = answers.userName.substring(firstName.length)
+      } catch (e) {
+        console.error('Error getting dCloud session info', e)
+      }
+      // create session and store in sessions global
+      session = new Session('twilio', {
+        type: 'twilio',
+        to,
+        from,
+        phone,
+        userId,
+        email: email || phone,
+        firstName: firstName || phone,
+        lastName: lastName || '',
+        // apiAiToken: botConfig.aiToken,
+        // entryPointId: brandConfig.entryPointId,
+        dcloudSession: dcloudSession.session,
+        dcloudDatacenter: dcloudSession.datacenter,
+        botEnabled: true,
+        survey: true
+      }, onAddMessage)
+      // add session to global sessions
+      await addSession(session)
+      // wait for the checkSessionInfo method to finish, so that any custom config
+      // is applied before we start the chat bot
+      await session.checkSessionPromise
+      // check if session is an instant demo
+      if (session.isInstantDemo) {
+        // make sure customer is registered, then send sparky message to AI
+        session.checkInstantDemoCustomer('sparky')
+        // don't do anything else
+        return
+      } else {
+        // set first message to AI as sparky, to trigger dialog with customer
+        session.addCustomerMessage('sparky')
+        // don't do anything else
+        return
+      }
+    } else {
+      console.log(session.id, `- existing SMS chat session with ${from}`)
+    }
+    // was there text in the message?
+    if (body) {
+      // add message to session data
+      session.addCustomerMessage(body)
+    }
+  } catch (e) {
+    console.error('error during twilio handleMessage:', e)
+    // throw e
   }
 }
 
