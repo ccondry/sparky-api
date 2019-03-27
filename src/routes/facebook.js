@@ -15,7 +15,7 @@ router.get('/webhook', (req, res) => {
 })
 
 function findPage (id) {
-  return db.findOne('facebook.pages', {id})
+  return db.findOne('facebook.page', {id})
 }
 
 // Accepts POST requests at /webhook endpoint for Facebook

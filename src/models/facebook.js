@@ -12,7 +12,7 @@ const localization = require('./localization')
 const cache = require('./sessions')
 
 function findPage (id) {
-  return db.findOne('facebook.pages', {id})
+  return db.findOne('facebook.page', {id})
 }
 
 function getKnownUser (pageId, userId) {
