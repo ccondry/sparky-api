@@ -29,8 +29,6 @@ class Session {
     this.timestamp = data.timestamp || new Date().getTime()
     // set createdAt for database record time-to-live
     // this.createdAt = data.createdAt || new Date()
-    // sessions expiry
-    this.expiry = data.expiry || new Date().getTime() + 1000 * Number(process.env.SESSION_TIMEOUT)
     // set expireAt for database record time-to-live
     if (data.expireAt) {
       this.expireAt = data.expireAt
@@ -119,8 +117,6 @@ class Session {
   }
 
   resetExpiration () {
-    // reset expiry to current time + configured timeout value
-    this.expiry = new Date().getTime() + 1000 * Number(process.env.SESSION_TIMEOUT)
     // set expireAt for database record time-to-live
     let d = new Date()
     d.setSeconds(d.getSeconds() + Number(process.env.SESSION_TIMEOUT))
