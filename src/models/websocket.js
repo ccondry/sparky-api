@@ -14,21 +14,23 @@ function start (server) {
   wss.on('connection', newConnection)
 }
 
+function onAddMessage (type, message, datetime, data) {
+  // attach handler to send messages to web socket client
+  this.websocket.send(JSON.stringify({
+    datetime,
+    text: message,
+    type,
+    data
+  }))
+}
+
 // create session object from database data, if found
 async function getSession (id) {
   try {
     // look for chat session in cache
     if (cache[id]) {
       // console.log(id, '- found chat session in cache. attaching onAddMessage handler for websocket.')
-      cache[id].onAddMessage = function (type, message, datetime) {
-        // console.log(this.id, '- attempting to send websocket message to client:', message)
-        // attach handler to send messages to web socket client
-        this.websocket.send(JSON.stringify({
-          datetime,
-          text: message,
-          type
-        }))
-      }
+      cache[id].onAddMessage = onAddMessage
       // in cache
       return cache[id]
     } else {
@@ -38,14 +40,7 @@ async function getSession (id) {
       if (session) {
         // console.log(id, '- chat session found in database.')
         // generate session object from database data
-        const newSession = new Session('sparky-ui', session, function (type, message, datetime) {
-          // attach handler to send messages to web socket client
-          this.websocket.send(JSON.stringify({
-            datetime,
-            text: message,
-            type
-          }))
-        })
+        const newSession = new Session('sparky-ui', session, onAddMessage)
         // console.log(id, '- chat session object created.')
         // add session to cache
         cache[id] = newSession

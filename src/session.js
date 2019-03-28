@@ -187,7 +187,7 @@ class Session {
         if (this.onAddMessage && typeof this.onAddMessage === 'function') {
           console.log(this.id, '- sending message using onAddMessage...')
           try {
-            this.onAddMessage.call(this, type, message, datetime)
+            this.onAddMessage.call(this, type, message, datetime, data)
             console.log(this.id, '- message sent using onAddMessage.')
           } catch (e) {
             console.log(this.id, '- error sending outgoing message with onAddMessage:', e)
