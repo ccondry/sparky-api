@@ -124,7 +124,13 @@ class Session {
     // set expireAt for database record time-to-live
     let d = new Date()
     d.setSeconds(d.getSeconds() + Number(process.env.SESSION_TIMEOUT))
+    // update cache expireAt
     this.expireAt = d
+    // update database record's expireAt
+    db.updateOne('chat.session', { id: this.id }, { $set: { expireAt: this.expireAt } })
+    .catch(e => {
+      console.error(this.id, '- error updating chat session expireAt:', e)
+    })
   }
 
   // get dCloud session information from cumulus-api
