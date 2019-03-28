@@ -104,7 +104,7 @@ class Session {
     // did session expire?
     if (new Date().getTime() > this.expireAt) {
       // expired
-      console.log(`${this.id} - session is old and has expired. Removing this session.`)
+      console.log(`${this.id} - session is old and has expired. Removing this session. expireAt =`, this.expireAt)
       // TODO update this message
       await this.addMessage('bot', this.sessionExpired)
       // remove session from sessions
@@ -117,6 +117,7 @@ class Session {
   }
 
   resetExpiration () {
+    console.log(this.id, '- resetting expiration')
     // set expireAt for database record time-to-live
     let d = new Date()
     d.setSeconds(d.getSeconds() + Number(process.env.SESSION_TIMEOUT))
