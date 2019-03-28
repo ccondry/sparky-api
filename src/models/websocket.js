@@ -24,19 +24,21 @@ function onAddMessage (type, message, datetime, data) {
   }))
 }
 
-function onTypingStart (type, message, datetime, data) {
+function onTypingStart (from) {
   // attach handler to send messages to web socket client
   this.websocket.send(JSON.stringify({
-    datetime,
-    type: 'onTypingStart'
+    datetime: new Date().toJSON(),
+    type: 'onTypingStart',
+    data: {from}
   }))
 }
 
-function onTypingStop (type, message, datetime, data) {
+function onTypingStop (from) {
   // attach handler to send messages to web socket client
   this.websocket.send(JSON.stringify({
-    datetime,
-    type: 'onTypingStop'
+    datetime: new Date().toJSON(),
+    type: 'onTypingStop',
+    data: {from}
   }))
 }
 
