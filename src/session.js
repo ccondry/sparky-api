@@ -822,7 +822,8 @@ class Session {
         author: `${this.firstName} ${this.lastName}`,
         // author: '',
         customerEmail: this.email,
-        customerPhone: this.phone
+        customerPhone: this.phone,
+        pollingInterval: 2000
       }
       console.log(this.id, 'uccx chat client initializing with data:', chatData)
       const uccx = new uccxChatClient(chatData)
