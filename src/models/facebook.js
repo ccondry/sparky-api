@@ -71,6 +71,36 @@ function onAddMessage (type, message, datetime) {
   sendMessage(this.senderId, message, this.page)
 }
 
+function onTypingStart (from) {
+  request({
+    url: 'https://graph.facebook.com/v2.6/me/messages',
+    qs: {access_token: this.page.token},
+    method: 'POST',
+    json: {
+      recipient: {id: this.senderId},
+      sender_action: 'typing_on'
+    }
+  })
+  .catch(e => {
+    console.error('facebook.onTypingStart - Error sending onTypingStart event:', e.message)
+  })
+}
+
+function onTypingStop (from) {
+  request({
+    url: 'https://graph.facebook.com/v2.6/me/messages',
+    qs: {access_token: this.page.token},
+    method: 'POST',
+    json: {
+      recipient: {id: this.senderId},
+      sender_action: 'typing_off'
+    }
+  })
+  .catch(e => {
+    console.error('facebook.onTypingStop - Error sending onTypingStop event:', e.message)
+  })
+}
+
 function findInCache (pageId, senderId) {
   // look for chat session in cache
   const keys = Object.keys(cache)
@@ -95,7 +125,7 @@ async function getSession (pageId, senderId) {
       const session = await db.findOne('chat.session', {pageId, senderId})
       if (session) {
         // generate session object from database data
-        const newSession = new Session('facebook', session, onAddMessage)
+        const newSession = new Session('facebook', session, onAddMessage, onTypingStart, onTypingStop)
         // add session to cache
         cache[session.id] = newSession
         // return the new session object
@@ -194,7 +224,7 @@ async function handleMessage (message) {
       email: userId,
       firstName,
       lastName
-    }, onAddMessage)
+    }, onAddMessage, onTypingStart, onTypingStop)
     // add session to database and cache
     addSession(session)
 
