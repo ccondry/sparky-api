@@ -24,6 +24,22 @@ function onAddMessage (type, message, datetime, data) {
   }))
 }
 
+function onTypingStart (type, message, datetime, data) {
+  // attach handler to send messages to web socket client
+  this.websocket.send(JSON.stringify({
+    datetime,
+    type: 'onTypingStart'
+  }))
+}
+
+function onTypingStop (type, message, datetime, data) {
+  // attach handler to send messages to web socket client
+  this.websocket.send(JSON.stringify({
+    datetime,
+    type: 'onTypingStop'
+  }))
+}
+
 // create session object from database data, if found
 async function getSession (id) {
   try {
@@ -31,6 +47,8 @@ async function getSession (id) {
     if (cache[id]) {
       // console.log(id, '- found chat session in cache. attaching onAddMessage handler for websocket.')
       cache[id].onAddMessage = onAddMessage
+      cache[id].onTypingStart = onTypingStart
+      cache[id].onTypingStop = onTypingStop
       // in cache
       return cache[id]
     } else {
@@ -40,7 +58,7 @@ async function getSession (id) {
       if (session) {
         // console.log(id, '- chat session found in database.')
         // generate session object from database data
-        const newSession = new Session('sparky-ui', session, onAddMessage)
+        const newSession = new Session('sparky-ui', session, onAddMessage, onTypingStart, onTypingStop)
         // console.log(id, '- chat session object created.')
         // add session to cache
         cache[id] = newSession

@@ -13,7 +13,7 @@ const cache = require('./models/sessions')
 
 class Session {
   // create a session object
-  constructor (type, data, onAddMessage) {
+  constructor (type, data, onAddMessage, onTypingStart, onTypingStop) {
     // copy data from input to this, or assign default values if properties are
     // not found
     if (data.id) {
@@ -55,6 +55,12 @@ class Session {
 
     // run this callback when messages are added
     this.onAddMessage = onAddMessage
+
+    // run this callback when agent starts typing
+    this.onTypingStart = onTypingStart
+
+    // run this callback when messages are added
+    this.onTypingStop = onTypingStop
 
     // resolve this promise to get user data
     // this.getCustomerData = data.getCustomerData
