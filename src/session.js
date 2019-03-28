@@ -149,7 +149,7 @@ class Session {
   }
 
   // add new message to session
-  async addMessage (type, message) {
+  async addMessage (type, message, data) {
     // if message is not empty string
     if (message && message.length) {
       // push message to array
@@ -157,7 +157,8 @@ class Session {
       const m = {
         text: message,
         type,
-        datetime
+        datetime,
+        data
       }
       this.messages.push(m)
 
@@ -195,13 +196,7 @@ class Session {
 
   // add new command to messages array
   addCommand (command, data) {
-    this.messages.push({
-      text: command,
-      type: 'command',
-      datetime: new Date().toJSON(),
-      data
-    })
-    // TODO if facebook client, possibly send different command message to facebook
+    this.addMessage('command', command, data)
   }
 
   deescalate () {
