@@ -158,11 +158,22 @@ class Session {
       }
       this.messages.push(m)
 
+      // set expireAt for database record time-to-live
+      let d = new Date()
+      d.setSeconds(d.getSeconds() + Number(process.env.SESSION_TIMEOUT))
+      // update cache expireAt
+      this.expireAt = d
+
       // push message to the database record also
       let done = false
       while (!done) {
         try {
-          await db.updateOne('chat.session', { id: this.id }, { $push: { messages: m } })
+          // push message onto array and set the expireAt to new time
+          await db.updateOne(
+            'chat.session',
+            { id: this.id },
+            { $push: { messages: m }, $set: { expireAt: this.expireAt } }
+          )
           done = true
         } catch (e) {
           console.log(this.id, '- failed to add message to database. trying again. error message was: ', e.message)
@@ -254,7 +265,7 @@ class Session {
     }
     // reset chat session expiration
     this.resetExpiration()
-    // add message to memory
+    // add message to memory and database
     this.addMessage('customer', message)
     // detect any goodbye messages that would end the session
     if (process.env.GOODBYE_MESSAGES.toLowerCase().split(',').includes(message.toLowerCase())) {
