@@ -6,6 +6,9 @@ const MongoClient = require('mongodb').MongoClient
 // Connection URL
 const url = process.env.MONGO_URL
 const connectOptions = { useNewUrlParser: true }
+// global db client object
+let _client
+
 module.exports = {
   find,
   findOne,
@@ -18,13 +21,19 @@ module.exports = {
 
 // get authenticated mongo client
 function getClient () {
-  return new Promise(function(resolve, reject) {
-    // connect to mongo
+  return new Promise(function (resolve, reject) {
+    // return client if it is already connected
+    if (_client) resolve(_client)
+    // otherwise, connect to mongo and then return the client
     MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
       // check for error
-      if (err) return reject(err)
-      // success - return client
-      else resolve(client)
+      if (err) {
+        return reject(err)
+      } else {
+        // success - set global client object and then resolve it
+        _client = client
+        resolve(_client)
+      }
     })
   })
 }
