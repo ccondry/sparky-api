@@ -41,7 +41,8 @@ router.post('/', async (req, res) => {
     // bot is enabled (default)
     // start conversation off by sending message 'sparky' as the customer, to get
     // the initial configured message from the AI bot
-    session.processCustomerMessage('sparky')
+    // but wait a moment before sending the first message so that the websocket client has time to connect
+    setTimeout(() => session.processCustomerMessage('sparky'), 1000)
   }
 
   // return session uuid to client
