@@ -18,7 +18,7 @@ if (!process.env.MONGO_URL) {
 const url = process.env.MONGO_URL
 const connectOptions = { useNewUrlParser: true }
 // global db client object
-let _client
+// let _client
 
 module.exports = {
   find,
@@ -34,7 +34,7 @@ module.exports = {
 function getClient () {
   return new Promise(function (resolve, reject) {
     // return client if it is already connected
-    if (_client) resolve(_client)
+    // if (_client) resolve(_client)
     // otherwise, connect to mongo and then return the client
     MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
       // check for error
@@ -42,8 +42,8 @@ function getClient () {
         return reject(err)
       } else {
         // success - set global client object and then resolve it
-        _client = client
-        resolve(_client)
+        // _client = client
+        resolve(client)
       }
     })
   })
@@ -61,7 +61,7 @@ function find (collection, query = {}, projections) {
       .find(query).project(projections)
       .toArray(function(queryError, doc) {
         // close the client connection
-        // client.close()
+        client.close()
         // check for error
         if (queryError) reject(queryError)
         // success
@@ -86,7 +86,7 @@ function findOne (collection, query, options) {
       // find!
       db.collection(collection).findOne(query, options, function (err, result) {
         // close the client connection
-        // client.close()
+        client.close()
         // check for error
         if (err) reject(err)
         // success
@@ -111,7 +111,7 @@ function insertOne (collection, data) {
       // insert!
       db.collection(collection).insertOne(data, function (err, result) {
         // close the client connection
-        // client.close()
+        client.close()
         // check for error
         if (err) reject(err)
         // success
@@ -136,7 +136,7 @@ function upsert (collection, query, data) {
       // upsert!
       db.collection(collection).findOneAndReplace(query, data, { upsert: true }, function (err, result) {
         // close the client connection
-        // client.close()
+        client.close()
         // check for error
         if (err) reject(err)
         // success
@@ -161,7 +161,7 @@ function updateOne (collection, query, data) {
       // upsert!
       db.collection(collection).updateOne(query, data, function (err, result) {
         // close the client connection
-        // client.close()
+        client.close()
         // check for error
         if (err) reject(err)
         // success
@@ -185,7 +185,7 @@ function removeOne (collection, query) {
       // go
       db.collection(collection).removeOne(query, function (err, result) {
         // close the client connection
-        // client.close()
+        client.close()
         // check for error
         if (err) reject(err)
         // success
