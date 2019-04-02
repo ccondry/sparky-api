@@ -28,49 +28,29 @@ function getClient () {
   })
 }
 
-// mongo find (returns array)
-// function find (collection, query, options) {
-//   return new Promise(function(resolve, reject) {
-//     // get mongo client
-//     getClient()
-//     .then(client => {
-//       // use db already specified in connect url
-//       const db = client.db()
-//       // find!
-//       db.collection(collection).find(query, options).toArray(function (err, result) {
-//         // close the client connection
-//         client.close()
-//         // check for error
-//         if (err) reject(err)
-//         // success
-//         else resolve(result)
-//       })
-//     })
-//     .catch(e => {
-//       // failed to get client
-//       reject(e)
-//     })
-//   })
-// }
-
-
 function find (collection, query = {}, projections) {
   return new Promise((resolve, reject) => {
-    try {
-      MongoClient.connect(url, connectOptions, function(connectError, client) {
-        if (connectError) return reject(connectError)
-        client.db()
-        .collection(collection)
-        .find(query).project(projections)
-        .toArray(function(queryError, doc) {
-          if (queryError) reject(queryError)
-          else resolve(doc)
-          client.close()
-        })
+    // get mongo client
+    getClient()
+    .then(client => {
+      // use db already specified in connect url
+      const db = client.db()
+      // find!
+      db.collection(collection)
+      .find(query).project(projections)
+      .toArray(function(queryError, doc) {
+        // close the client connection
+        client.close()
+        // check for error
+        if (queryError) reject(queryError)
+        // success
+        else resolve(doc)
       })
-    } catch (e) {
+    })
+    .catch(e => {
+      // failed to get client
       reject(e)
-    }
+    })
   })
 }
 
@@ -197,19 +177,3 @@ function removeOne (collection, query) {
     })
   })
 }
-
-// find('test', {})
-// .then(r => console.log(r))
-// .catch(e => console.log(e.message))
-//
-// findOne('test', {})
-// .then(r => console.log(r))
-// .catch(e => console.log(e.message))
-//
-// insert('test', {red: false})
-// .then(r => console.log(r))
-// .catch(e => console.log(e.message))
-//
-// upsert('test', {red: false}, {red: true})
-// .then(r => console.log(r))
-// .catch(e => console.log(e.message))
