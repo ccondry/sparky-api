@@ -6,7 +6,12 @@ const MongoClient = require('mongodb').MongoClient
 if (!process.env.MONGO_URL) {
   console.error('dcloud-sparky-api - process.env.MONGO_URL is not defined. Please configure this variable in cumulus-api/.env file.')
 } else {
-  console.log('process.env.MONGO_URL =', process.env.MONGO_URL)
+  try {
+    const redacted = process.env.MONGO_URL.split('@').pop()
+    console.log('process.env.MONGO_URL =', redacted)
+  } catch (e) {
+    console.log('process.env.MONGO_URL is set, but failed to redact the password from that URL, so not displaying it here.')
+  }
 }
 
 // Connection URL
