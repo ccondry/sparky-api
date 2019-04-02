@@ -3,6 +3,12 @@ This provides some simple async methods for using a mongo database
 */
 const MongoClient = require('mongodb').MongoClient
 
+if (!process.env.MONGO_URL) {
+  console.error('dcloud-sparky-api - process.env.MONGO_URL is not defined. Please configure this variable in cumulus-api/.env file.')
+} else {
+  console.log('process.env.MONGO_URL =', process.env.MONGO_URL)
+}
+
 // Connection URL
 const url = process.env.MONGO_URL
 const connectOptions = { useNewUrlParser: true }
