@@ -13,7 +13,7 @@ if (!process.env.MONGO_URL) {
 const url = process.env.MONGO_URL
 const connectOptions = { useNewUrlParser: true }
 // global db client object
-let _client
+// let _client
 
 module.exports = {
   find,
@@ -29,7 +29,7 @@ module.exports = {
 function getClient () {
   return new Promise(function (resolve, reject) {
     // return client if it is already connected
-    if (_client) resolve(_client)
+    // if (_client) resolve(_client)
     // otherwise, connect to mongo and then return the client
     MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
       // check for error
@@ -37,8 +37,8 @@ function getClient () {
         return reject(err)
       } else {
         // success - set global client object and then resolve it
-        _client = client
-        resolve(_client)
+        // _client = client
+        resolve(client)
       }
     })
   })
