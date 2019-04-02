@@ -12,7 +12,8 @@ module.exports = {
   insertOne,
   upsert,
   updateOne,
-  removeOne
+  removeOne,
+  getClient
 }
 
 // get authenticated mongo client
