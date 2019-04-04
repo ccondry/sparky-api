@@ -541,7 +541,8 @@ class Session {
   // get vertical config data from mm server
   getVerticalInfo () {
     return request({
-      url: 'https://mm.cxdemo.net/api/v1/verticals/' + this.vertical,
+      baseUrl: process.env.API_BASE,
+      url: '/api/v1/verticals/' + this.vertical,
       json: true
     })
   }
