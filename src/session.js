@@ -457,7 +457,7 @@ class Session {
       }
       if (this.demoConfig.chatCsqId) {
         // prefix the ID with Chat_Csq_ for UCCX chat form to work
-        this.csq = 'Chat_Csq_' + this.demoConfig.chatCsqId
+        this.csq = 'Chat_Csq' + this.demoConfig.chatCsqId
         console.log(this.id, '- used dCloud session config to update UCCX chat CSQ ID to', this.csq)
       }
       // update language code
@@ -916,7 +916,7 @@ class Session {
           if (this.botEnabled) {
             // bot enabled
             form = process.env.UCCX_CHAT_BOT_FORM_ID || '100000'
-            csq = this.csq || process.env.UCCX_CHAT_BOT_CSQ || 'Chat_Csq_31'
+            csq = this.csq || process.env.UCCX_CHAT_BOT_CSQ || 'Chat_Csq31'
             title = 'Chat Bot'
           } else {
             // bot disabled
