@@ -460,7 +460,7 @@ class Session {
         console.log(this.id, '- used dCloud session config to update UCCX chat CSQ ID to', this.csq)
       }
       // update language code
-      this.languageCode = `${this.language.toLowerCase()}_${this.region.toUpperCase()}`
+      this.languageCode = `${this.language.toLowerCase()}-${this.region.toUpperCase()}`
       console.log(this.id, '- used dCloud session config to update languageCode to', this.languageCode)
       // continue
     } catch (e) {
