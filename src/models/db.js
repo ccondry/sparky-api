@@ -72,7 +72,7 @@ module.exports = class DB {
 
   // mongo find one (returns object)
   findOne (collection, query, options) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       // get mongo client
       this.getClient()
       .then(client => {
@@ -97,7 +97,7 @@ module.exports = class DB {
 
   // mongo insert
   insertOne (collection, data) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       // get mongo client
       this.getClient()
       .then(client => {
@@ -122,7 +122,7 @@ module.exports = class DB {
 
   // mongo upsert (update existing or insert new if not exist)
   upsert (collection, query, data) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       // get mongo client
       this.getClient()
       .then(client => {
@@ -147,7 +147,7 @@ module.exports = class DB {
 
   // mongo updateOne (update one existing record)
   updateOne (collection, query, data) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       // get mongo client
       this.getClient()
       .then(client => {
