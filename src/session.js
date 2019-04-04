@@ -783,9 +783,9 @@ class Session {
         // send the survey results to the node service running in the demo
         try {
           await this.saveSurveyAnswers()
-          console.log('saved survey answers')
+          console.log(this.id, '- saved survey answers')
         } catch (e) {
-          console.log('Failed to save survey answers', e.message)
+          console.log(this.id, '- Failed to save survey answers', e.message)
         }
 
         break
