@@ -5,7 +5,8 @@ const WebSocket = require('ws')
 // chat session class
 const Session = require('../session')
 // database model
-const db = require('./db')
+const DB = require('./db')
+const db = new DB('cumulus')
 
 function start (server) {
   console.log('starting websocket server')

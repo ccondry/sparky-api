@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const fb = require('../models/facebook')
-const db = require('../models/db')
+const DB = require('../models/db')
+const db = new DB('cumulus')
 const request = require('request-promise-native')
 
 /* For Facebook Validation */

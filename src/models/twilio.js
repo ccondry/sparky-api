@@ -5,7 +5,8 @@ const PhoneNumber = require('awesome-phonenumber')
 // global cache for chat sessions
 const cache = require('./sessions')
 // database
-const db = require('./db')
+const DB = require('./db')
+const db = new DB('cumulus')
 
 const twilio = require('twilio')
 

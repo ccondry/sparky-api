@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const Session = require('../../session')
-const db = require('../../models/db')
+const DB = require('../../models/db')
+const db = new DB('cumulus')
 const cache = require('../../models/sessions')
 
 // get new session ID for sparky-ui client

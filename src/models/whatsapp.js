@@ -1,6 +1,7 @@
 const request = require('request-promise-native')
 const Session = require('../session.js')
-const db = require('./db')
+const DB = require('./db')
+const db = new DB('cumulus')
 const cache = require('./sessions')
 const PhoneNumber = require('awesome-phonenumber')
 const twilio = require('twilio')
