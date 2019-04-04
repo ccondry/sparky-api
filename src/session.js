@@ -8,7 +8,9 @@ const util = require('util')
 const uccxChatClient = require('uccx-chat-client')
 const smEventHandlers = require('./smEventHandlers')
 const localization = require('./models/localization')
-const db = require('./models/db')
+const DB = require('./models/db')
+const cumulusDb = new DB('cumulus')
+const toolboxDb = new DB('toolbox')
 const cache = require('./models/sessions')
 
 class Session {
@@ -51,7 +53,8 @@ class Session {
     this.language = data.language || process.env.DEFAULT_LANGUAGE || 'en'
     this.region = data.region || process.env.DEFAULT_REGION || 'US'
 
-    this.languageCode = data.languageCode || `${this.language.toLowerCase()}_${this.region.toUpperCase()}`
+    // set language code
+    this.languageCode = data.languageCode || `${this.language.toLowerCase()}-${this.region.toUpperCase()}`
 
     // run this callback when messages are added
     this.onAddMessage = onAddMessage
@@ -130,7 +133,7 @@ class Session {
     // update cache expireAt
     this.expireAt = d
     // update database record's expireAt
-    db.updateOne('chat.session', { id: this.id }, { $set: { expireAt: this.expireAt } })
+    cumulusDb.updateOne('chat.session', { id: this.id }, { $set: { expireAt: this.expireAt } })
     .catch(e => {
       console.error(this.id, '- error updating chat session expireAt:', e)
     })
@@ -176,7 +179,7 @@ class Session {
       while (!done) {
         try {
           // push message onto array and set the expireAt to new time
-          await db.updateOne(
+          await cumulusDb.updateOne(
             'chat.session',
             { id: this.id },
             { $push: { messages: m }, $set: { expireAt: this.expireAt } }
@@ -240,7 +243,7 @@ class Session {
   // remove session from the database
   endSession () {
     try {
-      db.removeOne('chat.session', {id: this.id})
+      cumulusDb.removeOne('chat.session', {id: this.id})
       console.log(this.id, '- removed chat session from database.')
       // end websocket, if any
       if (this.websocket) {
@@ -370,7 +373,7 @@ class Session {
       body: {
         sessionId: this.id,
         q: text,
-        lang: this.language
+        lang: this.languageCode
       },
       json: true
     })
@@ -428,6 +431,10 @@ class Session {
       console.log(this.id, '- demo configuration', this.demoConfig)
 
       // apply any demo configs for chat bots
+      if (this.demoConfig.vertical) {
+        this.vertical = this.demoConfig.vertical
+        console.log(this.id, '- used dCloud session config to set vertical to', this.vertical)
+      }
       if (this.demoConfig.chatBotToken) {
         this.apiAiToken = this.demoConfig.chatBotToken
         console.log(this.id, '- used dCloud session config to update apiAiToken to', this.apiAiToken)
@@ -455,9 +462,7 @@ class Session {
       // update language code
       this.languageCode = `${this.language.toLowerCase()}_${this.region.toUpperCase()}`
       console.log(this.id, '- used dCloud session config to update languageCode to', this.languageCode)
-
-      // success
-      return true
+      // continue
     } catch (e) {
       console.error(`${this.id} - error getting dcloud session info for ${this.dcloudDatacenter} ${this.dcloudSession}`, e.message)
       // reset the session info to null
@@ -466,6 +471,110 @@ class Session {
       // failed
       return false
     }
+
+    try {
+      // now get vertical config and apply it on top of demo session config
+      // this is to transition from demo session configuration values to using
+      // the branding tool for all customization options
+      const r2 = await this.getVerticalInfo()
+      console.log(`${this.id} - found dCloud vertical config for vertical "${this.vertical}"`)
+      if (r2.chatBotToken) {
+        this.apiAiToken = r2.chatBotToken
+        console.log(this.id, '- used dCloud vertical config to update apiAiToken to', this.apiAiToken)
+      }
+      if (r2.languageCode) {
+        this.languageCode = r2.languageCode
+        console.log(this.id, '- used dCloud vertical config to update languageCode to', this.languageCode)
+      }
+      if (r2.chatBotEnabled) {
+        this.botEnabled = r2.chatBotEnabled
+        console.log(this.id, '- used dCloud vertical config to update botEnabled to', this.botEnabled)
+      }
+      if (r2.chatBotSurveyEnabled) {
+        this.survey = r2.chatBotSurveyEnabled
+        console.log(this.id, '- used dCloud vertical config to update survey to', this.survey)
+      }
+    } catch (e) {
+      console.error(`${this.id} - error getting dcloud vertical config info for ${this.vertical}`, e.message)
+      // failed?
+      // return false
+    }
+
+    try {
+      // in the instant demo, get customer information so we can route chat properly
+      if (this.isInstantDemo) {
+        // look up customer using phone or email field data
+        const r3 = await this.getCustomerInfo()
+        if (r3) {
+          // a matching customer was found
+          // get instant demo instance info
+          const r4 = await this.getInstantDemoInstance()
+          if (r4) {
+            // create instant demo identifier
+            const instanceId = r4.datacenter + '-' + r4.id
+            // modify the demo version string for matching in mongodb
+            const modifiedVersion = this.demoVersion.replace(/\./g, ',')
+            // extract demo config for this customer for this demo instance
+            const d = r3.demo[this.demo].instant[modifiedVersion][instanceId]
+            if (d.chatCsq) {
+              // extract UCCX chat CSQ ID for this customer
+              this.csq = d.chatCsq
+              console.log(this.id, '- used dCloud session config to update UCCX chat CSQ ID to', this.csq)
+            }
+          } else {
+            console.log(this.id, '- instant demo instance not found')
+          }
+        } else {
+          console.log(this.id, '- customer info not found')
+        }
+      }
+    } catch (e) {
+      console.error(`${this.id} - error getting instant demo customer info:`, e.message)
+      // failed?
+      // return false
+    }
+
+    // success
+    return true
+  }
+
+  // get vertical config data from mm server
+  getVerticalInfo () {
+    return request({
+      url: 'https://mm.cxdemo.net/api/v1/verticals/' + this.vertical,
+      json: true
+    })
+  }
+
+  // find instant demo customer record in cloud db
+  getCustomerInfo () {
+    const query = {
+      'customer.contact': {
+        $in: [this.phone, this.email]
+      }
+    }
+    // don't return the internal _id or user's password from db query
+    const projection = {
+      _id: 0,
+      password: 0
+    }
+    // run db query
+    return toolboxDb.findOne('users', query, {projection})
+  }
+
+  // find the instant demo instance details in cloud db
+  async getInstantDemoInstance () {
+    // find the instant demo matching details for this session
+    const query = {
+      datacenter: this.dcloudDatacenter,
+      session: this.dcloudSession,
+      version: this.demoVersion,
+      demo: this.demo
+    }
+    // don't return the internal _id from db query
+    const projection = { _id: 0 }
+    // run db query
+    return toolboxDb.findOne('instance', query, {projection})
   }
 
   // register customer in instant demo

@@ -1,5 +1,5 @@
 module.exports = {
-  en_US: {
+  'en-US': {
     welcomeMessage: "Ok, I'll get you connected to one of our experts. One moment...",
     errorMessage: "I'm sorry, but we're having trouble connecting to an agent. Please try again later.",
     waitingAcceptAttachment: "Waiting for agent to accept attachment",
@@ -14,7 +14,7 @@ module.exports = {
     noVideo: "I'm sorry, I'm not able to connect a video call to you from here.",
     ccxPleaseWait: "Please wait while we connect you with a customer care representative..."
   },
-  pt_BR: {
+  'pt-BT': {
     welcomeMessage: "Um momento, vou procurar um agente da Ativos disponível",
     errorMessage: "Desculpe, estou com dificuldades em encontrar um atendente. Por favor tente mais tarde",
     waitingAcceptAttachment: "aguardando o agente aceitar o anexo",
@@ -29,7 +29,7 @@ module.exports = {
     noVideo: "Desculpe, não posso lhe conectar a uma video chamada.",
     ccxPleaseWait: "Um momento, vou procurar um agente da Ativos disponível..."
   },
-  es_MX: {
+  'es-MX': {
     welcomeMessage: "Ok, I'll get you connected to one of our experts. One moment...",
     errorMessage: "I'm sorry, but we're having trouble connecting to an agent. Please try again later.",
     waitingAcceptAttachment: "Waiting for agent to accept attachment",
