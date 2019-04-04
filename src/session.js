@@ -500,39 +500,42 @@ class Session {
       // return false
     }
 
-    try {
-      // in the instant demo, get customer information so we can route chat properly
-      if (this.isInstantDemo) {
-        // look up customer using phone or email field data
-        const r3 = await this.getCustomerInfo()
-        if (r3) {
-          // a matching customer was found
-          // get instant demo instance info
-          const r4 = await this.getInstantDemoInstance()
-          if (r4) {
-            // create instant demo identifier
-            const instanceId = r4.datacenter + '-' + r4.id
-            // modify the demo version string for matching in mongodb
-            const modifiedVersion = this.demoVersion.replace(/\./g, ',')
-            // extract demo config for this customer for this demo instance
-            const d = r3.demo[this.demo].instant[modifiedVersion][instanceId]
-            if (d.chatCsq) {
-              // extract UCCX chat CSQ ID for this customer
-              this.csq = d.chatCsq
-              console.log(this.id, '- used dCloud session config to update UCCX chat CSQ ID to', this.csq)
-            }
-          } else {
-            console.log(this.id, '- instant demo instance not found')
-          }
-        } else {
-          console.log(this.id, '- customer info not found')
-        }
-      }
-    } catch (e) {
-      console.error(`${this.id} - error getting instant demo customer info:`, e.message)
-      // failed?
-      // return false
-    }
+    // this commented section is not necessary until instant demo user config
+    // is stored in the cloud db. now it is stored inside the demo session and
+    // mm takes care of retrieving it
+    // try {
+    //   // in the instant demo, get customer information so we can route chat properly
+    //   if (this.isInstantDemo) {
+    //     // look up customer using phone or email field data
+    //     const r3 = await this.getCustomerInfo()
+    //     if (r3) {
+    //       // a matching customer was found
+    //       // get instant demo instance info
+    //       const r4 = await this.getInstantDemoInstance()
+    //       if (r4) {
+    //         // create instant demo identifier
+    //         const instanceId = r4.datacenter + '-' + r4.id
+    //         // modify the demo version string for matching in mongodb
+    //         const modifiedVersion = this.demoVersion.replace(/\./g, ',')
+    //         // extract demo config for this customer for this demo instance
+    //         const d = r3.demo[this.demo].instant[modifiedVersion][instanceId]
+    //         if (d.chatCsq) {
+    //           // extract UCCX chat CSQ ID for this customer
+    //           this.csq = d.chatCsq
+    //           console.log(this.id, '- used dCloud session config to update UCCX chat CSQ ID to', this.csq)
+    //         }
+    //       } else {
+    //         console.log(this.id, '- instant demo instance not found')
+    //       }
+    //     } else {
+    //       console.log(this.id, '- customer info not found')
+    //     }
+    //   }
+    // } catch (e) {
+    //   console.error(`${this.id} - error getting instant demo customer info:`, e.message)
+    //   // failed?
+    //   // return false
+    // }
 
     // success
     return true
