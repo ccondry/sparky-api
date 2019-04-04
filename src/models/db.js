@@ -47,7 +47,7 @@ module.exports = class DB {
   find (collection, query = {}, projections) {
     return new Promise((resolve, reject) => {
       // get mongo client
-      getClient()
+      this.getClient()
       .then(client => {
         // use db already specified in connect url
         const db = client.db(this.dbName)
@@ -74,7 +74,7 @@ module.exports = class DB {
   findOne (collection, query, options) {
     return new Promise(function(resolve, reject) {
       // get mongo client
-      getClient()
+      this.getClient()
       .then(client => {
         // use db already specified in connect url
         const db = client.db(this.dbName)
@@ -99,7 +99,7 @@ module.exports = class DB {
   insertOne (collection, data) {
     return new Promise(function(resolve, reject) {
       // get mongo client
-      getClient()
+      this.getClient()
       .then(client => {
         // use db already specified in connect url
         const db = client.db(this.dbName)
@@ -124,7 +124,7 @@ module.exports = class DB {
   upsert (collection, query, data) {
     return new Promise(function(resolve, reject) {
       // get mongo client
-      getClient()
+      this.getClient()
       .then(client => {
         // use db already specified in connect url
         const db = client.db(this.dbName)
@@ -149,7 +149,7 @@ module.exports = class DB {
   updateOne (collection, query, data) {
     return new Promise(function(resolve, reject) {
       // get mongo client
-      getClient()
+      this.getClient()
       .then(client => {
         // use db already specified in connect url
         const db = client.db(this.dbName)
@@ -173,7 +173,7 @@ module.exports = class DB {
   removeOne (collection, query) {
     return new Promise((resolve, reject) => {
       // get mongo client
-      getClient()
+      this.getClient()
       .then(client => {
         // use db already specified in connect url
         const db = client.db(this.dbName)
