@@ -4,7 +4,7 @@ function create (myChat, session) {
   let myEventHandlers = myChat.GetEventHandlers()
 
   myEventHandlers.OnConnectionInitialized = function (args) {
-    console.log(`${session.id} - eGain OnConnectionInitialized. XEgainSession =`, args.XEgainSession)
+    console.log(`${session.id} - eGain OnConnectionInitialized. XEgainSession =`, args ? args.XEgainSession : 'undefined')
   }
   myEventHandlers.OnConnectionPaused = function (args) {
     console.log(`${session.id} - eGain OnConnectionPaused`, args)
