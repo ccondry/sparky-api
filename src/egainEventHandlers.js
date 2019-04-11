@@ -59,8 +59,8 @@ function create (myChat, session) {
   /* Example output of system messages to the same DIV */
   myEventHandlers.OnSystemMessageReceived = function (args) {
     console.log(`${session.id} - eGain OnSystemMessageReceived:`, args.Message)
-    // send customer all system messages except the ECE 12.0 "agentPickup" and "agentTransfer"
-    if (!args.Message.startsWith('agentPickup') && !args.Message.startsWith('agentTransfer')) {
+    // send customer all system messages except the ECE 12.0 "agentPickup" and "activityTransfer"
+    if (!args.Message.startsWith('agentPickup') && !args.Message.startsWith('activityTransfer')) {
       session.addMessage('system', args.Message)
     }
   }
