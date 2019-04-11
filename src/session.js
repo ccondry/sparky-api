@@ -552,6 +552,7 @@ class Session {
   }
 
   // find instant demo customer record in cloud db
+  // not used yet
   getCustomerInfo () {
     const query = {
       'customer.contact': {
