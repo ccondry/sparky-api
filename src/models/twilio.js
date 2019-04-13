@@ -185,12 +185,13 @@ async function handleMessage (message) {
         console.error('Error getting dCloud session info', e)
       }
       // create session and store in sessions global
+      // try to set the user ID using info from phones db info
       session = new Session('twilio', {
         to,
         from,
         app,
         phone,
-        userId,
+        userId: dcloudSession.userId || userId,
         email: email || phone,
         firstName: firstName || phone,
         lastName: lastName || '',
