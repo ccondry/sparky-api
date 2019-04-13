@@ -588,7 +588,7 @@ class Session {
     return request({
       baseUrl: 'https://' + this.publicAddress,
       method: 'POST',
-      url: '/api/v1/pcce/public/customer',
+      url: '/api/v1/' + this.demo + '/public/customer',
       headers: {
         authorization: 'Bearer ' + process.env.REGISTER_CUSTOMER_TOKEN
       },
@@ -602,7 +602,7 @@ class Session {
       const response = await request({
         baseUrl: 'https://' + this.publicAddress,
         method: 'GET',
-        url: '/api/v1/pcce/public/customer/' + contact,
+        url: '/api/v1/' + this.demo + '/public/customer/' + contact,
         headers: {
           authorization: 'Bearer ' + process.env.GET_CUSTOMER_TOKEN
         },
