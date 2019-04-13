@@ -544,11 +544,7 @@ class Session {
 
   // get vertical config data from mm server
   getVerticalInfo () {
-    return request({
-      baseUrl: process.env.API_BASE,
-      url: '/api/v1/verticals/' + this.vertical,
-      json: true
-    })
+    return cumulusDb.findOne('vertical', {id: this.vertical}, {_id: 0})
   }
 
   // find instant demo customer record in cloud db
