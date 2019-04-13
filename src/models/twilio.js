@@ -37,12 +37,12 @@ function getDcloudSession (from, to) {
   console.log('getting dcloud session info for', from)
   const phone = getLookupNumber(from, to)
 
-  return db.find('phones', {phone})
+  return db.findOne('phones', {phone})
 }
 
 // get dCloud session information
 function getAnswers (phone) {
-  return db.find('answers', {phone})
+  return db.findOne('answers', {phone})
 }
 
 // send twilio SMS to user
