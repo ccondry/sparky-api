@@ -154,6 +154,7 @@ async function handleMessage (message) {
       let dcloudSession = {}
       try {
         dcloudSession = await getDcloudSession(from, to)
+        console.log('got dCloud session information:', dcloudSession)
       } catch (e) {
         console.error('Error getting dCloud phone number registration info', e.message)
       }
