@@ -94,7 +94,11 @@ class Session {
 
     // if we have dcloud session and datacenter info, check the session info now
     if (this.dcloudSession && this.dcloudDatacenter) {
+      console.log(this.id, '- started checking for dCloud session info')
       this.checkSessionPromise = this.checkSessionInfo()
+    } else {
+      console.log(this.id, '- not checking for dCloud session info yet')
+      console.log('this.dcloudSession =', this.dcloudSession, 'and this.dcloudDatacenter =', this.dcloudDatacenter)
     }
 
     // facebook session identifiers
