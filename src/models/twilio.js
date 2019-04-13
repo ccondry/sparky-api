@@ -1,4 +1,3 @@
-const request = require('request-promise-native')
 const Session = require('../session.js')
 // const entities = new Entities()
 const PhoneNumber = require('awesome-phonenumber')
