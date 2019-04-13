@@ -74,6 +74,10 @@ function onAddMessage (type, message, datetime) {
   })
 }
 
+// don't do anything with typing indicators when using SMS
+function onTypingStart () {}
+function onTypingStop () {}
+
 function findInCache (to, from) {
   // look for chat session in cache
   const keys = Object.keys(cache)
@@ -99,7 +103,7 @@ async function getSession (to, from) {
       const session = await db.findOne('chat.session', {to, from})
       if (session) {
         // generate session object from database data
-        const newSession = new Session('twilio', session, onAddMessage)
+        const newSession = new Session('twilio', session, onAddMessage, onTypingStart, onTypingStop)
         // add session to cache
         cache[session.id] = newSession
         // return the new session object
@@ -202,7 +206,7 @@ async function handleMessage (message) {
         dcloudDatacenter: dcloudSession.datacenter,
         botEnabled: true,
         survey: true
-      }, onAddMessage)
+      }, onAddMessage, onTypingStart, onTypingStop)
       // add session to global sessions
       await addSession(session)
       // wait for the checkSessionInfo method to finish, so that any custom config
