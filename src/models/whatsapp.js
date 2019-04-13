@@ -1,4 +1,3 @@
-const request = require('request-promise-native')
 const Session = require('../session.js')
 const DB = require('./db')
 const db = new DB('cumulus')
@@ -32,26 +31,12 @@ function getDcloudSession (from, to) {
   console.log('getting dcloud session info for', from)
   const phone = getLookupNumber(from, to)
 
-  return request({
-    method: 'GET',
-    url: `https://mm.cxdemo.net/api/v1/phones/${phone}`,
-    headers: {
-      authorization: 'Bearer ' + process.env.DCLOUD_API_TOKEN
-    },
-    json: true
-  })
+  return db.findOne('phones', {phone})
 }
 
 // get dCloud session information
 function getAnswers (phone) {
-  return request({
-    method: 'GET',
-    url: `https://mm.cxdemo.net/api/v1/answers/${phone}`,
-    headers: {
-      'Authorization': `Bearer ${process.env.DCLOUD_API_TOKEN}`
-    },
-    json: true
-  })
+  return db.findOne('answers', {phone})
 }
 
 // send twilio Whatsapp to user
