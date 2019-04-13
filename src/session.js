@@ -598,17 +598,22 @@ class Session {
   }
 
   async getCustomerIsRegistered (contact) {
-    const response = await request({
-      baseUrl: 'https://' + this.publicAddress,
-      method: 'GET',
-      url: '/api/v1/pcce/public/customer/' + contact,
-      headers: {
-        authorization: 'Bearer ' + process.env.GET_CUSTOMER_TOKEN
-      },
-      json: true
-    })
-    // parse response
-    return response.exists
+    try {
+      const response = await request({
+        baseUrl: 'https://' + this.publicAddress,
+        method: 'GET',
+        url: '/api/v1/pcce/public/customer/' + contact,
+        headers: {
+          authorization: 'Bearer ' + process.env.GET_CUSTOMER_TOKEN
+        },
+        json: true
+      })
+      // parse response
+      return response.exists
+    } catch (e) {
+      console.log(this.id, '- failed to getCustomerIsRegistered for instant demo:', e.message)
+      return false
+    }
   }
 
   async checkInstantDemoCustomer (aiMessage) {
