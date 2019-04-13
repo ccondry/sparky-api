@@ -37,26 +37,12 @@ function getDcloudSession (from, to) {
   console.log('getting dcloud session info for', from)
   const phone = getLookupNumber(from, to)
 
-  return request({
-    method: 'GET',
-    url: `${process.env.API_BASE}/api/v1/phones/${phone}`,
-    headers: {
-      authorization: 'Bearer ' + process.env.DCLOUD_API_TOKEN
-    },
-    json: true
-  })
+  return db.find('phones', {phone})
 }
 
 // get dCloud session information
 function getAnswers (phone) {
-  return request({
-    method: 'GET',
-    url: `${process.env.API_BASE}/api/v1/answers/${phone}`,
-    headers: {
-      'Authorization': `Bearer ${process.env.DCLOUD_API_TOKEN}`
-    },
-    json: true
-  })
+  return db.find('answers', {phone})
 }
 
 // send twilio SMS to user
