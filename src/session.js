@@ -956,8 +956,8 @@ class Session {
       this.smSession.start()
       // set escalated flag
       this.isEscalated = true
-      // tell customer we are finding an agent
-      // this.addMessage('system', `Please wait while we connect you with a customer care representative...`)
+      // tell customer we are finding an agent by sending a message to DialogFlow for a response
+      this.addCustomerMessage('system', 'dcloud-finding-agent')
       // this.addMessage('system', localization[this.languageCode].welcomeMessage)
     } catch (e) {
       console.error('error starting UCCX chat', e)
