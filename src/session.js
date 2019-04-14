@@ -221,7 +221,7 @@ class Session {
   }
 
   deescalate () {
-    console.log(`deescalate session`)
+    console.log(this.id, 'deescalate session')
     // try to end eGain session
     if (this.egainSession) {
       // end eGain session for PCCE
