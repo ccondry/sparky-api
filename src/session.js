@@ -870,6 +870,7 @@ class Session {
 
     // send the chat transcript to Context Service
     try {
+      console.log(`${this.id} - sending chat transcript...`)
       await transcript.send(this)
       console.log(`${this.id} - transcript sent.`)
     } catch (e) {
