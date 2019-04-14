@@ -83,10 +83,10 @@ class Session {
     this.type = type
     this.data = data
     // enable survey by default
-    if (typeof this.data.survey === 'undefined') {
-      this.data.survey = true
+    if (typeof this.survey === 'undefined') {
+      this.survey = true
     }
-    // console.log(`creating ${this.type} Sparky session ${this.id}: for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId} and survey is ${this.data.survey ? 'enabled' : 'disabled'}`)
+    // console.log(`creating ${this.type} Sparky session ${this.id}: for ${this.firstName} ${this.lastName} with AI token ${this.apiAiToken} for entry point ${this.entryPointId} and survey is ${this.survey ? 'enabled' : 'disabled'}`)
     // const logData = JSON.parse(JSON.stringify(this))
 
     // create survey answers array
@@ -234,7 +234,7 @@ class Session {
     // remove escalated flag
     this.isEscalated = false
     // start survey if enabled and not started already
-    if (this.data.survey && this.botEnabled) {
+    if (this.survey && this.botEnabled) {
       if (!this.inSurvey) {
         this.startSurvey()
       }
@@ -265,7 +265,7 @@ class Session {
     console.log(`${this.id} goodbye message received. ending chat without survey.`)
     // make sure we don't offer a survey if the user has ended the session with
     // a goodbye message
-    this.data.survey = false
+    this.survey = false
     // deescalate to end the eGain session (if any) and the local session
     this.deescalate()
   }
@@ -802,7 +802,7 @@ class Session {
       // }
       case 'end-session': {
         // end session
-        if (this.data.survey) {
+        if (this.survey) {
           this.startSurvey()
         } else {
           // survey not enabled - just go to deescalate
@@ -1010,7 +1010,7 @@ class Session {
         // tell customer that there are no agents available
         this.addMessage('system', localization[this.languageCode].noAgentsAvailable)
         // turn off survey
-        this.data.survey = false
+        this.survey = false
         // end egain session
         if (this.egainSession) {
           this.egainSession.End()
@@ -1024,7 +1024,7 @@ class Session {
         // tell customer that there are no agents available
         this.addMessage('system', localization[this.languageCode].cannotAssignAgent)
         // turn off survey
-        this.data.survey = false
+        this.survey = false
         // end egain session
         if (this.egainSession) {
           this.egainSession.End()
