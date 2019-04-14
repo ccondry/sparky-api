@@ -351,7 +351,7 @@ class Session {
     try {
       // figure out a response using AI
       const response = await this.queryAi(text)
-      console.log(this.id, '- processCustomerMessage response =', response)
+      // console.log(this.id, '- processCustomerMessage response =', response)
       // process the response text
       this.processAiResponse(response.result)
 
