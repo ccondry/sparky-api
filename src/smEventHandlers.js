@@ -9,6 +9,13 @@ function create (uccx, session) {
     },
     onStatusEvent (status, detail) {
       console.log(session.id, 'status event', status, detail)
+      if (status === 'chat_timedout_waiting_for_agent') {
+        // timeout trying to reach chat server
+        // disable survey
+        session.survey = false
+        // query dialogFlow for a response
+        session.addCustomerMessage('dcloud-timeout-waiting-for-agent')
+      }
     },
     onPresenceEvent (from, status) {
       console.log(session.id, 'presence event', from, status)
