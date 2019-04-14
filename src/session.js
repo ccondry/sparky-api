@@ -655,6 +655,7 @@ class Session {
   }
 
   async processAiResponse (result) {
+    console.log(this.id, '- processAiResponse - result.action =', result.action)
     const fulfillment = result.fulfillment
     // check the api.ai response message and perform the associated action
     switch (result.action) {
@@ -852,6 +853,7 @@ class Session {
   }
 
   async escalate (message) {
+    console.log(this.id, '- starting escalate to an agent...')
     if (!this.demo) {
       // check if session is valid, and get the session info
       const valid = await this.checkSessionInfo()
