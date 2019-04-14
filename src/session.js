@@ -863,8 +863,6 @@ class Session {
         this.processCustomerMessage('wrong-information')
         this.isEscalating = true
         return
-      } else {
-        // continue escalation
       }
     }
 
