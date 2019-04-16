@@ -881,7 +881,10 @@ class Session {
     // send the chat transcript to Context Service
     try {
       console.log(`${this.id} - sending chat transcript...`)
-      await transcript.send(this)
+      // send transcript if not RCDN
+      if (this.dcloudDatacenter.toLowerCase() !== 'rcdn') {
+        await transcript.send(this)
+      }
       console.log(`${this.id} - transcript sent.`)
     } catch (e) {
       console.log(`${this.id} - failed to send transcript:`, e.message)
