@@ -991,7 +991,7 @@ class Session {
       pkey: !this.phone.length ? 'email' : 'phone'
       // visitId: this.visitId
     })
-
+    console.log('escalating to ECE agent on entry point ID', this.entryPointId)
     try {
       const myLibrary = egainLibrary.get(this.egainHost)
       // create instance of ECE chat object
