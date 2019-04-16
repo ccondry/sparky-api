@@ -469,6 +469,12 @@ class Session {
         this.csq = 'Chat_Csq' + this.demoConfig.chatCsqId
         console.log(this.id, '- used dCloud session config to update UCCX chat CSQ ID to', this.csq)
       }
+      // set PCCE entry point IDs for instant demos
+      if (this.demoConfig.entryPointId) {
+        // prefix the ID with Chat_Csq_ for UCCX chat form to work
+        this.entryPointId = this.demoConfig.entryPointId
+        console.log(this.id, '- used dCloud session config to update PCCE ECE chat entry point ID', this.entryPointId)
+      }
       // update language code
       this.languageCode = `${this.language.toLowerCase()}-${this.region.toUpperCase()}`
       console.log(this.id, '- used dCloud session config to update languageCode to', this.languageCode)
