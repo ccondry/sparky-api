@@ -406,8 +406,13 @@ class Session {
         this.publicAddress = response.publicIp
       }
 
-      // set egainHost to public DNS of demo vpod for escalating to ECE agent
-      this.egainHost = `https://${this.publicAddress}/ece/system`
+      if (this.datacenter && this.datacenter.toLowerCase() === 'rcdn') {
+        // set egainHost to public DNS of demo vpod for escalating to ECE agent
+        this.egainHost = `https://${this.publicAddress}/system`
+      } else {
+        // set egainHost to public DNS of demo vpod for escalating to ECE agent
+        this.egainHost = `https://${this.publicAddress}/ece/system`
+      }
       console.log(`${this.id} - egainHost = ${this.egainHost}`)
       // set csHost to public DNS of demo vpod for transcript
       this.csHost = `https://${this.publicAddress}/cs`
