@@ -459,9 +459,9 @@ class Session {
         this.survey = this.demoConfig.chatBotSurveyEnabled
         console.log(this.id, '- used dCloud session config to update survey to', this.survey)
       }
-      if (this.demoConfig.chatCsq) {
+      if (this.demoConfig.chatCsqId) {
         // prefix the ID with Chat_Csq_ for UCCX chat form to work
-        this.csq = 'Chat_Csq' + this.demoConfig.chatCsq
+        this.csq = 'Chat_Csq' + this.demoConfig.chatCsqId
         console.log(this.id, '- used dCloud session config to update UCCX chat CSQ ID to', this.csq)
       }
       // update language code
@@ -524,9 +524,9 @@ class Session {
     //         const modifiedVersion = this.demoVersion.replace(/\./g, ',')
     //         // extract demo config for this customer for this demo instance
     //         const d = r3.demo[this.demo].instant[modifiedVersion][instanceId]
-    //         if (d.chatCsq) {
+    //         if (d.chatCsqId) {
     //           // extract UCCX chat CSQ ID for this customer
-    //           this.csq = d.chatCsq
+    //           this.csq = d.chatCsqId
     //           console.log(this.id, '- used dCloud session config to update UCCX chat CSQ ID to', this.csq)
     //         }
     //       } else {
