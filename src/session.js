@@ -406,7 +406,7 @@ class Session {
         this.publicAddress = response.publicIp
       }
 
-      if (this.datacenter && this.datacenter.toLowerCase() === 'rcdn') {
+      if (this.dcloudDatacenter.toLowerCase() === 'rcdn') {
         // set egainHost to public DNS of demo vpod for escalating to ECE agent
         this.egainHost = `https://${this.publicAddress}/system`
       } else {
