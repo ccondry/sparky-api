@@ -464,6 +464,7 @@ class Session {
         this.survey = this.demoConfig.chatBotSurveyEnabled
         console.log(this.id, '- used dCloud session config to update survey to', this.survey)
       }
+      // set UCCX chat CSQ ID for instant demos
       if (this.demoConfig.chatCsqId) {
         // prefix the ID with Chat_Csq_ for UCCX chat form to work
         this.csq = 'Chat_Csq' + this.demoConfig.chatCsqId
