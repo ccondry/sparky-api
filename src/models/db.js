@@ -95,6 +95,24 @@ function update (db, collection, query, updates, options) {
   })
 }
 
+function updateOne (db, collection, query, updates, options) {
+  return new Promise((resolve, reject) => {
+    try {
+      client.db(db).collection(collection).updateOne(
+        query,
+        updates,
+        options,
+        function(queryError, doc) {
+          if (queryError) reject(queryError)
+          else resolve(doc)
+        }
+      )
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 function insertOne (db, collection, data) {
   return new Promise((resolve, reject) => {
     try {
@@ -150,6 +168,7 @@ module.exports = {
   find,
   findOne,
   update,
+  updateOne,
   upsert,
   insertOne,
   remove,
