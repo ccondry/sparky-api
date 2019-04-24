@@ -1,13 +1,12 @@
 const Session = require('../session.js')
-const DB = require('./db')
-const db = new DB('cumulus')
+const db = require('./db')
 const cache = require('./sessions')
 const PhoneNumber = require('awesome-phonenumber')
 const twilio = require('twilio')
 const striptags = require('striptags')
 
 function findApp (id) {
-  return db.findOne('twilio.app', {id})
+  return db.findOne('cumulus', 'twilio.app', {id})
 }
 
 function getLookupNumber (from, to) {
@@ -31,12 +30,12 @@ function getDcloudSession (from, to) {
   console.log('getting dcloud session info for', from)
   const phone = getLookupNumber(from, to)
 
-  return db.findOne('phones', {phone})
+  return db.findOne('cumulus', 'phones', {phone})
 }
 
 // get dCloud session information
 function getAnswers (phone) {
-  return db.findOne('answers', {phone})
+  return db.findOne('cumulus', 'answers', {phone})
 }
 
 // send twilio Whatsapp to user
@@ -91,7 +90,7 @@ async function getSession (to, from) {
       return hit
     } else {
       // not in cache. look in database
-      const session = await db.findOne('chat.session', {to, from})
+      const session = await db.findOne('cumulus', 'chat.session', {to, from})
       if (session) {
         // generate session object from database data
         const newSession = new Session('twilio', session, onAddMessage)
@@ -115,7 +114,7 @@ function addSession (session) {
   // add to cache
   cache[session.id] = session
   // add to db
-  return db.insertOne('chat.session', session)
+  return db.insertOne('cumulus', 'chat.session', session)
 }
 
 // handle incoming twilio messages

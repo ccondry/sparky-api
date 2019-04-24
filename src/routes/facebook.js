@@ -1,8 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const fb = require('../models/facebook')
-const DB = require('../models/db')
-const db = new DB('cumulus')
+const db = require('../models/db')
 const request = require('request-promise-native')
 
 /* For Facebook Validation */
@@ -16,7 +15,7 @@ router.get('/webhook', (req, res) => {
 })
 
 function findPage (id) {
-  return db.findOne('facebook.page', {id})
+  return db.findOne('cumulus', 'facebook.page', {id})
 }
 
 // Accepts POST requests at /webhook endpoint for Facebook

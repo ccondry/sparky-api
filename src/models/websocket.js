@@ -5,8 +5,7 @@ const WebSocket = require('ws')
 // chat session class
 const Session = require('../session')
 // database model
-const DB = require('./db')
-const db = new DB('cumulus')
+const db = require('./db')
 
 function start (server) {
   console.log('starting websocket server')
@@ -57,7 +56,7 @@ async function getSession (id) {
     } else {
       // console.log(id, '- chat session not in cache. looking in database...')
       // not in cache. look in database
-      const session = await db.findOne('chat.session', {id})
+      const session = await db.findOne('cumulus', 'chat.session', {id})
       if (session) {
         // console.log(id, '- chat session found in database.')
         // generate session object from database data

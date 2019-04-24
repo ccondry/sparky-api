@@ -1,197 +1,157 @@
-/*
-This provides some simple async methods for using a mongo database
-*/
 const MongoClient = require('mongodb').MongoClient
+// make sure environment file is loaded
+require('dotenv').config()
 
-if (!process.env.MONGO_URL) {
-  console.error('dcloud-sparky-api - process.env.MONGO_URL is not defined. Please configure this variable in cumulus-api/.env file.')
-} else {
-  try {
-    const redacted = process.env.MONGO_URL.split('@').pop()
-    console.log('process.env.MONGO_URL =', redacted)
-  } catch (e) {
-    console.log('process.env.MONGO_URL is set, but failed to redact the password from that URL, so not displaying it here.')
-  }
-}
-
-// Connection URL
 const url = process.env.MONGO_URL
-const connectOptions = { useNewUrlParser: true }
-// global db client object
-// let _client
+const clientOptions = { useNewUrlParser: true, poolSize: 5 }
 
-module.exports = class DB {
-  constructor (dbName) {
-    this.dbName = dbName
-  }
+// connection pool reference
+let client
 
-  // get authenticated mongo client
-  getClient () {
-    return new Promise(function (resolve, reject) {
-      // return client if it is already connected
-      // if (_client) resolve(_client)
-      // otherwise, connect to mongo and then return the client
-      MongoClient.connect(url, { useNewUrlParser: true }, function(err, client) {
-        // check for error
-        if (err) {
-          return reject(err)
+// create connection pool
+function connect () {
+  return new Promise((resolve, reject) => {
+    if (!url) {
+      reject('process.env.MONGO_URL is not defined. please add this to the .env file.')
+    }
+    try {
+      MongoClient.connect(url, clientOptions, function(connectError, dbClient) {
+        if (connectError) {
+          reject(connectError)
         } else {
-          // success - set global client object and then resolve it
-          // _client = client
-          resolve(client)
+          console.log('cloud mongo db connected')
+          client = dbClient
+          resolve(dbClient)
         }
       })
-    })
-  }
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
 
-  find (collection, query = {}, projections) {
-    return new Promise((resolve, reject) => {
-      // get mongo client
-      this.getClient()
-      .then(client => {
-        // use db already specified in connect url
-        const db = client.db(this.dbName)
-        // find!
-        db.collection(collection)
-        .find(query).project(projections)
-        .toArray(function(queryError, doc) {
-          // close the client connection
-          client.close()
-          // check for error
+function find (db, collection, query = {}, projections) {
+  return new Promise((resolve, reject) => {
+    try {
+      client.db(db).collection(collection).find(query).project(projections)
+      .toArray(function (queryError, doc) {
+        // check for error
+        if (queryError) reject(queryError)
+        // success
+        else resolve(doc)
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+function findOne (db, collection, query, options) {
+  return new Promise((resolve, reject) => {
+    try {
+      client.db(db).collection(collection).findOne(query, options, function (queryError, result) {
+        if (queryError) reject(queryError)
+        else resolve(result)
+      })
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+function upsert (db, collection, query, data) {
+  return new Promise((resolve, reject) => {
+    try {
+      client.db(db).collection(collection).findOneAndReplace(
+        query,
+        data,
+        { upsert: true },
+        function(queryError, doc) {
           if (queryError) reject(queryError)
-          // success
           else resolve(doc)
-        })
-      })
-      .catch(e => {
-        // failed to get client
-        reject(e)
-      })
-    })
-  }
+        }
+      )
+    } catch (e) {
+      return reject(e)
+    }
+  })
+}
 
-  // mongo find one (returns object)
-  findOne (collection, query, options) {
-    return new Promise((resolve, reject) => {
-      // get mongo client
-      this.getClient()
-      .then(client => {
-        // use db already specified in connect url
-        const db = client.db(this.dbName)
-        // find!
-        db.collection(collection).findOne(query, options, function (err, result) {
-          // close the client connection
-          client.close()
-          // check for error
-          if (err) reject(err)
-          // success
-          else resolve(result)
-        })
-      })
-      .catch(e => {
-        // failed to get client
-        reject(e)
-      })
-    })
-  }
+function update (db, collection, query, updates, options) {
+  return new Promise((resolve, reject) => {
+    try {
+      client.db(db).collection(collection).update(
+        query,
+        updates,
+        options,
+        function(queryError, doc) {
+          if (queryError) reject(queryError)
+          else resolve(doc)
+        }
+      )
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
 
-  // mongo insert
-  insertOne (collection, data) {
-    return new Promise((resolve, reject) => {
-      // get mongo client
-      this.getClient()
-      .then(client => {
-        // use db already specified in connect url
-        const db = client.db(this.dbName)
-        // insert!
-        db.collection(collection).insertOne(data, function (err, result) {
-          // close the client connection
-          client.close()
-          // check for error
-          if (err) reject(err)
-          // success
-          else resolve(result)
-        })
-      })
-      .catch(e => {
-        // failed to get client
-        reject(e)
-      })
-    })
-  }
+function insertOne (db, collection, data) {
+  return new Promise((resolve, reject) => {
+    try {
+      client.db(db).collection(collection).insertOne(
+        data,
+        function(queryError, doc) {
+          if (queryError) reject(queryError)
+          else resolve(doc)
+        }
+      )
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
 
-  // mongo upsert (update existing or insert new if not exist)
-  upsert (collection, query, data) {
-    return new Promise((resolve, reject) => {
-      // get mongo client
-      this.getClient()
-      .then(client => {
-        // use db already specified in connect url
-        const db = client.db(this.dbName)
-        // upsert!
-        db.collection(collection).findOneAndReplace(query, data, { upsert: true }, function (err, result) {
-          // close the client connection
-          client.close()
-          // check for error
-          if (err) reject(err)
-          // success
-          else resolve(result)
-        })
-      })
-      .catch(e => {
-        // failed to get client
-        reject(e)
-      })
-    })
-  }
+function remove (db, collection, query) {
+  return new Promise((resolve, reject) => {
+    try {
+      client.db(db).collection(collection).remove(
+        query,
+        function(queryError, doc) {
+          if (queryError) reject(queryError)
+          else resolve(doc)
+        }
+      )
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
 
-  // mongo updateOne (update one existing record)
-  updateOne (collection, query, data) {
-    return new Promise((resolve, reject) => {
-      // get mongo client
-      this.getClient()
-      .then(client => {
-        // use db already specified in connect url
-        const db = client.db(this.dbName)
-        // upsert!
-        db.collection(collection).updateOne(query, data, function (err, result) {
-          // close the client connection
-          client.close()
-          // check for error
-          if (err) reject(err)
-          // success
-          else resolve(result)
-        })
+function removeOne (db, collection, query) {
+  return new Promise((resolve, reject) => {
+    try {
+      client.db(db).collection(collection)
+      .removeOne(query, function (err, result) {
+        // check for error
+        if (err) reject(err)
+        // success
+        else resolve(result)
       })
-      .catch(e => {
-        // failed to get client
-        reject(e)
-      })
-    })
-  }
+    } catch (e) {
+      // failed to get client
+      reject(e)
+    }
+  })
+}
 
-  removeOne (collection, query) {
-    return new Promise((resolve, reject) => {
-      // get mongo client
-      this.getClient()
-      .then(client => {
-        // use db already specified in connect url
-        const db = client.db(this.dbName)
-        // go
-        db.collection(collection).removeOne(query, function (err, result) {
-          // close the client connection
-          client.close()
-          // check for error
-          if (err) reject(err)
-          // success
-          else resolve(result)
-        })
-      })
-      .catch(e => {
-        // failed to get client
-        reject(e)
-      })
-    })
-  }
-
+module.exports = {
+  client,
+  connect,
+  find,
+  findOne,
+  update,
+  upsert,
+  insertOne,
+  remove,
+  removeOne
 }

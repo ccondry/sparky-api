@@ -144,7 +144,7 @@ async function handleMessage (app, {text, personEmail, personId, roomId, files})
 }
 
 function findApp (id) {
-  return db.findOne(dbName, {id})
+  return db.findOne('cumulus', dbName, {id})
 }
 
 // async function registerPage (id, token, aiToken, entryPointId) {

@@ -8,9 +8,7 @@ const util = require('util')
 const uccxChatClient = require('uccx-chat-client')
 const smEventHandlers = require('./smEventHandlers')
 const localization = require('./models/localization')
-const DB = require('./models/db')
-const cumulusDb = new DB('cumulus')
-const toolboxDb = new DB('toolbox')
+const db = require('./models/db')
 const cache = require('./models/sessions')
 
 class Session {
@@ -137,7 +135,7 @@ class Session {
     // update cache expireAt
     this.expireAt = d
     // update database record's expireAt
-    cumulusDb.updateOne('chat.session', { id: this.id }, { $set: { expireAt: this.expireAt } })
+    db.updateOne('cumulus', 'chat.session', { id: this.id }, { $set: { expireAt: this.expireAt } })
     .catch(e => {
       console.error(this.id, '- error updating chat session expireAt:', e)
     })
@@ -183,7 +181,8 @@ class Session {
       while (!done) {
         try {
           // push message onto array and set the expireAt to new time
-          await cumulusDb.updateOne(
+          await db.updateOne(
+            'cumulus',
             'chat.session',
             { id: this.id },
             { $push: { messages: m }, $set: { expireAt: this.expireAt } }
@@ -247,7 +246,7 @@ class Session {
   // remove session from the database
   endSession () {
     try {
-      cumulusDb.removeOne('chat.session', {id: this.id})
+      db.removeOne('cumulus', 'chat.session', {id: this.id})
       console.log(this.id, '- removed chat session from database.')
       // end websocket, if any
       if (this.websocket) {
@@ -570,7 +569,7 @@ class Session {
 
   // get vertical config data from mm server
   getVerticalInfo () {
-    return cumulusDb.findOne('vertical', {id: this.vertical}, {_id: 0})
+    return db.findOne('cumulus', 'vertical', {id: this.vertical}, {_id: 0})
   }
 
   // find instant demo customer record in cloud db
@@ -587,7 +586,7 @@ class Session {
       password: 0
     }
     // run db query
-    return toolboxDb.findOne('users', query, {projection})
+    return db.findOne('toolbox', 'users', query, {projection})
   }
 
   // find the instant demo instance details in cloud db
@@ -602,7 +601,7 @@ class Session {
     // don't return the internal _id from db query
     const projection = { _id: 0 }
     // run db query
-    return toolboxDb.findOne('instance', query, {projection})
+    return db.findOne('toolbox', 'instance', query, {projection})
   }
 
   // register customer in instant demo

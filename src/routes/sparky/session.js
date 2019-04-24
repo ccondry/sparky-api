@@ -1,8 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Session = require('../../session')
-const DB = require('../../models/db')
-const db = new DB('cumulus')
+const db = require('../../models/db')
 const cache = require('../../models/sessions')
 
 // get new session ID for sparky-ui client
@@ -28,7 +27,7 @@ router.post('/', async (req, res) => {
 
   // store new session in sessions db
   try {
-    await db.insertOne('chat.session', session)
+    await db.insertOne('cumulus', 'chat.session', session)
   } catch (e) {
     console.log(session.id, '- failed to add chat session to database:', e.message)
     return res.status(500).send('Failed to start chat session. Server error is:' + e.message)

@@ -1,8 +1,7 @@
 const request = require('request-promise-native')
 const Session = require('../session.js')
 // console.log('Session', Session)
-const DB = require('./db')
-const db = new DB('cumulus')
+const db = require('./db')
 // const Entities = require('html-entities').AllHtmlEntities
 // const entities = new Entities()
 // const hydra = require('./hydra')
@@ -13,11 +12,11 @@ const localization = require('./localization')
 const cache = require('./sessions')
 
 function findPage (id) {
-  return db.findOne('facebook.page', {id})
+  return db.findOne('cumulus', 'facebook.page', {id})
 }
 
 function getKnownUser (pageId, userId) {
-  return db.findOne('facebook.users', {pageId, userId})
+  return db.findOne('cumulus', 'facebook.users', {pageId, userId})
 }
 
 function handlePostback(sender, postback, page) {
@@ -123,7 +122,7 @@ async function getSession (pageId, senderId) {
       return hit
     } else {
       // not in cache. look in database
-      const session = await db.findOne('chat.session', {pageId, senderId})
+      const session = await db.findOne('cumulus', 'chat.session', {pageId, senderId})
       if (session) {
         // generate session object from database data
         const newSession = new Session('facebook', session, onAddMessage, onTypingStart, onTypingStop)
@@ -148,7 +147,7 @@ function addSession (session) {
   // add to cache
   cache[session.id] = session
   // add to database
-  return db.insertOne('chat.session', session)
+  return db.insertOne('cumulus', 'chat.session', session)
 }
 
 // handle incoming facebook messages from users to page
