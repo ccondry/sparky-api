@@ -608,9 +608,11 @@ class Session {
   async registerCustomer ({userId, contact}) {
     try {
       // try to push contact to existing customer record
-      try {
-        await db.updateOne('toolbox', 'customer', {userId}, {$push: {contact}})
-      } catch (e) {
+      const result = await db.updateOne('toolbox', 'customer', {userId}, {$push: {contact}})
+      if (result.matchedCount && result.modifiedCount) {
+        console.log('customer', contact, 'registered to existing customer record for userId', userId)
+      } else {
+        console.log('registerCustomer updateOne failed. trying to find user', userId)
         // failed, so try to insert instead
         // find username
         const projection = {username: 1, firstName: 1, lastName: 1}
@@ -618,10 +620,17 @@ class Session {
         if (!user) {
           throw Error('user ID ' + userId + ' not found.')
         }
+        console.log('registerCustomer found user:', user)
         // set userId value
         user.userId = userId
         // upsert contact record into db
-        await db.upsert('toolbox', 'customer', {userId}, user)
+        console.log('registerCustomer creating customer for', user)
+        const result2 = await db.upsert('toolbox', 'customer', {userId}, user)
+        if (result.matchedCount && result.modifiedCount) {
+          console.log('registerCustomer successfully created customer for', user)
+        } else {
+          console.log('registerCustomer failed to created customer for', user)
+        }
       }
     } catch (e) {
       throw e
