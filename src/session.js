@@ -609,7 +609,7 @@ class Session {
     try {
       // try to push contact to existing customer record
       try {
-        await db.update('toolbox', 'customer', {userId}, {$push: {contact}})
+        await db.updateOne('toolbox', 'customer', {userId}, {$push: {contact}})
       } catch (e) {
         // failed, so try to insert instead
         // find username
