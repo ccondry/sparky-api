@@ -615,7 +615,7 @@ class Session {
         // find username
         const projection = {username: 1, firstName: 1, lastName: 1}
         const user = await db.findOne('toolbox', 'users', {id: userId}, {projection})
-        if (user) {
+        if (!user) {
           throw Error('user ID ' + userId + ' not found.')
         }
         // set userId value
