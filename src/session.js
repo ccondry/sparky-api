@@ -605,36 +605,32 @@ class Session {
   }
 
   // register customer in instant demo
-  registerCustomer ({userId, contact}) {
-    return request({
-      baseUrl: 'https://' + this.publicAddress,
-      method: 'POST',
-      url: '/api/v1/' + this.demo + '/public/customer',
-      headers: {
-        authorization: 'Bearer ' + process.env.REGISTER_CUSTOMER_TOKEN
-      },
-      json: true,
-      body: {userId, contact}
-    })
+  async registerCustomer ({userId, contact}) {
+    try {
+      // try to push contact to existing customer record
+      try {
+        await db.update('toolbox', 'customer', {userId}, {$push: {contact}})
+      } catch (e) {
+        // failed, so try to insert instead
+        // find username
+        const projection = {username: 1, firstName: 1, lastName: 1}
+        const user = await db.findOne('toolbox', 'users', {id: userId}, {projection})
+        if (user) {
+          throw Error('user ID ' + userId + ' not found.')
+        }
+        // set userId value
+        user.userId = userId
+        // upsert contact record into db
+        await db.upsert('toolbox', 'customer', {userId}, user)
+      }
+    } catch (e) {
+      throw e
+    }
   }
 
-  async getCustomerIsRegistered (contact) {
-    try {
-      const response = await request({
-        baseUrl: 'https://' + this.publicAddress,
-        method: 'GET',
-        url: '/api/v1/' + this.demo + '/public/customer/' + contact,
-        headers: {
-          authorization: 'Bearer ' + process.env.GET_CUSTOMER_TOKEN
-        },
-        json: true
-      })
-      // parse response
-      return response.exists
-    } catch (e) {
-      console.log(this.id, '- failed to getCustomerIsRegistered for instant demo:', e.message)
-      return false
-    }
+  // check if customer is registered to an instant demo user
+  getCustomerIsRegistered (contact) {
+    return db.findOne('toolbox', 'customer', {contact})
   }
 
   async checkInstantDemoCustomer (aiMessage) {
