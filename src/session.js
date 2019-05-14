@@ -382,6 +382,11 @@ class Session {
     })
   }
 
+  // get mobile app answers information
+  getAnswers (phone) {
+    return db.findOne('cumulus', 'answers', {phone})
+  }
+
   // check the dcloud session info using datacenter and session ID, and respond accordingly
   async checkSessionInfo () {
     console.log(`${this.id} - checking dCloud session info...`)
@@ -392,9 +397,33 @@ class Session {
     }
     try {
       console.log(`${this.id} - dCloud session and datacenter are set. Looking up session info from ${process.env.API_BASE}.`)
-      const response = await this.getSessionInfo(this.userId)
-      console.log(`${this.id} - found dCloud session and datacenter information`)
+      let response = await this.getSessionInfo(this.userId)
+      console.log(`${this.id} - found dCloud session and datacenter information for`, this.dcloudDatacenter, this.dcloudSession)
       // console.log('dcloud session response', response)
+
+      // is this an instant demo session? (multi-user session)
+      this.isInstantDemo = response.instant === true || response.instant === 'true'
+      console.log(`${this.id} - instant demo = ${this.isInstantDemo}`)
+
+      // if this an instant demo session, make sure we have user ID
+      if (this.isInstantDemo && !this.userId) {
+        // is instant demo, but user ID is unknown
+        // we need to find user ID and then get demo configuration data again
+        const answers = await this.getAnswers(this.phone)
+        this.userId = answers.podId
+        if (this.userId) {
+          // user ID found
+          console.log(this.id, '- user ID found in mobile app answers db:', this.userId)
+          // get session info again
+          response = await this.getSessionInfo(this.userId)
+          console.log(`${this.id} - found dCloud session and datacenter information again for`, this.dcloudDatacenter, this.dcloudSession)
+        } else {
+          // user ID not found. sorry, gonna fail now
+          console.log(this.id, '- could not find user ID in mobile app answers db')
+          // tell user there was an error
+          this.processCustomerMessage('dcloud-mobile-app-user-id-not-found')
+        }
+      }
 
       // check if public address type is configured to use DNS
       if (process.env.PUBLIC_ADDRESS_TYPE.toLowerCase() === 'dns') {
@@ -428,9 +457,8 @@ class Session {
       // dCloud demo version (11.6v2, 11.6v3)
       this.demoVersion = response.version
       console.log(`${this.id} - demo version = ${this.demoVersion}`)
-      // is this an instant demo session? (multi-user session)
-      this.isInstantDemo = response.instant === true || response.instant === 'true'
-      console.log(`${this.id} - instant demo = ${this.isInstantDemo}`)
+
+
       // set surveyHost to public DNS of demo vpod for saving survey answers
       this.surveyHost = `https://${this.publicAddress}/survey`
 
