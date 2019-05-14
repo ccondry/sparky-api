@@ -410,9 +410,9 @@ class Session {
         // is instant demo, but user ID is unknown
         // we need to find user ID and then get demo configuration data again
         const answers = await this.getAnswers(this.phone)
-        this.userId = answers.podId
-        if (this.userId) {
-          // user ID found
+        if (answers && answers.podId) {
+          // Pod ID found - set to user ID
+          this.userId = answers.podId
           console.log(this.id, '- user ID found in mobile app answers db:', this.userId)
           // get session info again
           response = await this.getSessionInfo(this.userId)
