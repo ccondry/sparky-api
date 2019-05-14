@@ -389,8 +389,9 @@ class Session {
   }
 
   // get mobile app answers information
-  getAnswers (phone) {
-    return db.findOne('cumulus', 'answers', {phone})
+  getAnswers (phoneNumber) {
+    console.log(this.id, '- looking up answers for phoneNumber =', phoneNumber)
+    return db.findOne('cumulus', 'answers', {phoneNumber})
   }
 
   // check the dcloud session info using datacenter and session ID, and respond accordingly
