@@ -42,10 +42,15 @@ class Session {
     this.isEscalated = data.isEscalated || false
     this.messages = data.messages || []
     this.phone = data.phone
+    console.log(this.id, '- phone =', this.phone)
     this.email = data.email
+    console.log(this.id, '- email =', this.email)
     this.userId = data.userId
+    console.log(this.id, '- userId =', this.userId)
     this.firstName = data.firstName
+    console.log(this.id, '- firstName =', this.firstName)
     this.lastName = data.lastName
+    console.log(this.id, '- lastName =', this.lastName)
 
     // set language and country (region)
     this.language = data.language || process.env.DEFAULT_LANGUAGE || 'en'
@@ -53,6 +58,7 @@ class Session {
 
     // set language code
     this.languageCode = data.languageCode || `${this.language.toLowerCase()}-${this.region.toUpperCase()}`
+    console.log(this.id, '- languageCode =', this.languageCode)
 
     // run this callback when messages are added
     this.onAddMessage = onAddMessage
