@@ -446,7 +446,7 @@ class Session {
         // default to use public IP address of demo, to avoid DNS resolution
         this.publicAddress = response.publicIp
       }
-
+      // is this the RCDN demo?
       if (this.dcloudDatacenter.toLowerCase() === 'rcdn') {
         // set egainHost to public DNS of demo vpod for escalating to ECE agent
         this.egainHost = `https://chat.cdxdemo.net/system`
