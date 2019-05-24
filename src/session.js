@@ -610,23 +610,6 @@ class Session {
     return db.findOne('cumulus', 'vertical', {id: this.vertical}, {_id: 0})
   }
 
-  // find instant demo customer record in cloud db
-  // not used yet
-  getCustomerInfo () {
-    const query = {
-      'customer.contact': {
-        $in: [this.phone, this.email]
-      }
-    }
-    // don't return the internal _id or user's password from db query
-    const projection = {
-      _id: 0,
-      password: 0
-    }
-    // run db query
-    return db.findOne('toolbox', 'users', query, {projection})
-  }
-
   // find the instant demo instance details in cloud db
   async getInstantDemoInstance () {
     // find the instant demo matching details for this session
