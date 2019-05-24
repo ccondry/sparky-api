@@ -414,7 +414,7 @@ class Session {
 
       // if this an instant demo session, make sure we have user ID
       if (this.isInstantDemo && !this.userId) {
-        await this.checkInstantDemoCustomer('sparky')
+        await this.checkInstantDemoCustomer()
       }
       // if (this.isInstantDemo && !this.userId) {
       //   // is instant demo, but user ID is unknown
