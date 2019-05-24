@@ -659,8 +659,13 @@ class Session {
   }
 
   // check if customer is registered to an instant demo user
-  getCustomerIsRegistered (contact) {
-    return db.findOne('toolbox', 'customer', {contact})
+  getCustomer () {
+    const query = {
+      contact: {
+        $in: [this.phone, this.email]
+      }
+    }
+    return db.findOne('toolbox', 'customer', query)
   }
 
   async checkInstantDemoCustomer (aiMessage) {
@@ -668,10 +673,13 @@ class Session {
       // is this an instant demo? then we might need to look up the
       // userId inside the demo session
       console.log(this.id, '- this is an instant demo. Checking user registration...')
-      // check if the customer phone is registered in the instant demo system
-      const phoneIsRegistered = await this.getCustomerIsRegistered(this.phone)
-      if (phoneIsRegistered) {
-        // is registered. log instant demo user ID
+      // find the customer in cloud db
+      const customer = await this.getCustomer()
+      if (customer) {
+        // customer found
+        // set user ID from customer info
+        this.userId = customer.userId
+        // log instant demo user ID
         console.log(this.id, '- instant demo - customer phone is already registered. Instant demo user ID is', this.userId, '. Continue with bot script.')
         // if aiMessage passed, start dialog with that message
         if (aiMessage) {
@@ -679,23 +687,15 @@ class Session {
         }
         // done
         return
+      } else {
+        // customer not found
+        // not registered - ask customer to register
+        console.log(this.id, 'instant demo - customer phone is not registered. Requesting that customer register now. Customer phone =', this.phone)
+        // set session state to isRegistering
+        this.isRegistering = true
+        // send keyword to AI to send AI response to customer asking customer to register
+        return this.processCustomerMessage('dcloud-user-register')
       }
-      // check if customer email is registered in the instant demo
-      // const emailIsRegistered = await this.getCustomerIsRegistered(this.email)
-      // if (emailIsRegistered) {
-      //   // is registered
-      //   console.log(this.id, '- instant demo - customer email is already registered. Continue with bot script.')
-      //   // if aiMessage passed, start dialog with that message
-      //   if (aiMessage) {
-      //     return this.processCustomerMessage(aiMessage)
-      //   }
-      // }
-      // not registered - ask customer to register
-      console.log(this.id, 'instant demo - customer phone is not registered. Requesting that customer register now. Customer phone =', this.phone)
-      // set session state to isRegistering
-      this.isRegistering = true
-      // send keyword to AI to send AI response to customer asking customer to register
-      return this.processCustomerMessage('dcloud-user-register')
     } catch (e) {
       throw e
     }
