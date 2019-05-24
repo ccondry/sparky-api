@@ -414,23 +414,26 @@ class Session {
 
       // if this an instant demo session, make sure we have user ID
       if (this.isInstantDemo && !this.userId) {
-        // is instant demo, but user ID is unknown
-        // we need to find user ID and then get demo configuration data again
-        const answers = await this.getAnswers(this.phone)
-        if (answers && answers.podId) {
-          // Pod ID found - set to user ID
-          this.userId = answers.podId
-          console.log(this.id, '- user ID found in mobile app answers db:', this.userId)
-          // get session info again
-          response = await this.getSessionInfo(this.userId)
-          console.log(`${this.id} - found dCloud session and datacenter information again for`, this.dcloudDatacenter, this.dcloudSession)
-        } else {
-          // user ID not found. sorry, gonna fail now
-          console.log(this.id, '- could not find user ID in mobile app answers db')
-          // tell user there was an error
-          this.processCustomerMessage('dcloud-mobile-app-user-id-not-found')
-        }
+        await this.checkInstantDemoCustomer('sparky')
       }
+      // if (this.isInstantDemo && !this.userId) {
+      //   // is instant demo, but user ID is unknown
+      //   // we need to find user ID and then get demo configuration data again
+      //   const answers = await this.getAnswers(this.phone)
+      //   if (answers && answers.podId) {
+      //     // Pod ID found - set to user ID
+      //     this.userId = answers.podId
+      //     console.log(this.id, '- user ID found in mobile app answers db:', this.userId)
+      //     // get session info again
+      //     response = await this.getSessionInfo(this.userId)
+      //     console.log(`${this.id} - found dCloud session and datacenter information again for`, this.dcloudDatacenter, this.dcloudSession)
+      //   } else {
+      //     // user ID not found. sorry, gonna fail now
+      //     console.log(this.id, '- could not find user ID in mobile app answers db')
+      //     // tell user there was an error
+      //     this.processCustomerMessage('dcloud-mobile-app-user-id-not-found')
+      //   }
+      // }
 
       // check if public address type is configured to use DNS
       if (process.env.PUBLIC_ADDRESS_TYPE.toLowerCase() === 'dns') {
