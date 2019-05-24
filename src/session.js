@@ -417,7 +417,7 @@ class Session {
         // get the instant demo customer (or register them if they are not registered)
         await this.checkInstantDemoCustomer()
         // get session info again now that we have user ID
-        await this.getSessionInfo(this.userId)
+        response = await this.getSessionInfo(this.userId)
       }
       // if (this.isInstantDemo && !this.userId) {
       //   // is instant demo, but user ID is unknown
