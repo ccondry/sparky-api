@@ -358,7 +358,7 @@ class Session {
       const response = await this.queryAi(text)
       // console.log(this.id, '- processCustomerMessage response =', response)
       // process the response text
-      this.processAiResponse(response.result)
+      return this.processAiResponse(response.result)
 
     } catch (e) {
       console.error(`${this.id} exception during processCustomerMessage`, e.message)
@@ -686,10 +686,11 @@ class Session {
         console.log(this.id, '- instant demo - customer phone is already registered. Instant demo user ID is', this.userId, '. Continue with bot script.')
         // if aiMessage passed, start dialog with that message
         if (aiMessage) {
-          this.processCustomerMessage(aiMessage)
+          return this.processCustomerMessage(aiMessage)
+        } else {
+          // done
+          return
         }
-        // done
-        return
       } else {
         // customer not found
         // not registered - ask customer to register
