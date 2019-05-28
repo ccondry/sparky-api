@@ -39,8 +39,8 @@ function getDcloudSession (from, to) {
 }
 
 // get dCloud session information
-function getAnswers (phone) {
-  return db.findOne('cumulus', 'answers', {phone})
+function getAnswers (phoneNumber) {
+  return db.findOne('cumulus', 'answers', {phoneNumber})
 }
 
 // send twilio SMS to user
