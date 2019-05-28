@@ -209,7 +209,7 @@ async function handleMessage (message) {
         lastName: lastName || '',
         // apiAiToken: botConfig.aiToken,
         // entryPointId: brandConfig.entryPointId,
-        dcloudSession: dcloudSession.sessionId,
+        dcloudSession: dcloudSession.session,
         dcloudDatacenter: dcloudSession.datacenter,
         botEnabled: true,
         survey: true
