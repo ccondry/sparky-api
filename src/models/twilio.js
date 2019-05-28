@@ -175,16 +175,23 @@ async function handleMessage (message) {
       let email = undefined
       let userId = undefined
       try {
-        // get dCloud answers information that user submitted (hopefully)
+        // get mobile app answers information that user submitted (hopefully)
         answers = await getAnswers(phone)
-        // get instant demo username from the POD ID that user entered into the
-        // settings screen of the mobile app
-        userId = answers.podId
-        email = answers.emailAddress
-        // first name is the string of non-space characters before the first space
-        firstName = answers.userName.split(' ')[0]
-        // last name is the rest of the userName value, after firstName
-        lastName = answers.userName.substring(firstName.length)
+        // did we find mobile app info for this phone number in the answers db?
+        if (answers) {
+          // get instant demo username from the POD ID that user entered into the
+          // settings screen of the mobile app
+          console.log('found mobile app answers for', phone, '- it has podId', answers.podId)
+          userId = answers.podId
+          email = answers.emailAddress
+          // first name is the string of non-space characters before the first space
+          firstName = answers.userName.split(' ')[0]
+          // last name is the rest of the userName value, after firstName
+          lastName = answers.userName.substring(firstName.length)
+        } else {
+          // no mobile app answers found
+          console.log('failed to find mobile app answers for', phone)
+        }
       } catch (e) {
         console.error('Error getting dCloud session info', e)
       }
@@ -195,6 +202,7 @@ async function handleMessage (message) {
         from,
         app,
         phone,
+        // set user ID from dcloud session info or from mobile app answers
         userId: dcloudSession.userId || userId,
         email: email || phone,
         firstName: firstName || phone,
