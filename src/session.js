@@ -84,6 +84,7 @@ class Session {
     } else {
       this.botEnabled = true
     }
+    console.log(this.id, '- botEnabled =', botEnabled)
     this.type = type
     this.data = data
     // enable survey by default
@@ -240,11 +241,17 @@ class Session {
     this.isEscalated = false
     // start survey if enabled and not started already
     if (this.survey && this.botEnabled) {
+      console.log(this.id, '- survey and bot are enabled. Starting post-chat survey.')
       if (!this.inSurvey) {
+        console.log(this.id, '- not in survey yet. Starting post-chat survey.')
         this.startSurvey()
+      } else {
+        console.log(this.id, '- already in survey.')
       }
     } else {
       // survey not enabled - just end session
+      console.log(this.id, '- survey =', this.survey, 'and botEnabled =', this.botEnabled)
+      console.log(this.id, '- not starting post-chat survye. Just end the session.')
       this.endSession()
     }
   }
@@ -1100,6 +1107,7 @@ class Session {
   }
 
   startSurvey () {
+    console.log(this.id, '- starting post-chat survey by sending the chat bot the keyword "survey".')
     // egain session ended - now provide chat survey
     this.inSurvey = true
     // start survey conversation by saying 'survey' to bot AI
