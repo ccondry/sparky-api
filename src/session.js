@@ -241,7 +241,7 @@ class Session {
     this.isEscalated = false
     // start survey if enabled and not started already
     if (this.survey && this.botEnabled) {
-      console.log(this.id, '- survey and bot are enabled. Starting post-chat survey.')
+      console.log(this.id, '- survey and bot are enabled.')
       if (!this.inSurvey) {
         console.log(this.id, '- not in survey yet. Starting post-chat survey.')
         this.startSurvey()
