@@ -505,13 +505,8 @@ class Session {
         console.log(this.id, '- used dCloud session config to update region to', this.region)
       }
       if (this.demoConfig.chatBotEnabled) {
-        if (this.botEnabled === undefined) {
-          // this.botEnabled not defined - set it with vertical config
-          this.botEnabled = this.demoConfig.chatBotEnabled
-          console.log(this.id, '- used dCloud session config to update botEnabled to', this.botEnabled)
-        } else {
-          // this.botEnabled already defined - don't set it again with vertical
-        }
+        this.botEnabled = this.demoConfig.chatBotEnabled
+        console.log(this.id, '- used dCloud session config to update botEnabled to', this.botEnabled)
       }
       if (this.demoConfig.chatBotSurveyEnabled) {
         this.survey = this.demoConfig.chatBotSurveyEnabled
@@ -557,13 +552,8 @@ class Session {
         console.log(this.id, '- used dCloud vertical config to update languageCode to', this.languageCode)
       }
       if (r2.chatBotEnabled) {
-        if (this.botEnabled === undefined) {
-          // this.botEnabled not defined - set it with vertical config
-          this.botEnabled = r2.chatBotEnabled
-          console.log(this.id, '- used dCloud vertical config to update botEnabled to', this.botEnabled)
-        } else {
-          // this.botEnabled already defined - don't set it again with vertical
-        }
+        this.botEnabled = r2.chatBotEnabled
+        console.log(this.id, '- used dCloud vertical config to update botEnabled to', this.botEnabled)
       }
       if (r2.chatBotSurveyEnabled) {
         this.survey = r2.chatBotSurveyEnabled
