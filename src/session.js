@@ -84,7 +84,7 @@ class Session {
     } else {
       this.botEnabled = true
     }
-    console.log(this.id, '- botEnabled =', botEnabled)
+    console.log(this.id, '- botEnabled =', this.botEnabled)
     this.type = type
     this.data = data
     // enable survey by default
