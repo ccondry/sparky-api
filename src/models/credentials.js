@@ -2,7 +2,7 @@
 const db = require('./db')
 
 module.exports = {
-  get (project_id) {
+  async get (project_id) {
     if (!project_id || !project_id.length) {
       throw new Error('GCP project ID required to retrieve credentials but was not provided.')
     }
@@ -12,7 +12,7 @@ module.exports = {
     }
     return db.findOne('toolbox', 'credentials', query)
   },
-  set (credentials) {
+  async set (credentials) {
     if (!credentials || !credentials.project_id || !credentials.project_id.length) {
       throw new Error('GCP credentials must contain a project_id property.')
     }
