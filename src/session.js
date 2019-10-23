@@ -4,12 +4,14 @@ const request = require('request-promise-native')
 const egainEventHandlers = require('./egainEventHandlers')
 const transcript = require('./transcript')
 const axios = require('axios')
-const util = require('util')
+// const util = require('util')
 const uccxChatClient = require('uccx-chat-client')
 const smEventHandlers = require('./smEventHandlers')
 const localization = require('./models/localization')
 const db = require('./models/db')
 const cache = require('./models/sessions')
+const credentials = require('./models/credentials')
+const dialogflow = require('dialogflow')
 
 class Session {
   // create a session object
@@ -73,6 +75,27 @@ class Session {
     // this.getCustomerData = data.getCustomerData
 
     this.apiAiToken = data.apiAiToken || process.env.API_AI_TOKEN
+    // dialogFlow API v2 project ID
+    this.gcpProjectId = data.gcpProjectId || process.env.GCP_PROJECT_ID
+
+    // get dialogflow GCP credentials from database
+    credentials.get(this.gcpProjectId)
+    .then(r => {
+      // save credentials to session info
+      this.gcpCredentials = r
+      console.log(this.id, '- got GCP credentials from database for project ID', this.gcpProjectId)
+      // Create a new session client for dialogflow for this project/credential pair
+      // const sessionClient = new dialogflow.SessionsClient({projectId, keyFilename})
+      this.sessionClient = new dialogflow.SessionsClient({
+        projectId: this.gcpProjectId,
+        credentials: this.gcpCredentials
+      })
+      // build dialogflow session path
+      this.sessionPath = this.sessionClient.sessionPath(this.gcpProjectId, this.id)
+    })
+    .catch(e => {
+      console.log(this.id, '- failed to get GCP credentials from database for project ID', this.gcpProjectId, e.message)
+    })
     this.entryPointId = data.entryPointId || process.env.ENTRY_POINT_ID
 
     // dCloud session information
@@ -362,10 +385,10 @@ class Session {
     console.log(this.id, '- processing customer message:', text)
     try {
       // figure out a response using AI
-      const response = await this.queryAi(text)
+      const responses = await this.queryAi(text)
       // console.log(this.id, '- processCustomerMessage response =', response)
       // process the response text
-      return this.processAiResponse(response.result)
+      return this.processAiResponse(responses[0].queryResult)
 
     } catch (e) {
       console.error(`${this.id} exception during processCustomerMessage`, e.message)
@@ -373,26 +396,23 @@ class Session {
   }
 
   queryAi (text) {
-    console.log(this.id, '- querying api.api.ai using token', this.apiAiToken)
-    // figure out a response using AI
-    return request({
-      method: 'POST',
-      url: 'https://api.api.ai/v1/query',
-      headers: {
-        'Authorization': `Bearer ${this.apiAiToken}`,
-        'Accept': `application/json`,
-        'Content-Type': `application/json; charset=utf-8`
+    console.log(this.id, '- querying dialogflow using project ID', this.gcpProjectId)
+
+    // The dialogflow query body
+    const req = {
+      session: this.sessionPath,
+      queryInput: {
+        text: {
+          // The query to send to the dialogflow agent
+          text,
+          // The language used by the client (en-US)
+          languageCode: this.languageCode,
+        },
       },
-      qs: {
-        v: '20170910'
-      },
-      body: {
-        sessionId: this.id,
-        q: text,
-        lang: this.languageCode
-      },
-      json: true
-    })
+    }
+
+    // Send request
+    return this.sessionClient.detectIntent(req)
   }
 
   // get mobile app answers information
@@ -705,14 +725,15 @@ class Session {
 
   async processAiResponse (result) {
     console.log(this.id, '- processAiResponse - result.action =', result.action)
-    const fulfillment = result.fulfillment
+
+    const fulfillment = result.fulfillmentMessages
     // check the api.ai response message and perform the associated action
     switch (result.action) {
       case 'datacenter': {
-        if (fulfillment.speech.length) {
+        if (fulfillment) {
           // add bot's reply to session's messages list
-          for (let message of fulfillment.messages) {
-            this.addMessage('bot', message.speech)
+          for (const message of fulfillment) {
+            this.addMessage('bot', message.text.text[0])
           }
         }
         // set datacenter
@@ -743,11 +764,10 @@ class Session {
         break
       }
       case 'dcloud-session': {
-        // console.log('ai response', result)
-        if (fulfillment.speech.length) {
+        if (fulfillment) {
           // add bot's reply to session's messages list
-          for (let message of fulfillment.messages) {
-            this.addMessage('bot', message.speech)
+          for (const message of fulfillment) {
+            this.addMessage('bot', message.text.text[0])
           }
         }
         // set dcloud session ID
@@ -778,10 +798,10 @@ class Session {
         break
       }
       case 'escalate': {
-        if (fulfillment.speech !== 'escalate' && fulfillment.speech.length) {
+        if (fulfillment) {
           // add bot's reply to session's messages list
-          for (let message of fulfillment.messages) {
-            this.addMessage('bot', message.speech)
+          for (const message of fulfillment) {
+            this.addMessage('bot', message.text.text[0])
           }
         }
         // escalate request to agent
@@ -790,10 +810,13 @@ class Session {
       }
       case 'start-video': {
         if (this.type === 'sparky-ui') {
-          // add bot's reply to session's messages list
-          for (let message of fulfillment.messages) {
-            this.addMessage('bot', message.speech)
+          if (fulfillment) {
+            // add bot's reply to session's messages list
+            for (const message of fulfillment) {
+              this.addMessage('bot', message.text.text[0])
+            }
           }
+
           // start REM call
           this.addCommand('start-rem-video')
         } else {
@@ -815,9 +838,11 @@ class Session {
       case 'survey-response': {
         // save the last survey answer
         this.surveyAnswers.push(result.parameters.surveyscore)
-        // add bot's reply to session's messages list
-        for (let message of fulfillment.messages) {
-          this.addMessage('bot', message.speech)
+        if (fulfillment) {
+          // add bot's reply to session's messages list
+          for (const message of fulfillment) {
+            this.addMessage('bot', message.text.text[0])
+          }
         }
         break
       }
@@ -828,8 +853,11 @@ class Session {
         // out of survey now
         this.inSurvey = false
         // add bot's reply to session's messages list
-        for (let message of fulfillment.messages) {
-          this.addMessage('bot', message.speech)
+        if (fulfillment) {
+          // add bot's reply to session's messages list
+          for (const message of fulfillment) {
+            this.addMessage('bot', message.text.text[0])
+          }
         }
         if (this.type !== 'sparky-ui') {
           // end of survey should end the session for bots other than sparky-ui
@@ -864,8 +892,11 @@ class Session {
       case 'change-brand-url': {
         // change the branding page background URL
         // add bot's reply to session's messages list
-        for (let message of fulfillment.messages) {
-          this.addMessage('bot', message.speech)
+        if (fulfillment) {
+          // add bot's reply to session's messages list
+          for (const message of fulfillment) {
+            this.addMessage('bot', message.text.text[0])
+          }
         }
         console.log(this.id, '- sending change-brand-url command to UI with URL =', result.parameters.url)
         // send command to UI
@@ -873,9 +904,11 @@ class Session {
         break
       }
       default: {
-        // add bot's reply to session's messages list
-        for (let message of fulfillment.messages) {
-          this.addMessage('bot', message.speech)
+        if (fulfillment) {
+          // add bot's reply to session's messages list
+          for (const message of fulfillment) {
+            this.addMessage('bot', message.text.text[0])
+          }
         }
         break
       }
