@@ -78,23 +78,8 @@ class Session {
     this.gcpProjectId = data.gcpProjectId || process.env.GCP_PROJECT_ID
 
     // get dialogflow GCP credentials from database
-    credentials.get(this.gcpProjectId)
-    .then(r => {
-      // save credentials to session info
-      this.gcpCredentials = r
-      console.log(this.id, '- got GCP credentials from database for project ID', this.gcpProjectId)
-      // Create a new session client for dialogflow for this project/credential pair
-      // const sessionClient = new dialogflow.SessionsClient({projectId, keyFilename})
-      this.sessionClient = new dialogflow.SessionsClient({
-        projectId: this.gcpProjectId,
-        credentials: this.gcpCredentials
-      })
-      // build dialogflow session path
-      this.sessionPath = this.sessionClient.sessionPath(this.gcpProjectId, this.id)
-    })
-    .catch(e => {
-      console.log(this.id, '- failed to get GCP credentials from database for project ID', this.gcpProjectId, e.message)
-    })
+    this.updateGcpCredentials()
+
     this.entryPointId = data.entryPointId || process.env.ENTRY_POINT_ID
 
     // dCloud session information
@@ -138,6 +123,26 @@ class Session {
     this.to = data.to
     this.from = data.from
     this.app = data.app
+  }
+
+  async updateGcpCredentials () {
+    credentials.get(this.gcpProjectId)
+    .then(r => {
+      // save credentials to session info
+      this.gcpCredentials = r
+      console.log(this.id, '- got GCP credentials from database for project ID', this.gcpProjectId)
+      // Create a new session client for dialogflow for this project/credential pair
+      // const sessionClient = new dialogflow.SessionsClient({projectId, keyFilename})
+      this.sessionClient = new dialogflow.SessionsClient({
+        projectId: this.gcpProjectId,
+        credentials: this.gcpCredentials
+      })
+      // build dialogflow session path
+      this.sessionPath = this.sessionClient.sessionPath(this.gcpProjectId, this.id)
+    })
+    .catch(e => {
+      console.log(this.id, '- failed to get GCP credentials from database for project ID', this.gcpProjectId, e.message)
+    })
   }
 
   async checkExpiration () {
@@ -514,6 +519,7 @@ class Session {
       if (this.demoConfig.gcpProjectId) {
         this.gcpProjectId = this.demoConfig.gcpProjectId
         console.log(this.id, '- used dCloud session config to update gcpProjectId to', this.gcpProjectId)
+        this.updateGcpCredentials()
       }
       if (this.demoConfig.language) {
         this.language = this.demoConfig.language
@@ -565,6 +571,7 @@ class Session {
       if (r2.gcpProjectId) {
         this.gcpProjectId = r2.gcpProjectId
         console.log(this.id, '- used dCloud vertical config to update gcpProjectId to', this.gcpProjectId)
+        this.updateGcpCredentials()
       }
       if (r2.languageCode) {
         this.languageCode = r2.languageCode
