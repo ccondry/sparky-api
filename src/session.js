@@ -74,7 +74,6 @@ class Session {
     // resolve this promise to get user data
     // this.getCustomerData = data.getCustomerData
 
-    this.apiAiToken = data.apiAiToken || process.env.API_AI_TOKEN
     // dialogFlow API v2 project ID
     this.gcpProjectId = data.gcpProjectId || process.env.GCP_PROJECT_ID
 
@@ -512,9 +511,9 @@ class Session {
         this.vertical = this.demoConfig.vertical
         console.log(this.id, '- used dCloud session config to set vertical to', this.vertical)
       }
-      if (this.demoConfig.chatBotToken) {
-        this.apiAiToken = this.demoConfig.chatBotToken
-        console.log(this.id, '- used dCloud session config to update apiAiToken to', this.apiAiToken)
+      if (this.demoConfig.gcpProjectId) {
+        this.gcpProjectId = this.demoConfig.gcpProjectId
+        console.log(this.id, '- used dCloud session config to update gcpProjectId to', this.gcpProjectId)
       }
       if (this.demoConfig.language) {
         this.language = this.demoConfig.language
@@ -563,9 +562,9 @@ class Session {
       // the branding tool for all customization options
       const r2 = await this.getVerticalInfo()
       console.log(`${this.id} - found dCloud vertical config for vertical "${this.vertical}"`)
-      if (r2.chatBotToken) {
-        this.apiAiToken = r2.chatBotToken
-        console.log(this.id, '- used dCloud vertical config to update apiAiToken to', this.apiAiToken)
+      if (r2.gcpProjectId) {
+        this.gcpProjectId = r2.gcpProjectId
+        console.log(this.id, '- used dCloud vertical config to update gcpProjectId to', this.gcpProjectId)
       }
       if (r2.languageCode) {
         this.languageCode = r2.languageCode
