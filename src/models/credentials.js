@@ -6,8 +6,6 @@ module.exports = {
     if (!project_id || !project_id.length) {
       throw new Error('GCP project ID required to retrieve credentials but was not provided.')
     }
-    // trim whitespace off
-    project_id = project_id.trim()
     // get GCP credentials JSON from database, key on project_id
     const query = {
       project_id

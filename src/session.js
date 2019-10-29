@@ -76,6 +76,8 @@ class Session {
 
     // dialogFlow API v2 project ID
     this.gcpProjectId = data.gcpProjectId || process.env.GCP_PROJECT_ID
+    // trim whitespace off
+    this.gcpProjectId = this.gcpProjectId.trim()
 
     // get dialogflow GCP credentials from database
     this.updateGcpCredentials()
@@ -554,6 +556,8 @@ class Session {
       }
       if (this.demoConfig.gcpProjectId) {
         this.gcpProjectId = this.demoConfig.gcpProjectId
+        // trim whitespace off
+        this.gcpProjectId = this.gcpProjectId.trim()
         console.log(this.id, '- used dCloud session config to update gcpProjectId to', this.gcpProjectId)
         this.updateGcpCredentials()
       }
@@ -606,6 +610,8 @@ class Session {
       console.log(`${this.id} - found dCloud vertical config for vertical "${this.vertical}"`)
       if (r2.gcpProjectId) {
         this.gcpProjectId = r2.gcpProjectId
+        // trim whitespace off
+        this.gcpProjectId = this.gcpProjectId.trim()
         console.log(this.id, '- used dCloud vertical config to update gcpProjectId to', this.gcpProjectId)
         this.updateGcpCredentials()
       }
