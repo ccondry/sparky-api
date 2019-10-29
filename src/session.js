@@ -126,22 +126,38 @@ class Session {
   }
 
   async updateGcpCredentials () {
+    const oldGcpId = this.gcpProjectId
+    let r
     try {
-      const r = await credentials.get(this.gcpProjectId)
-      // save credentials to session info
-      this.gcpCredentials = r
-      console.log(this.id, '- got GCP credentials from database for project ID', this.gcpProjectId)
-      // Create a new session client for dialogflow for this project/credential pair
-      // const sessionClient = new dialogflow.SessionsClient({projectId, keyFilename})
-      this.sessionClient = new dialogflow.SessionsClient({
-        projectId: this.gcpProjectId,
-        credentials: this.gcpCredentials
-      })
-      // build dialogflow session path
-      this.sessionPath = this.sessionClient.sessionPath(this.gcpProjectId, this.id)
+      r = await credentials.get(this.gcpProjectId)
     } catch (e) {
+      // failed to get credentials
       console.log(this.id, '- failed to get GCP credentials from database for project ID', this.gcpProjectId, e.message)
+      // reset GCP project ID to default
+      console.log(this.id, '- reverting to default GCP credentials using project ID', process.env.GCP_PROJECT_ID)
+      this.gcpProjectId = process.env.GCP_PROJECT_ID
+      // get credentials again
+      try {
+        r = await credentials.get(this.gcpProjectId)
+      } catch (e2) {
+        console.log(this.id, '- failed to get default GCP credentials from database:', e.message)
+        this.addMessage('system', `There was an error loading the JSON credentials for your DialogFlow project ID ${oldGcpId}: ${e.message}`)
+        this.addMessage('system', `I tried to load the default DialogFlow credentials (project ID ${this.gcpProjectId}), but there was another error: ${e2.message}`)
+        throw e2
+      }
     }
+
+    // save credentials to session info
+    this.gcpCredentials = r
+    console.log(this.id, '- got GCP credentials from database for project ID', this.gcpProjectId)
+    // Create a new session client for dialogflow for this project/credential pair
+    // const sessionClient = new dialogflow.SessionsClient({projectId, keyFilename})
+    this.sessionClient = new dialogflow.SessionsClient({
+      projectId: this.gcpProjectId,
+      credentials: this.gcpCredentials
+    })
+    // build dialogflow session path
+    this.sessionPath = this.sessionClient.sessionPath(this.gcpProjectId, this.id)
   }
 
   async checkExpiration () {
@@ -413,7 +429,7 @@ class Session {
         } catch (e) {
           console.error(`${this.id} - failed again after loading default credentials:`, e.message)
           // send an error message to user
-          this.addMessage('system', `There was an error loading the JSON credentials for your DialogFlow project ID ${this.oldGcpId}. I tried to load the default DialogFlow credentials, but there was another error: ${e.message}`)
+          this.addMessage('system', `There was an error loading the JSON credentials for your DialogFlow project ID ${oldGcpId}. I tried to load the default DialogFlow credentials, but there was another error: ${e.message}`)
         }
       }
     }
