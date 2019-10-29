@@ -12,7 +12,10 @@ module.exports = {
     const query = {
       project_id
     }
-    return db.findOne('toolbox', 'credentials', query)
+    const results = await db.findOne('toolbox', 'credentials', query)
+    if (!results) {
+      throw new Error('GCP project ID', project_id, 'did not have matching credentials in the database.')
+    }
   },
   async set (credentials) {
     if (!credentials || !credentials.project_id || !credentials.project_id.length) {
