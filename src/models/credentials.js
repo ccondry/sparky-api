@@ -16,6 +16,7 @@ module.exports = {
     if (!results) {
       throw new Error('GCP project ID', project_id, 'did not have matching credentials in the database.')
     }
+    return results
   },
   async set (credentials) {
     if (!credentials || !credentials.project_id || !credentials.project_id.length) {
