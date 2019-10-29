@@ -387,15 +387,36 @@ class Session {
 
   async processCustomerMessage (text) {
     console.log(this.id, '- processing customer message:', text)
+    const oldGcpId = this.gcpProjectId
     try {
       // figure out a response using AI
       const responses = await this.queryAi(text)
       // console.log(this.id, '- processCustomerMessage response =', response)
       // process the response text
-      return this.processAiResponse(responses[0].queryResult)
-
+      this.processAiResponse(responses[0].queryResult)
     } catch (e) {
       console.error(`${this.id} exception during processCustomerMessage`, e.message)
+      // GCP credentials failed?
+      if (e.message.indexOf('Could not load the default credentials.') >=0) {
+        // load default credentials on this session and try again
+        console.log(`${this.id} - failed to load credentials for GCP project ID ${this.gcpProjectId} - reverting to default.`)
+        // set default GCP project ID
+        this.gcpProjectId = process.env.GCP_PROJECT_ID
+        // update credentials for this session
+        await this.updateGcpCredentials()
+        // retry now
+        try {
+          // figure out a response using AI
+          const responses = await this.queryAi(text)
+          // console.log(this.id, '- processCustomerMessage response =', response)
+          // process the response text
+          this.processAiResponse(responses[0].queryResult)
+        } catch (e) {
+          console.error(`${this.id} - failed again after loading default credentials:`, e.message)
+          // send an error message to user
+          this.addMessage('system', `There was an error loading the JSON credentials for your DialogFlow project ID ${this.oldGcpId}. I tried to load the default DialogFlow credentials, but there was another error: ${e.message}`)
+        }
+      }
     }
   }
 
