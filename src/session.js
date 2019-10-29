@@ -126,8 +126,8 @@ class Session {
   }
 
   async updateGcpCredentials () {
-    credentials.get(this.gcpProjectId)
-    .then(r => {
+    try {
+      const r = await credentials.get(this.gcpProjectId)
       // save credentials to session info
       this.gcpCredentials = r
       console.log(this.id, '- got GCP credentials from database for project ID', this.gcpProjectId)
@@ -139,10 +139,9 @@ class Session {
       })
       // build dialogflow session path
       this.sessionPath = this.sessionClient.sessionPath(this.gcpProjectId, this.id)
-    })
-    .catch(e => {
+    } catch (e) {
       console.log(this.id, '- failed to get GCP credentials from database for project ID', this.gcpProjectId, e.message)
-    })
+    }
   }
 
   async checkExpiration () {
