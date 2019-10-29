@@ -14,7 +14,7 @@ Environment=PATH=/usr/bin:/usr/local/bin
 Environment=NODE_ENV=production
 WorkingDirectory=/opt/dcloud/sparky-api/
 Type=simple
-ExecStart=/usr/bin/node /opt/dcloud/sparky-api/src/index.js
+ExecStart=/usr/local/bin/node /opt/dcloud/sparky-api/src/index.js
 Restart=on-failure
 
 [Install]
