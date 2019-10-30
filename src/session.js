@@ -13,6 +13,17 @@ const cache = require('./models/sessions')
 const credentials = require('./models/credentials')
 const dialogflow = require('dialogflow')
 
+function getDialogFlowV2Parameters (result) {
+  // get a more usable parameter JSON
+  const keys = Object.keys(result.parameters.fields)
+  const output = {}
+  for (const key of keys) {
+    const param = result.parameters.fields[key]
+    output[key] = param[param.kind]
+  }
+  return output
+}
+
 class Session {
   // create a session object
   constructor (type, data, onAddMessage, onTypingStart, onTypingStop) {
@@ -769,17 +780,6 @@ class Session {
     } catch (e) {
       throw e
     }
-  }
-
-  getDialogFlowV2Parameters (result) {
-    // get a more usable parameter JSON
-    const keys = Object.keys(result.parameters.fields)
-    const output = {}
-    for (const key of keys) {
-      const param = result.parameters.fields[key]
-      output[key] = param[param.kind]
-    }
-    return output
   }
 
   async processAiResponse (result) {
