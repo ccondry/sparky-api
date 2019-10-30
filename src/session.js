@@ -773,7 +773,7 @@ class Session {
 
   async processAiResponse (result) {
     console.log(this.id, '- processAiResponse - result.action =', result.action)
-
+    console.log(this.id, '- processAiResponse - result.parameters =', result.parameters)
     const fulfillment = result.fulfillmentMessages
     // check the api.ai response message and perform the associated action
     switch (result.action) {
