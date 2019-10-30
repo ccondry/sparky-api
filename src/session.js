@@ -91,7 +91,8 @@ class Session {
     this.gcpProjectId = this.gcpProjectId.trim()
 
     // get dialogflow GCP credentials from database
-    this.updateGcpCredentials()
+    // and save a reference to the promise
+    this.updateGcpCredentialsPromise = this.updateGcpCredentials()
 
     this.entryPointId = data.entryPointId || process.env.ENTRY_POINT_ID
 
@@ -459,9 +460,16 @@ class Session {
           // The query to send to the dialogflow agent
           text,
           // The language used by the client (en-US)
-          languageCode: this.languageCode,
-        },
-      },
+          languageCode: this.languageCode
+        }
+      }
+    }
+
+    // make sure the sessionClient exists
+    if (!this.sessionClient) {
+      // session client doesn't exist yet, so wait for the credentials promise
+      // to finish
+      await this.updateGcpCredentialsPromise
     }
 
     // Send request
@@ -570,7 +578,7 @@ class Session {
         // trim whitespace off
         this.gcpProjectId = this.gcpProjectId.trim()
         console.log(this.id, '- used dCloud session config to update gcpProjectId to', this.gcpProjectId)
-        this.updateGcpCredentials()
+        this.updateGcpCredentialsPromise = this.updateGcpCredentials()
       }
       if (this.demoConfig.language) {
         this.language = this.demoConfig.language
@@ -624,7 +632,7 @@ class Session {
         // trim whitespace off
         this.gcpProjectId = this.gcpProjectId.trim()
         console.log(this.id, '- used dCloud vertical config to update gcpProjectId to', this.gcpProjectId)
-        this.updateGcpCredentials()
+        this.updateGcpCredentialsPromise = this.updateGcpCredentials()
       }
       if (r2.languageCode) {
         this.languageCode = r2.languageCode
