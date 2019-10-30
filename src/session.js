@@ -771,10 +771,22 @@ class Session {
     }
   }
 
+  getDialogFlowV2Parameters (result) {
+    // get a more usable parameter JSON
+    const keys = Object.keys(result.parameters.fields)
+    const output = {}
+    for (const key of keys) {
+      const param = result.parameters.fields[key]
+      output[key] = param[param.kind]
+    }
+    return output
+  }
+
   async processAiResponse (result) {
     console.log(this.id, '- processAiResponse - result.action =', result.action)
     console.log(this.id, '- processAiResponse - result.parameters =', result.parameters)
     const fulfillment = result.fulfillmentMessages
+    const parameters = getDialogFlowV2Parameters(result)
     // check the api.ai response message and perform the associated action
     switch (result.action) {
       case 'datacenter': {
@@ -785,7 +797,7 @@ class Session {
           }
         }
         // set datacenter
-        this.dcloudDatacenter = result.parameters.dc
+        this.dcloudDatacenter = parameters.dc
         // get session info now
         if (this.dcloudSession && this.dcloudDatacenter) {
           const valid = await this.checkSessionInfo()
@@ -819,7 +831,7 @@ class Session {
           }
         }
         // set dcloud session ID
-        this.dcloudSession = result.parameters.session
+        this.dcloudSession = parameters.session
         // get session info now
         if (this.dcloudSession && this.dcloudDatacenter) {
           const valid = await this.checkSessionInfo()
@@ -889,7 +901,7 @@ class Session {
       }
       case 'survey-response': {
         // save the last survey answer
-        this.surveyAnswers.push(result.parameters.surveyscore)
+        this.surveyAnswers.push(parameters.surveyscore)
         if (fulfillment) {
           // add bot's reply to session's messages list
           for (const message of fulfillment) {
@@ -901,7 +913,7 @@ class Session {
       case 'survey-end': {
         console.log(`${this.id} - ending survey and sending survey answers to demo now`)
         // save the last survey answer
-        this.surveyAnswers.push(result.parameters.surveyscore)
+        this.surveyAnswers.push(parameters.surveyscore)
         // out of survey now
         this.inSurvey = false
         // add bot's reply to session's messages list
@@ -950,9 +962,9 @@ class Session {
             this.addMessage('bot', message.text.text[0])
           }
         }
-        console.log(this.id, '- sending change-brand-url command to UI with URL =', result.parameters.url)
+        console.log(this.id, '- sending change-brand-url command to UI with URL =', parameters.url)
         // send command to UI
-        this.addCommand('change-brand-url', result.parameters.url)
+        this.addCommand('change-brand-url', parameters.url)
         break
       }
       default: {
