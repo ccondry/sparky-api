@@ -449,7 +449,7 @@ class Session {
     }
   }
 
-  queryAi (text) {
+  async queryAi (text) {
     console.log(this.id, '- querying dialogflow using project ID', this.gcpProjectId)
 
     // The dialogflow query body
