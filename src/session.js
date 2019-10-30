@@ -842,6 +842,10 @@ class Session {
             // try to get info from customer again
             this.processCustomerMessage('wrong-information')
           }
+        } else {
+          // didn't get session info?
+          // try to get info from customer again
+          this.processCustomerMessage('wrong-information')
         }
         break
       }
