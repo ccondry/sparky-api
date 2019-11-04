@@ -12,6 +12,7 @@ const db = require('./models/db')
 const cache = require('./models/sessions')
 const credentials = require('./models/credentials')
 const dialogflow = require('dialogflow')
+const teamsLogger = require('./models/teams-logger')
 
 function getDialogFlowV2Parameters (result) {
   // get a more usable parameter JSON
@@ -402,15 +403,37 @@ class Session {
     }
   }
 
-  sendEscalatedMessage (message) {
+  async sendEscalatedMessage (message) {
     if (this.demo === 'uccx') {
       // send to uccx session
       console.log(`${this.id} - sending message to UCCX agent.`)
-      this.smSession.sendMessage(message)
+      try {
+        await this.smSession.sendMessage(message)
+        console.log(`${this.id} - successfully sent message to UCCX agent.`)
+      } catch (e) {
+        console.log(`${this.id} - failed to send message to UCCX agent:`, e.message)
+        // check for ETIMEDOUT errors
+        if (e.message.indexOf('ETIMEDOUT') >=0) {
+          // log to Teams
+          teamsLogger.log(`${this.id} - timed out error - failed to send message to UCCX agent:`, e)
+        }
+        throw e
+      }
     } else {
       // send message to eGain agent
       console.log(`${this.id} - sending message to ECE agent.`)
-      this.egainSession.SendMessageToAgent(message)
+      try {
+        await this.egainSession.SendMessageToAgent(message)
+        console.log(`${this.id} - successfully sent message to ECE agent.`)
+      } catch (e) {
+        console.log(`${this.id} - failed to send message to ECE agent:`, e.message)
+        // check for ETIMEDOUT errors
+        if (e.message.indexOf('ETIMEDOUT') >=0) {
+          // log to Teams
+          teamsLogger.log(`${this.id} - timed out error - failed to send message to ECE agent:`, e)
+        }
+        throw e
+      }
     }
   }
 
@@ -1043,7 +1066,7 @@ class Session {
     }
   }
 
-  escalateToSocialMiner(message) {
+  async escalateToSocialMiner(message) {
     console.log(`${this.id} - escalating to SocialMiner agent`)
 
     // set up UCCX chat system
@@ -1111,7 +1134,14 @@ class Session {
       // save a reference to SocialMiner session
       this.smSession = uccx
       // start chat session
-      this.smSession.start()
+      try {
+        await this.smSession.start()
+      } catch (e) {
+        console.log(this.id, '-', 'UCCX chat failed to start:', e.message)
+        // log to Teams
+        teamsLogger.log(`${this.id} - failed to start UCCX chat:`, e.message)
+        throw e
+      }
       // set escalated flag
       this.isEscalated = true
       // tell customer we are finding an agent by sending a message to DialogFlow for a response
