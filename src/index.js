@@ -10,7 +10,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const pkg = require('../package.json')
-
+const teamsLogger = require('./models/teams-logger')
 // init express
 const app = express()
 app.use(bodyParser.json())
@@ -38,6 +38,7 @@ app.use('/api/v1/teams', require('./routes/teams'))
 // listen on port defined in .env
 const server = app.listen(process.env.PORT || 3020, () => {
   console.log('Express server listening on port %d in %s mode', server.address().port, app.settings.env)
+  teamsLogger.log('service started')
 })
 
 // start web socket server on same port
