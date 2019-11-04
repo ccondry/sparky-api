@@ -50,8 +50,9 @@ async function log (args) {
   const packageName = package.name
   // const packageVersion = process.env.npm_package_version
   const packageVersion = package.version
-  const textPrefix = `${packageName} ${packageVersion}: `
-  const markdownPrefix = `**${packageName} ${packageVersion}**: `
+  const datacenter = process.env.DCLOUD_DATACENTER
+  const textPrefix = `${packageName} ${packageVersion} in ${datacenter}: `
+  const markdownPrefix = `**${packageName} ${packageVersion}** in **${datacenter}**: `
   // add prefix to plaintext
   text = textPrefix + text
   // add prefix to markdown
