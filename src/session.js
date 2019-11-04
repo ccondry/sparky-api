@@ -415,7 +415,7 @@ class Session {
         // check for ETIMEDOUT errors
         if (e.message.indexOf('ETIMEDOUT') >=0) {
           // log to Teams
-          teamsLogger.log(`${this.id} - timed out error - failed to send message to UCCX agent:`, e)
+          teamsLogger.log(`${this.id} - timed out error - failed to send message to UCCX agent: ${e.message}`)
         }
         throw e
       }
@@ -430,7 +430,7 @@ class Session {
         // check for ETIMEDOUT errors
         if (e.message.indexOf('ETIMEDOUT') >=0) {
           // log to Teams
-          teamsLogger.log(`${this.id} - timed out error - failed to send message to ECE agent:`, e)
+          teamsLogger.log(`${this.id} - timed out error - failed to send message to ECE agent: ${e.message}`)
         }
         throw e
       }
@@ -1139,7 +1139,7 @@ class Session {
       } catch (e) {
         console.log(this.id, '-', 'UCCX chat failed to start:', e.message)
         // log to Teams
-        teamsLogger.log(`${this.id} - failed to start UCCX chat:`, e.message)
+        teamsLogger.log(`${this.id} - failed to start UCCX chat: ${e.message}`)
         throw e
       }
       // set escalated flag
