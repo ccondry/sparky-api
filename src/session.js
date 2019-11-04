@@ -391,7 +391,12 @@ class Session {
 
     // is this chat escalated to an agent?
     if (this.isEscalated) {
-      this.sendEscalatedMessage(message)
+      try {
+        await this.sendEscalatedMessage(message)
+      } catch (e) {
+        console.log(`${this.id} - failed to escalate to agent:`, e.message)
+        // throw e
+      }
     } else if (this.botEnabled === false) {
       // if bot disabled, escalate directly to an agent
       console.log(`${this.id} - bot disabled. Escalating directly to agent.`)
@@ -413,7 +418,7 @@ class Session {
       } catch (e) {
         console.log(`${this.id} - failed to send message to UCCX agent:`, e.message)
         // check for ETIMEDOUT errors
-        if (e.message.indexOf('ETIMEDOUT') >=0) {
+        if (e.message.indexOf('ETIMEDOUT') >= 0) {
           // log to Teams
           teamsLogger.log(`${this.id} - timed out error - failed to send message to UCCX agent: ${e.message}`)
         }
