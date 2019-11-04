@@ -1,5 +1,9 @@
 const request = require('request-promise-native')
 const package = require('../../package.json')
+const os = require('os')
+
+// find env hostname
+const hostname = os.hostname()
 
 // trim message to 7439 bytes for Webex to accept it
 function trimMessage (message) {
@@ -51,8 +55,8 @@ async function log (args) {
   // const packageVersion = process.env.npm_package_version
   const packageVersion = package.version
   const datacenter = process.env.DCLOUD_DATACENTER
-  const textPrefix = `${packageName} ${packageVersion} in ${datacenter}: `
-  const markdownPrefix = `**${packageName} ${packageVersion}** in **${datacenter}**: `
+  const textPrefix = `${packageName} ${packageVersion} on ${hostname} in ${datacenter}: `
+  const markdownPrefix = `**${packageName} ${packageVersion}** on **${hostname}** in **${datacenter}**: `
   // add prefix to plaintext
   text = textPrefix + text
   // add prefix to markdown
