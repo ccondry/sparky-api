@@ -175,7 +175,7 @@ async function handleMessage (message) {
         // last name is the rest of the userName value, after firstName
         lastName = answers.userName.substring(firstName.length)
       } catch (e) {
-        console.error('Error getting dCloud session info', e)
+        console.error('sparky-api - Whatsapp - did not find dCloud session info from answers:', e.message)
       }
       // create session and store in sessions global
       session = new Session('whatsapp', {
