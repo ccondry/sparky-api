@@ -1,7 +1,5 @@
 // Load our environment variables
 require('dotenv').load()
-// connect to database, log any errors
-require('./models/db').connect().catch(e => console.error(e))
 const dialogflow = require('dialogflow')
 // Needed to get around self signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
