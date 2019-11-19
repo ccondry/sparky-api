@@ -65,8 +65,8 @@ function create (uccx, session) {
     },
     onPollingError (e) {
       // UCCX polling error
-      console.log(session.id, 'polling error', e.message)
-      teamsLogger.log(`${session.id} polling error: ${e.message}`)
+      console.log(session.id, 'UCCX polling error:', e.message)
+      teamsLogger.log(`${session.id} - UCCX polling error: ${e.message}`)
     }
   }
 
