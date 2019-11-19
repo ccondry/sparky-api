@@ -2,7 +2,7 @@ const teamsLogger = require('./models/teams-logger')
 
 module.exports = {create}
 
-function create (uccx, session) {
+function create (session) {
   const handlers = {
     onMessageEvent (from, message) {
       console.log(session.id, from, 'said', message)

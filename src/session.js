@@ -1119,6 +1119,8 @@ class Session {
           break
         }
       }
+      console.log(this.id, 'setting up uccx handlers...')
+      const handlers = smEventHandlers.create(this)
       const chatData = {
         urlBase: this.smHost,
         form,
@@ -1129,13 +1131,11 @@ class Session {
         // author: '',
         customerEmail: this.email,
         customerPhone: this.phone,
-        pollingInterval: 2000
+        pollingInterval: 2000,
+        handlers
       }
       console.log(this.id, 'uccx chat client initializing with data:', chatData)
       const uccx = new uccxChatClient(chatData)
-      console.log(this.id, 'uccx chat client created. setting up handlers...')
-      uccx.setHandlers(smEventHandlers.create(uccx, this))
-      console.log(this.id, 'uccx chat handlers set up.')
       // save a reference to SocialMiner session
       this.smSession = uccx
       // start chat session
