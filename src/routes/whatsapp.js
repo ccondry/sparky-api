@@ -31,8 +31,8 @@ router.post('/status', (req, res) => {
   //   ApiVersion: '2010-04-01',
   //   ChannelInstallSid: 'XEcc20d939f803ee381f2442185d0d5dc5' }
   const b = req.body
-  const from = message.From.split('whatsapp:').pop()
-  const to = message.To.split('whatsapp:').pop()
+  const from = b.From.split('whatsapp:').pop()
+  const to = b.To.split('whatsapp:').pop()
   const message = `${b.SmsStatus} from ${from} to ${to}`
   console.log(`WhatsApp message delivery status from Twilio:`, message)
 })
