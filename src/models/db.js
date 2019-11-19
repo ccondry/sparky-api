@@ -66,7 +66,7 @@ function find (db, collection, query = {}, projections) {
 function findOne (db, collection, query, options) {
   return new Promise((resolve, reject) => {
     // get mongo client
-    this.getClient()
+    getClient()
     .then(client => {
       // find one!
       client.db(db).collection(collection).findOne(query, options, function (err, result) {
@@ -89,7 +89,7 @@ function findOne (db, collection, query, options) {
 function insertOne (db, collection, data) {
   return new Promise((resolve, reject) => {
     // get mongo client
-    this.getClient()
+    getClient()
     .then(client => {
       // insert!
       client.db(db).collection(collection).insertOne(data, function (err, result) {
@@ -112,7 +112,7 @@ function insertOne (db, collection, data) {
 function upsert (db, collection, query, data) {
   return new Promise((resolve, reject) => {
     // get mongo client
-    this.getClient()
+    getClient()
     .then(client => {
       // upsert!
       client.db(db).collection(collection).findOneAndReplace(query, data, { upsert: true }, function (err, result) {
@@ -135,7 +135,7 @@ function upsert (db, collection, query, data) {
 function updateOne (db, collection, filter, query) {
   return new Promise((resolve, reject) => {
     // get mongo client
-    this.getClient()
+    getClient()
     .then(client => {
       // update one
       client.db(db).collection(collection).updateOne(filter, query, function (err, result) {
@@ -157,7 +157,7 @@ function updateOne (db, collection, filter, query) {
 function removeOne (db, collection, query) {
   return new Promise((resolve, reject) => {
     // get mongo client
-    this.getClient()
+    getClient()
     .then(client => {
       // go
       client.db(db).collection(collection).removeOne(query, function (err, result) {
