@@ -1,3 +1,5 @@
+const teamsLogger = require('./models/teams-logger')
+
 module.exports = {create}
 
 function create (uccx, session) {
@@ -60,6 +62,11 @@ function create (uccx, session) {
     onSessionExpired () {
       console.log(session.id, 'session expired')
       session.deescalate()
+    },
+    onPollingError (e) {
+      // UCCX polling error
+      console.log(session.id, 'polling error', e.message)
+      teamsLogger.log(`${session.id} polling error: ${e.message}`)
     }
   }
 
