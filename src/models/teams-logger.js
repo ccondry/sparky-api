@@ -75,6 +75,8 @@ async function log (args) {
       markdown
     },
     json: true
+  }).catch(e => {
+    console.log('failed to send log message to Teams room:', e.message)
   })
 }
 
