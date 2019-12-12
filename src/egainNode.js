@@ -3168,7 +3168,11 @@ Strophe.Connection.prototype._processRequest = function(i, sync) {
             // Fires the XHR request -- may be invoked immediately
             // or on a gradually expanding retry window for reconnects
             var sendFunc = function() {
-                req.xhr.send(req.data);
+                try {
+                  req.xhr.send(req.data);
+                } catch (e) {
+                  console.log('failed to send XHR to eGain:', e.message)
+                }
             };
 
             // Implement progressive backoff for reconnects --
