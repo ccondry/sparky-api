@@ -140,6 +140,19 @@ class Session {
     this.app = data.app
   }
 
+  // get a localized string from models/localization
+  getLocalizedText (id) {
+    try {
+      const a = localization[this.languageCode][id]
+      if (a) {
+        return a
+      }
+    } catch (e) {
+      // continue
+    }
+    return localization['en-US'][id] || ''
+  }
+
   async updateGcpCredentials () {
     const oldGcpId = this.gcpProjectId
     let r
@@ -920,18 +933,18 @@ class Session {
           // start REM call
           this.addCommand('start-rem-video')
         } else {
-          this.addMessage('bot', localization[this.languageCode].noVideo)
+          this.addMessage('bot', this.getLocalizedText('noVideo'))
         }
         break
       }
       case 'mortgage-calculator': {
         console.log(`${this.id} - sending mortgage-calculator command`)
         if (this.type === 'sparky-ui') {
-          this.addMessage('bot', localization[this.languageCode].calculatorAppeared)
+          this.addMessage('bot', this.getLocalizedText('calculatorAppeared'))
           // open mortgage calculator
           this.addCommand('mortgage-calculator')
         } else {
-          this.addMessage('bot', localization[this.languageCode].calculator + ' ' + process.env.CALCULATOR_URL)
+          this.addMessage('bot', this.getLocalizedText('calculator') + ' ' + process.env.CALCULATOR_URL)
         }
         break
       }
@@ -1201,7 +1214,7 @@ class Session {
     switch (args.StatusMessage) {
       case 'L10N_NO_AGENTS_AVAILABLE': {
         // tell customer that there are no agents available
-        this.addMessage('system', localization[this.languageCode].noAgentsAvailable)
+        this.addMessage('system', this.getLocalizedText('noAgentsAvailable'))
         // turn off survey
         this.survey = false
         // end egain session
@@ -1215,7 +1228,7 @@ class Session {
       }
       case 'L10N_SYSTEM_CANNOT_ASSIGN_AGENT': {
         // tell customer that there are no agents available
-        this.addMessage('system', localization[this.languageCode].cannotAssignAgent)
+        this.addMessage('system', this.getLocalizedText('cannotAssignAgent'))
         // turn off survey
         this.survey = false
         // end egain session
