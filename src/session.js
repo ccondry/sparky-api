@@ -1155,9 +1155,9 @@ class Session {
       try {
         await this.smSession.start()
       } catch (e) {
-        console.log(this.id, '-', 'UCCX chat failed to start:', e.message)
+        console.log(this.id, '-', `UCCX chat failed to start for ${this.dcloudDatacenter} ${this.dcloudSession}:`, e.message)
         // log to Teams
-        teamsLogger.log(`${this.id} - failed to start UCCX chat: ${e.message}`)
+        teamsLogger.log(`${this.id} - failed to start UCCX chat for ${this.dcloudDatacenter} ${this.dcloudSession}: ${e.message}`)
         throw e
       }
       // set escalated flag
