@@ -433,7 +433,7 @@ class Session {
         // check for ETIMEDOUT errors
         if (e.message.indexOf('ETIMEDOUT') >= 0) {
           // log to Teams
-          teamsLogger.log(`${this.id} - timed out error - failed to send message to UCCX agent: ${e.message}`)
+          teamsLogger.log(`${this.id} - timed out error - failed to send message to UCCX agent in ${this.dcloudDatacenter} ${this.dcloudSession}: ${e.message}`)
         }
         throw e
       }
@@ -448,7 +448,7 @@ class Session {
         // check for ETIMEDOUT errors
         if (e.message.indexOf('ETIMEDOUT') >=0) {
           // log to Teams
-          teamsLogger.log(`${this.id} - timed out error - failed to send message to ECE agent: ${e.message}`)
+          teamsLogger.log(`${this.id} - timed out error - failed to send message to ECE agent in ${this.dcloudDatacenter} ${this.dcloudSession}: ${e.message}`)
         }
         throw e
       }
