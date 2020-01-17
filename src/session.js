@@ -1028,7 +1028,7 @@ class Session {
         }
       }
     } catch (e) {
-      console.log(this.id, '- error during processAiResponse:', e.message)
+      console.log(this.id, '- error during processAiResponse, and the result from DialogFlow was:', JSON.stringify(result, null, 2), 'and the error was:', e.message)
     }
   }
 
