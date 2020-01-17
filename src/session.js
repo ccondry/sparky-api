@@ -12,7 +12,10 @@ const db = require('./models/db')
 const cache = require('./models/sessions')
 const credentials = require('./models/credentials')
 const dialogflow = require('dialogflow')
+// webex teams logger
 const teamsLogger = require('./models/teams-logger')
+// webex teams library
+const teams = require('./models/teams')
 
 function getDialogFlowV2Parameters (result) {
   // get a more usable parameter JSON
@@ -1029,6 +1032,40 @@ class Session {
       }
     } catch (e) {
       console.log(this.id, '- error during processAiResponse, and the result from DialogFlow was:', JSON.stringify(result, null, 2), 'and the error was:', e.message)
+      // try to send the user a Teams message with this error, if instant demo user
+      if (this.userId) {
+        try {
+          // find email address of instant demo user
+          const projection = {email: 1}
+          const user = await db.findOne('toolbox', 'users', {id: this.userId}, {projection})
+          const toPersonEmail = user.email
+          // make a file buffer from the result JSON
+          const fileData = new Buffer.from(JSON.stringify(result, null, 2))
+          // give it a filename
+          const filename = 'dialgflow-response.json'
+          // set content type to JSON
+          const contentType = 'application/json'
+          // write the message
+          const markdown = `There was an error on the dCloud chat bot platform with vertical ${this.vertical} with GCP project ID ${this.gcpProjectId} - the last DialogFlow intent received didn't have response text defined. Attached is the DialogFlow response.`
+          // send the message and file to teams
+          await teams.message.send({
+            toPersonEmail,
+            roomType: 'direct',
+            // roomId: undefined,
+            // text: 'hi **you**',
+            markdown,
+            files: {
+              value: fileData,
+              options: {
+                filename,
+                contentType
+              }
+            }
+          })
+        } catch (e2) {
+          console.log(this.id, '- failed to send DialogFlow response as a Teams message with file attachment:', e2.message)
+        }
+      }
     }
   }
 
