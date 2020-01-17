@@ -834,197 +834,201 @@ class Session {
   async processAiResponse (result) {
     console.log(this.id, '- processAiResponse - result.action =', result.action)
     console.log(this.id, '- processAiResponse - result.parameters =', result.parameters)
-    const fulfillment = result.fulfillmentMessages
-    const parameters = getDialogFlowV2Parameters(result)
-    // check the api.ai response message and perform the associated action
-    switch (result.action) {
-      case 'datacenter': {
-        if (fulfillment) {
-          // add bot's reply to session's messages list
-          for (const message of fulfillment) {
-            this.addMessage('bot', message.text.text[0])
-          }
-        }
-        // set datacenter
-        this.dcloudDatacenter = parameters.dc
-        // get session info now
-        if (this.dcloudSession && this.dcloudDatacenter) {
-          const valid = await this.checkSessionInfo()
-          if (valid) {
-            // check if we are isEscalating now or just showing instructions
-            if (this.isEscalating) {
-              // escalate
-              this.escalate()
-            } else if (this.isInstantDemo) {
-              try {
-                this.checkInstantDemoCustomer('sparky')
-              } catch (e) {
-                console.error(this.id, '- failed to check instant demo customer', e.message)
-              }
-            } else {
-              // send instructions
-              this.processCustomerMessage('instructions')
-            }
-          } else {
-            // try to get info from customer again
-            this.processCustomerMessage('wrong-information')
-          }
-        }
-        break
-      }
-      case 'dcloud-session': {
-        if (fulfillment) {
-          // add bot's reply to session's messages list
-          for (const message of fulfillment) {
-            this.addMessage('bot', message.text.text[0])
-          }
-        }
-        // set dcloud session ID
-        this.dcloudSession = parameters.session
-        // get session info now
-        if (this.dcloudSession && this.dcloudDatacenter) {
-          const valid = await this.checkSessionInfo()
-          if (valid) {
-            // check if we are isEscalating now or just showing instructions
-            if (this.isEscalating) {
-              // escalate
-              this.escalate()
-            } else if (this.isInstantDemo) {
-              try {
-                this.checkInstantDemoCustomer('sparky')
-              } catch (e) {
-                console.error(this.id, '- failed to check instant demo customer', e.message)
-              }
-            } else {
-              // send instructions
-              this.processCustomerMessage('instructions')
-            }
-          } else {
-            // try to get info from customer again
-            this.processCustomerMessage('wrong-information')
-          }
-        } else {
-          // didn't get session info?
-          // try to get info from customer again
-          this.processCustomerMessage('wrong-information')
-        }
-        break
-      }
-      case 'escalate': {
-        if (fulfillment) {
-          // add bot's reply to session's messages list
-          for (const message of fulfillment) {
-            this.addMessage('bot', message.text.text[0])
-          }
-        }
-        // escalate request to agent
-        this.escalate()
-        break
-      }
-      case 'start-video': {
-        if (this.type === 'sparky-ui') {
+    try {
+      const fulfillment = result.fulfillmentMessages
+      const parameters = getDialogFlowV2Parameters(result)
+      // check the api.ai response message and perform the associated action
+      switch (result.action) {
+        case 'datacenter': {
           if (fulfillment) {
             // add bot's reply to session's messages list
             for (const message of fulfillment) {
               this.addMessage('bot', message.text.text[0])
             }
           }
+          // set datacenter
+          this.dcloudDatacenter = parameters.dc
+          // get session info now
+          if (this.dcloudSession && this.dcloudDatacenter) {
+            const valid = await this.checkSessionInfo()
+            if (valid) {
+              // check if we are isEscalating now or just showing instructions
+              if (this.isEscalating) {
+                // escalate
+                this.escalate()
+              } else if (this.isInstantDemo) {
+                try {
+                  this.checkInstantDemoCustomer('sparky')
+                } catch (e) {
+                  console.error(this.id, '- failed to check instant demo customer', e.message)
+                }
+              } else {
+                // send instructions
+                this.processCustomerMessage('instructions')
+              }
+            } else {
+              // try to get info from customer again
+              this.processCustomerMessage('wrong-information')
+            }
+          }
+          break
+        }
+        case 'dcloud-session': {
+          if (fulfillment) {
+            // add bot's reply to session's messages list
+            for (const message of fulfillment) {
+              this.addMessage('bot', message.text.text[0])
+            }
+          }
+          // set dcloud session ID
+          this.dcloudSession = parameters.session
+          // get session info now
+          if (this.dcloudSession && this.dcloudDatacenter) {
+            const valid = await this.checkSessionInfo()
+            if (valid) {
+              // check if we are isEscalating now or just showing instructions
+              if (this.isEscalating) {
+                // escalate
+                this.escalate()
+              } else if (this.isInstantDemo) {
+                try {
+                  this.checkInstantDemoCustomer('sparky')
+                } catch (e) {
+                  console.error(this.id, '- failed to check instant demo customer', e.message)
+                }
+              } else {
+                // send instructions
+                this.processCustomerMessage('instructions')
+              }
+            } else {
+              // try to get info from customer again
+              this.processCustomerMessage('wrong-information')
+            }
+          } else {
+            // didn't get session info?
+            // try to get info from customer again
+            this.processCustomerMessage('wrong-information')
+          }
+          break
+        }
+        case 'escalate': {
+          if (fulfillment) {
+            // add bot's reply to session's messages list
+            for (const message of fulfillment) {
+              this.addMessage('bot', message.text.text[0])
+            }
+          }
+          // escalate request to agent
+          this.escalate()
+          break
+        }
+        case 'start-video': {
+          if (this.type === 'sparky-ui') {
+            if (fulfillment) {
+              // add bot's reply to session's messages list
+              for (const message of fulfillment) {
+                this.addMessage('bot', message.text.text[0])
+              }
+            }
 
-          // start REM call
-          this.addCommand('start-rem-video')
-        } else {
-          this.addMessage('bot', this.getLocalizedText('noVideo'))
-        }
-        break
-      }
-      case 'mortgage-calculator': {
-        console.log(`${this.id} - sending mortgage-calculator command`)
-        if (this.type === 'sparky-ui') {
-          this.addMessage('bot', this.getLocalizedText('calculatorAppeared'))
-          // open mortgage calculator
-          this.addCommand('mortgage-calculator')
-        } else {
-          this.addMessage('bot', this.getLocalizedText('calculator') + ' ' + process.env.CALCULATOR_URL)
-        }
-        break
-      }
-      case 'survey-response': {
-        // save the last survey answer
-        this.surveyAnswers.push(parameters.surveyscore)
-        if (fulfillment) {
-          // add bot's reply to session's messages list
-          for (const message of fulfillment) {
-            this.addMessage('bot', message.text.text[0])
+            // start REM call
+            this.addCommand('start-rem-video')
+          } else {
+            this.addMessage('bot', this.getLocalizedText('noVideo'))
           }
+          break
         }
-        break
-      }
-      case 'survey-end': {
-        console.log(`${this.id} - ending survey and sending survey answers to demo now`)
-        // save the last survey answer
-        this.surveyAnswers.push(parameters.surveyscore)
-        // out of survey now
-        this.inSurvey = false
-        // add bot's reply to session's messages list
-        if (fulfillment) {
-          // add bot's reply to session's messages list
-          for (const message of fulfillment) {
-            this.addMessage('bot', message.text.text[0])
+        case 'mortgage-calculator': {
+          console.log(`${this.id} - sending mortgage-calculator command`)
+          if (this.type === 'sparky-ui') {
+            this.addMessage('bot', this.getLocalizedText('calculatorAppeared'))
+            // open mortgage calculator
+            this.addCommand('mortgage-calculator')
+          } else {
+            this.addMessage('bot', this.getLocalizedText('calculator') + ' ' + process.env.CALCULATOR_URL)
           }
+          break
         }
-        if (this.type !== 'sparky-ui') {
-          // end of survey should end the session for bots other than sparky-ui
-          // this.deescalate()
-          this.endSession()
+        case 'survey-response': {
+          // save the last survey answer
+          this.surveyAnswers.push(parameters.surveyscore)
+          if (fulfillment) {
+            // add bot's reply to session's messages list
+            for (const message of fulfillment) {
+              this.addMessage('bot', message.text.text[0])
+            }
+          }
+          break
         }
-        // send the survey results to the node service running in the demo
-        try {
-          await this.saveSurveyAnswers()
-          console.log(this.id, '- saved survey answers')
-        } catch (e) {
-          console.log(this.id, '- Failed to save survey answers', e.message)
-        }
+        case 'survey-end': {
+          console.log(`${this.id} - ending survey and sending survey answers to demo now`)
+          // save the last survey answer
+          this.surveyAnswers.push(parameters.surveyscore)
+          // out of survey now
+          this.inSurvey = false
+          // add bot's reply to session's messages list
+          if (fulfillment) {
+            // add bot's reply to session's messages list
+            for (const message of fulfillment) {
+              this.addMessage('bot', message.text.text[0])
+            }
+          }
+          if (this.type !== 'sparky-ui') {
+            // end of survey should end the session for bots other than sparky-ui
+            // this.deescalate()
+            this.endSession()
+          }
+          // send the survey results to the node service running in the demo
+          try {
+            await this.saveSurveyAnswers()
+            console.log(this.id, '- saved survey answers')
+          } catch (e) {
+            console.log(this.id, '- Failed to save survey answers', e.message)
+          }
 
-        break
-      }
-      // case 'start-survey': {
-      //   this.startSurvey()
-      //   break
-      // }
-      case 'end-session': {
-        // end session
-        if (this.survey) {
-          this.startSurvey()
-        } else {
-          // survey not enabled - just go to deescalate
-          // this.deescalate()
-          this.endSession()
+          break
         }
-        break
-      }
-      case 'change-brand-url': {
-        // change the branding page background URL
-        // add bot's reply to session's messages list
-        if (fulfillment) {
-          // add bot's reply to session's messages list
-          for (const message of fulfillment) {
-            this.addMessage('bot', message.text.text[0])
+        // case 'start-survey': {
+        //   this.startSurvey()
+        //   break
+        // }
+        case 'end-session': {
+          // end session
+          if (this.survey) {
+            this.startSurvey()
+          } else {
+            // survey not enabled - just go to deescalate
+            // this.deescalate()
+            this.endSession()
           }
+          break
         }
-        console.log(this.id, '- sending change-brand-url command to UI with URL =', parameters.url)
-        // send command to UI
-        this.addCommand('change-brand-url', parameters.url)
-        break
-      }
-      default: {
-        if (fulfillment) {
+        case 'change-brand-url': {
+          // change the branding page background URL
           // add bot's reply to session's messages list
-          for (const message of fulfillment) {
-            this.addMessage('bot', message.text.text[0])
+          if (fulfillment) {
+            // add bot's reply to session's messages list
+            for (const message of fulfillment) {
+              this.addMessage('bot', message.text.text[0])
+            }
           }
+          console.log(this.id, '- sending change-brand-url command to UI with URL =', parameters.url)
+          // send command to UI
+          this.addCommand('change-brand-url', parameters.url)
+          break
         }
-        break
+        default: {
+          if (fulfillment) {
+            // add bot's reply to session's messages list
+            for (const message of fulfillment) {
+              this.addMessage('bot', message.text.text[0])
+            }
+          }
+          break
+        }
       }
+    } catch (e) {
+      console.log(this.id, '- error during processAiResponse:', e.message)
     }
   }
 
