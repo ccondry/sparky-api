@@ -1024,7 +1024,11 @@ class Session {
           if (fulfillment) {
             // add bot's reply to session's messages list
             for (const message of fulfillment) {
-              this.addMessage('bot', message.text.text[0])
+              try {
+                this.addMessage('bot', message.text.text[0])
+              } catch (e) {
+                // ignore fulfillment messages without text that we can process
+              }
             }
           }
           break
