@@ -1129,7 +1129,7 @@ class Session {
       // generate transcript string
       let transcript = ''
       this.messages.forEach(message => {
-        transcript += `${message.type}: ${message.text}\r\n\r\n`
+        transcript += `${message.type}: ${message.text}\r`
       })
       this.escalateToEgain(transcript)
     }
