@@ -1118,19 +1118,19 @@ class Session {
     //   console.log(`${this.id} - failed to send transcript:`, e.message)
     // }
 
+    // generate transcript string
+    let transcript = ''
+    this.messages.forEach(message => {
+      transcript += `${message.type}: ${message.text}\r`
+    })
+
     if (this.demo && this.demo === 'uccx') {
       console.log(`${this.id} - Escalating to UCCX agent`)
       // escalate to SM on UCCX demo
-      this.escalateToSocialMiner(message)
+      this.escalateToSocialMiner(transcript)
     } else {
       console.log(`${this.id} - Escalating to PCCE agent`)
       // default to PCCE
-      // this.escalateToEgain(message)
-      // generate transcript string
-      let transcript = ''
-      this.messages.forEach(message => {
-        transcript += `${message.type}: ${message.text}\r`
-      })
       this.escalateToEgain(transcript)
     }
   }
@@ -1216,6 +1216,8 @@ class Session {
       // tell customer we are finding an agent by sending a message to DialogFlow for a response
       // this.addCustomerMessage('system', 'dcloud-finding-agent')
       // this.addMessage('system', localization[this.languageCode].welcomeMessage)
+      // send the transcript as a customer message
+      this.sendEscalatedMessage(message)
     } catch (e) {
       console.error('error starting UCCX chat', e)
     }
