@@ -1107,16 +1107,16 @@ class Session {
     }
 
     // send the chat transcript to Context Service
-    try {
-      console.log(`${this.id} - sending chat transcript...`)
-      // send transcript if not RCDN
-      if (this.dcloudDatacenter.toLowerCase() !== 'rcdn') {
-        await transcript.send(this)
-      }
-      console.log(`${this.id} - transcript sent.`)
-    } catch (e) {
-      console.log(`${this.id} - failed to send transcript:`, e.message)
-    }
+    // try {
+    //   console.log(`${this.id} - sending chat transcript...`)
+    //   // send transcript if not RCDN
+    //   if (this.dcloudDatacenter.toLowerCase() !== 'rcdn') {
+    //     await transcript.send(this)
+    //   }
+    //   console.log(`${this.id} - transcript sent.`)
+    // } catch (e) {
+    //   console.log(`${this.id} - failed to send transcript:`, e.message)
+    // }
 
     if (this.demo && this.demo === 'uccx') {
       console.log(`${this.id} - Escalating to UCCX agent`)
