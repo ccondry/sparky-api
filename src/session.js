@@ -1125,7 +1125,13 @@ class Session {
     } else {
       console.log(`${this.id} - Escalating to PCCE agent`)
       // default to PCCE
-      this.escalateToEgain(message)
+      // this.escalateToEgain(message)
+      // generate transcript string
+      let transcript = ''
+      this.messages.forEach(message => {
+        transcript += `${message.type}: ${message.text}\r\n\r\n`
+      })
+      this.escalateToEgain(transcript)
     }
   }
 
