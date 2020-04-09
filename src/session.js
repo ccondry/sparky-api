@@ -1121,7 +1121,7 @@ class Session {
     // generate transcript string
     let transcript = ''
     this.messages.forEach(message => {
-      transcript += `${message.type}: ${message.text}\r`
+      transcript += `${message.type}: ${message.text}\r\n`
     })
 
     if (this.demo && this.demo === 'uccx') {
