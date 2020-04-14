@@ -11,7 +11,7 @@ const localization = require('./models/localization')
 const db = require('./models/db')
 const cache = require('./models/sessions')
 const credentials = require('./models/credentials')
-const dialogflow = require('dialogflow')
+const dialogflow = require('dialogflow').v2beta1
 // webex teams logger
 const teamsLogger = require('./models/teams-logger')
 // webex teams library

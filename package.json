@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "NODE_TLS_REJECT_UNAUTHORIZED=0 node src/index.js",
-    "test": "NODE_TLS_REJECT_UNAUTHORIZED=0 node test/test.js"
+    "test": "NODE_TLS_REJECT_UNAUTHORIZED=0 node test/test.js",
+    "test:covid": "node test/covid.js"
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,7 @@
     "axios": "^0.18.0",
     "body-parser": "^1.15.2",
     "cors": "^2.8.4",
-    "dialogflow": "^0.12.2",
+    "dialogflow": "^1.2.0",
     "dotenv": "^4.0.0",
     "express": "^4.14.0",
     "html-entities": "^1.2.1",

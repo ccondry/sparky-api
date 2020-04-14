@@ -1,6 +1,5 @@
 // Load our environment variables
 require('dotenv').load()
-const dialogflow = require('dialogflow')
 // Needed to get around self signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 // Node includes
