@@ -16,12 +16,7 @@ if (!process.env.MONGO_URL) {
 
 // Connection URL
 const url = process.env.MONGO_URL
-// mongo connection options
-const connectOptions = {
-  useNewUrlParser: true,
-  poolSize: 5, 
-  useUnifiedTopology: true
-}
+const connectOptions = { useNewUrlParser: true, poolSize: 5 }
 // global db client object
 // let _client
 
