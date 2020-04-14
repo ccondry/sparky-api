@@ -2,6 +2,8 @@
 require('dotenv').load()
 // Needed to get around self signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+// init dialogflow, or it will fail when required later
+require('dialogflow').v2beta1
 // Node includes
 const express = require('express')
 const bodyParser = require('body-parser')
