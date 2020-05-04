@@ -36,7 +36,7 @@ function getDcloudSession (from, to) {
 // get dCloud session information from mobile app answers
 function getAnswers (from, to) {
   const phone = getLookupNumber(from, to)
-  return db.findOne('cumulus', 'answers', {phone})
+  return db.findOne('cumulus', 'answers', {phoneNumber: phone})
 }
 
 // send twilio Whatsapp to user
