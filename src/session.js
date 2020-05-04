@@ -96,7 +96,7 @@ class Session {
 
     // get dialogflow GCP credentials from database
     // and save a reference to the promise
-    this.updateGcpCredentialsPromise = await this.updateGcpCredentials()
+    this.updateGcpCredentialsPromise = this.updateGcpCredentials()
 
     this.entryPointId = data.entryPointId || process.env.ENTRY_POINT_ID
 
