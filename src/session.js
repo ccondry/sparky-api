@@ -364,6 +364,8 @@ class Session {
     }
     // reset chat session expiration
     this.resetExpiration()
+    // make sure we have the right vertical set before trying to say sparky
+    await this.updateGcpCredentialsPromise
     // add message to memory and database
     this.addMessage('customer', message)
     // detect any goodbye messages that would end the session
