@@ -622,7 +622,8 @@ class Session {
         // trim whitespace off
         this.gcpProjectId = this.gcpProjectId.trim()
         console.log(this.id, '- used dCloud session config to update gcpProjectId to', this.gcpProjectId)
-        this.updateGcpCredentialsPromise = await this.updateGcpCredentials()
+        this.updateGcpCredentialsPromise = this.updateGcpCredentials()
+        await this.updateGcpCredentialsPromise
       }
       if (this.demoConfig.language) {
         this.language = this.demoConfig.language
