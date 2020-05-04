@@ -273,7 +273,7 @@ class Session {
         }
       }
 
-      // if this is a bot/system/agent message, send it to the customer on facebook
+      // if this is a bot/system/agent message, send it to the customer
       if (type !== 'customer') {
         // match the Incoming log message format
         console.log(this.id, '- outgoing', type, 'message:', message)
