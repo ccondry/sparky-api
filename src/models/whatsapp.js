@@ -25,7 +25,7 @@ function getLookupNumber (from, to) {
   }
 }
 
-// get dCloud session information
+// get dCloud session information from phone number
 function getDcloudSession (from, to) {
   console.log('getting dcloud session info for', from)
   const phone = getLookupNumber(from, to)
@@ -33,8 +33,9 @@ function getDcloudSession (from, to) {
   return db.findOne('cumulus', 'phones', {phone})
 }
 
-// get dCloud session information
-function getAnswers (phone) {
+// get dCloud session information from mobile app answers
+function getAnswers (from, to) {
+  const phone = getLookupNumber(from, to)
   return db.findOne('cumulus', 'answers', {phone})
 }
 
@@ -164,8 +165,12 @@ async function handleMessage (message) {
       let email = undefined
       let userId = undefined
       try {
+        console.log('sparky-api - Whatsapp - looking up mobile app answers for', phone, '...')
         // get dCloud answers information that user submitted (hopefully)
-        answers = await getAnswers(phone)
+        answers = await getAnswers(from, to)
+        if (answers === null) {
+          console.log('sparky-api - Whatsapp - did not find any mobile app answers for', phone, '.')
+        }
         // get instant demo username from the POD ID that user entered into the
         // settings screen of the mobile app
         userId = answers.podId
