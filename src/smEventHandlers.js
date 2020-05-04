@@ -39,11 +39,15 @@ function create (session) {
     },
     onTypingStart (from) {
       console.log(session.id, from, 'is typing')
-      session.onTypingStart(from)
+      if (typeof session.onTypingStart === 'function') {
+        session.onTypingStart(from)
+      }
     },
     onTypingStop (from) {
       console.log(session.id, from, 'stopped typing')
-      session.onTypingStop(from)
+      if (typeof session.onTypingStop === 'function') {
+        session.onTypingStop(from)
+      }
     },
     onOtherEvent (type, ev) {
       console.log(session.id, 'other event', type, ev)
