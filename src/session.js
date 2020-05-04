@@ -277,7 +277,7 @@ class Session {
       if (type !== 'customer') {
         // match the Incoming log message format
         console.log(this.id, '- outgoing', type, 'message:', message)
-        if (this.onAddMessage && typeof this.onAddMessage === 'function') {
+        if (typeof this.onAddMessage === 'function') {
           console.log(this.id, '- sending message using onAddMessage...')
           try {
             this.onAddMessage.call(this, type, message, datetime, data)
