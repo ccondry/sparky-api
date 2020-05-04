@@ -201,7 +201,7 @@ async function handleMessage (message) {
       // add session to sessions cache and to database
       await addSession(session)
       // make sure we have the right session info before sending sparky message
-      await session.checkSessionInfo()
+      await session.checkSessionPromise
       // set first message as sparky
       session.addCustomerMessage('sparky')
       // don't do anything else
