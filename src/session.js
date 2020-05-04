@@ -96,7 +96,7 @@ class Session {
 
     // get dialogflow GCP credentials from database
     // and save a reference to the promise
-    this.updateGcpCredentialsPromise = this.updateGcpCredentials()
+    this.updateGcpCredentialsPromise = await this.updateGcpCredentials()
 
     this.entryPointId = data.entryPointId || process.env.ENTRY_POINT_ID
 
@@ -622,7 +622,7 @@ class Session {
         // trim whitespace off
         this.gcpProjectId = this.gcpProjectId.trim()
         console.log(this.id, '- used dCloud session config to update gcpProjectId to', this.gcpProjectId)
-        this.updateGcpCredentialsPromise = this.updateGcpCredentials()
+        this.updateGcpCredentialsPromise = await this.updateGcpCredentials()
       }
       if (this.demoConfig.language) {
         this.language = this.demoConfig.language
