@@ -1,10 +1,5 @@
 // Load our environment variables
 require('dotenv').config()
-const db = require('./models/db')
-// test database
-db.findOne('toolbox', 'provision', {username: 'ccondry'})
-.then(r => console.log('db connect successfully:', r))
-.catch(e => console.log('db failed to connect:', e))
 // Needed to get around self signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 // init dialogflow, or it will fail when required later

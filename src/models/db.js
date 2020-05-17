@@ -1,6 +1,6 @@
+// require('dotenv').config()
 const MongoClient = require('mongodb').MongoClient
 // make sure environment file is loaded
-require('dotenv').config()
 
 const url = process.env.MONGO_URL
 const connectOptions = {
@@ -49,7 +49,7 @@ function find (db, collection, query = {}, projection) {
       .find(query).project(projection)
       .toArray(function (queryError, doc) {
         // close the client connection
-        client.close()
+        // client.close()
         // check for error
         if (queryError) reject(queryError)
         // success
@@ -72,7 +72,7 @@ function findOne (db, collection, query, options) {
       // find one!
       client.db(db).collection(collection).findOne(query, options, function (err, result) {
         // close the client connection
-        client.close()
+        // client.close()
         // check for error
         if (err) reject(err)
         // success
@@ -95,7 +95,7 @@ function insertOne (db, collection, data) {
       // insert!
       client.db(db).collection(collection).insertOne(data, function (err, result) {
         // close the client connection
-        client.close()
+        // client.close()
         // check for error
         if (err) reject(err)
         // success
@@ -118,7 +118,7 @@ function upsert (db, collection, query, data) {
       // upsert!
       client.db(db).collection(collection).findOneAndReplace(query, data, { upsert: true }, function (err, result) {
         // close the client connection
-        client.close()
+        // client.close()
         // check for error
         if (err) reject(err)
         // success
@@ -141,7 +141,7 @@ function updateOne (db, collection, filter, query) {
       // update one
       client.db(db).collection(collection).updateOne(filter, query, function (err, result) {
         // close the client connection
-        client.close()
+        // client.close()
         // check for error
         if (err) reject(err)
         // success
@@ -163,7 +163,7 @@ function removeOne (db, collection, query) {
       // go
       client.db(db).collection(collection).removeOne(query, function (err, result) {
         // close the client connection
-        client.close()
+        // client.close()
         // check for error
         if (err) reject(err)
         // success
