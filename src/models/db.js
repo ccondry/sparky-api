@@ -1,59 +1,52 @@
-/*
-This provides some simple async methods for using a mongo database
-*/
 const MongoClient = require('mongodb').MongoClient
+// make sure environment file is loaded
+require('dotenv').config()
 
-if (!process.env.MONGO_URL) {
-  console.error('dcloud-sparky-api - process.env.MONGO_URL is not defined. Please configure this variable in cumulus-api/.env file.')
-} else {
-  try {
-    const redacted = process.env.MONGO_URL.split('@').pop()
-    console.log('process.env.MONGO_URL =', redacted)
-  } catch (e) {
-    console.log('process.env.MONGO_URL is set, but failed to redact the password from that URL, so not displaying it here.')
-  }
-}
-
-// Connection URL
 const url = process.env.MONGO_URL
-// mongo connection options
 const connectOptions = {
   useNewUrlParser: true,
   poolSize: 5, 
   useUnifiedTopology: true
 }
-// global db client object
+
+// global client
 let globalClient
 
-// get authenticated mongo client
+// create connection pool
 function getClient () {
-  return new Promise(function (resolve, reject) {
-    // return client if it is already connected
+  return new Promise((resolve, reject) => {
+    if (!url) {
+      reject('process.env.MONGO_URL is not defined. please add this to the .env file.')
+    }
+    // return existing global client connection
     if (globalClient) {
       resolve(globalClient)
     } else {
-      // otherwise, connect to mongo and then return the client
-      MongoClient.connect(url, connectOptions, function (err, client) {
-        // check for error
-        if (err) {
-          return reject(err)
-        } else {
-          // success - set global client object and then resolve it
-          globalClient = client
-          resolve(globalClient)
-        }
-      })
+      // connect and then return new global client connection
+      try {
+        MongoClient.connect(url, connectOptions, function(connectError, dbClient) {
+          if (connectError) {
+            reject(connectError)
+          } else {
+            console.log('cloud mongo db connected')
+            globalClient = dbClient
+            resolve(globalClient)
+          }
+        })
+      } catch (e) {
+        reject(e)
+      }
     }
   })
 }
 
-function find (db, collection, query = {}, projections) {
+function find (db, collection, query = {}, projection) {
   return new Promise((resolve, reject) => {
     // get mongo client
     getClient()
     .then(client => {
       client.db(db).collection(collection)
-      .find(query).project(projections)
+      .find(query).project(projection)
       .toArray(function (queryError, doc) {
         // close the client connection
         client.close()
@@ -185,10 +178,14 @@ function removeOne (db, collection, query) {
 }
 
 module.exports = {
+  // client,
+  // connect,
   find,
   findOne,
-  insertOne,
-  removeOne,
+  // update,
   updateOne,
-  upsert
+  upsert,
+  insertOne,
+  // remove,
+  removeOne
 }
