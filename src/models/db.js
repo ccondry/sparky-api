@@ -23,24 +23,27 @@ const connectOptions = {
   useUnifiedTopology: true
 }
 // global db client object
-// let _client
+let globalClient
 
 // get authenticated mongo client
 function getClient () {
   return new Promise(function (resolve, reject) {
     // return client if it is already connected
-    // if (_client) resolve(_client)
-    // otherwise, connect to mongo and then return the client
-    MongoClient.connect(url, connectOptions, function (err, client) {
-      // check for error
-      if (err) {
-        return reject(err)
-      } else {
-        // success - set global client object and then resolve it
-        // _client = client
-        resolve(client)
-      }
-    })
+    if (globalClient) {
+      resolve(globalClient)
+    } else {
+      // otherwise, connect to mongo and then return the client
+      MongoClient.connect(url, connectOptions, function (err, client) {
+        // check for error
+        if (err) {
+          return reject(err)
+        } else {
+          // success - set global client object and then resolve it
+          globalClient = client
+          resolve(globalClient)
+        }
+      })
+    }
   })
 }
 
