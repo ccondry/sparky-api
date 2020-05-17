@@ -1,5 +1,5 @@
 // Load our environment variables
-require('dotenv').load()
+require('dotenv').config()
 
 // load required libraries
 const dialogflow = require('dialogflow').v2beta1

@@ -1,5 +1,5 @@
 // Load our environment variables
-require('dotenv').load()
+require('dotenv').config()
 // Needed to get around self signed certs
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 // init dialogflow, or it will fail when required later

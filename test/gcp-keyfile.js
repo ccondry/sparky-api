@@ -1,5 +1,5 @@
 // Load our environment variables
-require('dotenv').load()
+require('dotenv').config()
 // connect to database, log any errors
 const db = require('../src/models/db')
 const fs = require('fs')
