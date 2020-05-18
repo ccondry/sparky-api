@@ -32,7 +32,7 @@
     "express": "^4.14.0",
     "html-entities": "^1.2.1",
     "jquery": "^3.3.1",
-    "mongodb": "^3.5.7",
+    "@ccondry/mongo-wrapper": "^1.0.1",
     "node-strophe": "git+https://github.com/juxe/node-strophe.git",
     "query-string": "^5.1.0",
     "request": "^2.87.0",
