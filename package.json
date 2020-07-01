@@ -1,6 +1,6 @@
 {
   "name": "sparky-api",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "Sparky - a chat bot using DialogFlow that can escalate chats to an agent in UCCX or PCCE.",
   "main": "src/index.js",
   "scripts": {
