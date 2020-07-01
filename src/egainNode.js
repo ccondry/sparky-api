@@ -2710,7 +2710,7 @@ eGainLibrary = function (librarySettings) {
 
 Strophe.log = function (level, msg)
 {
-    console.log("egainNode Strophe LOG: " + level + " MESSAGE: " + msg);
+    // console.log("egainNode Strophe LOG: " + level + " MESSAGE: " + msg);
     try {
         if (level === Strophe.LogLevel.ERROR || level === Strophe.LogLevel.FATAL || eGainLibrary.debug)
         {
