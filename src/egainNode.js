@@ -3257,6 +3257,7 @@ Strophe.Connection.prototype._onRequestStateChange = function (func, req)
             }
 
             if (this.disconnecting) {
+                console.log('egainNode disconnecting with request status', reqStatus)
                 if (reqStatus >= 400) {
                     this._hitError(reqStatus);
                     return;
