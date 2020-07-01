@@ -3302,7 +3302,7 @@ Strophe.Connection.prototype._onRequestStateChange = function (func, req)
                 this.errors = 0;
             } else {
                 if("function" === typeof this.eGainOnError){
-                    this.eGainOnError({"status": "error", "message": "Should be abandoned. " + reqStatus});
+                    this.eGainOnError({"status": "error", "message": "Should be abandoned. " + reqStatus + " " + req.xhr.responseText});
                 }
                 else {
                     Strophe.error("request id " +
