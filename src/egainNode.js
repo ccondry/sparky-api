@@ -16,8 +16,8 @@ const path = require('path')
  *      It can be used run the library in development mode and define CORS host.
  */
  eGainLibrarySettings = function () {
-    this.IsDevelopmentModeOn = true;
-    this.IsDebugOn = true;
+    this.IsDevelopmentModeOn = false;
+    this.IsDebugOn = false;
     this.CORSHost = "";
     this.ChatPauseInSec = 30;
     this.eGainContextPath = "";
@@ -3200,7 +3200,7 @@ Strophe.Connection.prototype._processRequest = function(i, sync) {
  * A modified copy of Strophe.Connection.prototype._hitError which logs a
  * message to the transcript
  */
-Strophe.Connection.prototype._hitError = function(reqStatus) {
+Strophe.Connection.prototype._hitError = function(req) {
 	if(typeof App == 'undefined'){
             if(typeof clearPollQueueStatusTimer == 'function')
                 clearPollQueueStatusTimer();
@@ -3208,17 +3208,17 @@ Strophe.Connection.prototype._hitError = function(reqStatus) {
 	else
             App.connection.clearPollQueueStatusTimer();
 	this.errors++;
-	Strophe.warn("request errored, status: " + reqStatus
+	Strophe.warn("request errored, status: " + req.xhr.status
 			+ ", number of errors: " + this.errors);
 	if (this.errors > 4) {
-            if("function" === typeof this.eGainOnError){
-                this.eGainOnError({"status": "error", "message": "Should be abandoned. " + reqStatus});
-            }
-            this._onDisconnectTimeout();
+        if("function" === typeof this.eGainOnError){
+            this.eGainOnError({"status": "error", "message": "Should be abandoned. " + req.xhr.status + " " + req.xhr.responseText});
+        }
+        this._onDisconnectTimeout();
 	} else {
-            if("function" === typeof this.eGainOnError){
-                this.eGainOnError({"status": "log", "message": "Retrying. " + reqStatus});
-            }
+        if("function" === typeof this.eGainOnError){
+            this.eGainOnError({"status": "log", "message": "Retrying. " + req.xhr.status});
+        }
 	}
 }
 
@@ -3257,9 +3257,9 @@ Strophe.Connection.prototype._onRequestStateChange = function (func, req)
             }
 
             if (this.disconnecting) {
-                console.log('egainNode disconnecting with request status', reqStatus, req)
+                console.log('egainNode disconnecting with request status', reqStatus)
                 if (reqStatus >= 400) {
-                    this._hitError(reqStatus);
+                    this._hitError(req);
                     return;
                 }
             }
@@ -3313,8 +3313,7 @@ Strophe.Connection.prototype._onRequestStateChange = function (func, req)
                 if (reqStatus === 0 ||
                     (reqStatus >= 400 && reqStatus < 600) ||
                     reqStatus >= 12000) {
-                    console.log('egainNode disconnecting with request status', reqStatus, req)
-                    this._hitError(reqStatus);
+                    this._hitError(req);
                     if (reqStatus >= 400 && reqStatus < 500) {
                         this._changeConnectStatus(Strophe.Status.DISCONNECTING,
                                                   null);
