@@ -16,8 +16,8 @@ const path = require('path')
  *      It can be used run the library in development mode and define CORS host.
  */
  eGainLibrarySettings = function () {
-    this.IsDevelopmentModeOn = false;
-    this.IsDebugOn = false;
+    this.IsDevelopmentModeOn = true;
+    this.IsDebugOn = true;
     this.CORSHost = "";
     this.ChatPauseInSec = 30;
     this.eGainContextPath = "";
@@ -2710,7 +2710,7 @@ eGainLibrary = function (librarySettings) {
 
 Strophe.log = function (level, msg)
 {
-    // console.log("LOG: " + level + " MESSAGE: " + msg);
+    console.log("egainNode Strophe LOG: " + level + " MESSAGE: " + msg);
     try {
         if (level === Strophe.LogLevel.ERROR || level === Strophe.LogLevel.FATAL || eGainLibrary.debug)
         {
@@ -3257,7 +3257,7 @@ Strophe.Connection.prototype._onRequestStateChange = function (func, req)
             }
 
             if (this.disconnecting) {
-                console.log('egainNode disconnecting with request status', reqStatus)
+                console.log('egainNode disconnecting with request status', reqStatus, req)
                 if (reqStatus >= 400) {
                     this._hitError(reqStatus);
                     return;
@@ -3301,17 +3301,19 @@ Strophe.Connection.prototype._onRequestStateChange = function (func, req)
                 func(req);
                 this.errors = 0;
             } else {
-                        if("function" === typeof this.eGainOnError){
-                            this.eGainOnError({"status": "error", "message": "Should be abandoned. " + reqStatus});
-                        }
-                        else
-                                Strophe.error("request id " +
-                              req.id + "." +
-                              req.sends + " error " + reqStatus +
-                              " happened");
+                if("function" === typeof this.eGainOnError){
+                    this.eGainOnError({"status": "error", "message": "Should be abandoned. " + reqStatus});
+                }
+                else {
+                    Strophe.error("request id " +
+                    req.id + "." +
+                    req.sends + " error " + reqStatus +
+                    " happened");
+                }
                 if (reqStatus === 0 ||
                     (reqStatus >= 400 && reqStatus < 600) ||
                     reqStatus >= 12000) {
+                    console.log('egainNode disconnecting with request status', reqStatus, req)
                     this._hitError(reqStatus);
                     if (reqStatus >= 400 && reqStatus < 500) {
                         this._changeConnectStatus(Strophe.Status.DISCONNECTING,
