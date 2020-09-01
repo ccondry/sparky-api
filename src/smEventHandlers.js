@@ -70,7 +70,10 @@ function create (session) {
     onPollingError (e) {
       // UCCX polling error
       console.log(session.id, 'UCCX polling error:', e.message)
-      teamsLogger.log(`${session.id} - UCCX polling error: ${e.message}`)
+      // log unexpected errors to Webex Team space
+      if (e.statusCode !== 404 && e.message.match(/^WebSocket is not open/i)) {
+        teamsLogger.log(`${session.id} - UCCX polling error: ${e.message}`)
+      }
     }
   }
 
