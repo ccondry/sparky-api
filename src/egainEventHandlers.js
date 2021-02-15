@@ -22,18 +22,6 @@ function create (myChat, session) {
     console.log(`${session.id} - eGain OnDuplicateSession`, args)
     session.onEgainEnd()
   }
-  myEventHandlers.OnSysemMessageReceived = function (args) {
-    console.log(`${session.id} - eGain OnSysemMessageReceived`, args)
-    // send redirect command for WXM survey
-    if (args.startsWith('https://nps.bz')) {
-      session.addCommand('redirect', args)
-      return
-    }
-    if (args === 'externalsurvey') {
-      // ignore
-      return
-    }
-  }
   myEventHandlers.OnGetQueueCurrentStatus = function (args) {
     console.log(`${session.id} - eGain OnGetQueueCurrentStatus`, args)
   }
@@ -68,10 +56,22 @@ function create (myChat, session) {
   /* Example output of system messages to the same DIV */
   myEventHandlers.OnSystemMessageReceived = function (args) {
     console.log(`${session.id} - eGain OnSystemMessageReceived:`, args.Message)
-    // send customer all system messages except the ECE 12.0 "agentPickup" and "activityTransfer"
-    if (!args.Message.startsWith('agentPickup') && !args.Message.startsWith('activityTransfer')) {
-      session.addMessage('system', args.Message)
+    // send redirect command for WXM survey
+    if (args.Message.startsWith('https://nps.bz')) {
+      session.addCommand('redirect', args)
+      return
     }
+    // ignore these messages
+    if (
+      args.Message === 'externalsurvey' ||
+      args.Message.startsWith('agentPickup') ||
+      args.Message.startsWith('activityTransfer')
+    ) {
+      return
+    }
+    // send all other system messages to customer
+    session.addMessage('system', args.Message)
+    return
   }
   /* Example browser console.log when an error occurs */
   myEventHandlers.OnErrorOccurred = function (args) {
