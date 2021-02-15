@@ -17,12 +17,14 @@ const demos = {
 }
 
 async function send (session) {
+  // choose UCCX or PCCE demo details
   const demo = demos[session.demo]
   if (!demo) {
     // log demo type not recognized
     console.log(`${session.id} - unable to send WXM survey answers because "${session.demo}" is not a recognized demo type. Valid demo types are: ${Object.keys(demos).join(', ')}`)
     return
   }
+  // build REST URL with the static demo ID for UCCX or PCCE
   const url = 'https://api.getcloudcherry.com/api/surveybytoken/' + demo.id
   // build auth header from credentials
   const auth = Buffer.from(`${demo.username}:${demo.password}`, 'utf-8').toString('base64')
@@ -33,7 +35,9 @@ async function send (session) {
     id: demo.id,
     // this is always null
     restrictBySignature: null,
+    // timestamp
     responseDateTime: new Date(),
+    // the responses
     responses: [{
       // customer name
       questionId: demo.questionIds.name,
@@ -61,6 +65,7 @@ async function send (session) {
     }]
   }
 
+  // build fetch options
   const options = {
     headers: {
       Authorization: 'Basic ' + auth,
