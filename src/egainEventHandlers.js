@@ -58,7 +58,7 @@ function create (myChat, session) {
     console.log(`${session.id} - eGain OnSystemMessageReceived:`, args.Message)
     // send redirect command for WXM survey
     if (args.Message.startsWith('https://nps.bz')) {
-      session.addCommand('redirect', args)
+      session.addCommand('redirect', args.Message)
       return
     }
     // ignore these messages
