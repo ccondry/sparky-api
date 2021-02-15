@@ -24,6 +24,15 @@ function create (myChat, session) {
   }
   myEventHandlers.OnSysemMessageReceived = function (args) {
     console.log(`${session.id} - eGain OnSysemMessageReceived`, args)
+    // send redirect command for WXM survey
+    if (args.startsWith('https://nps.bz')) {
+      session.addCommand('redirect', args)
+      return
+    }
+    if (args === 'externalsurvey') {
+      // ignore
+      return
+    }
   }
   myEventHandlers.OnGetQueueCurrentStatus = function (args) {
     console.log(`${session.id} - eGain OnGetQueueCurrentStatus`, args)
