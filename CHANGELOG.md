@@ -3,6 +3,12 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2021.2.15-2
+
+### Features
+* **WXM Survey:** Improve logging of WXM survey action success.
+
+
 # 2021.2.15-1
 
 ### Bug Fixes
