@@ -94,7 +94,7 @@ async function getSession (to, from) {
       const session = await db.findOne('cumulus', 'chat.session', {to, from})
       if (session) {
         // generate session object from database data
-        const newSession = new Session('twilio', session, onAddMessage)
+        const newSession = new Session('whatsapp', session, onAddMessage)
         // add session to cache
         cache[session.id] = newSession
         // return the new session object
@@ -105,7 +105,7 @@ async function getSession (to, from) {
       }
     }
   } catch (e) {
-    console.log('error looking up session info for twilio SMS to', to, 'and from', from, ':', e.message)
+    console.log('error looking up session info for twilio whatsapp to', to, 'and from', from, ':', e.message)
     // rethrow all errors
     throw e
   }

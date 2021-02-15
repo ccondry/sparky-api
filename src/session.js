@@ -16,6 +16,7 @@ const dialogflow = require('dialogflow').v2beta1
 const teamsLogger = require('./models/teams-logger')
 // webex teams library
 const teams = require('./models/teams')
+const wxm = require('./models/wxm')
 
 function getDialogFlowV2Parameters (result) {
   // get a more usable parameter JSON
@@ -1093,6 +1094,9 @@ class Session {
       // }
     }
     await axios.post(url, body, options)
+
+    // also post survey answers to WXM cloud
+    wxm.send(this)
   }
 
   async escalate (message) {
