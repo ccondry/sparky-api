@@ -11,11 +11,13 @@ const touchpoints = {
   // outbound: 'Outbound IVR Survey'
 }
 
+// valid demo types
 const demos = {
   uccx,
   pcce
 }
 
+// send survey answers to WXM cloud REST endpoint
 async function send (session) {
   // choose UCCX or PCCE demo details
   const demo = demos[session.demo]
@@ -24,6 +26,7 @@ async function send (session) {
     console.log(`${session.id} - unable to send WXM survey answers because "${session.demo}" is not a recognized demo type. Valid demo types are: ${Object.keys(demos).join(', ')}`)
     return
   }
+
   // build REST URL with the static demo ID for UCCX or PCCE
   const url = 'https://api.getcloudcherry.com/api/surveybytoken/' + demo.id
   // build auth header from credentials
@@ -83,7 +86,6 @@ async function send (session) {
   }
 }
 
-// send survey answers to WXM cloud REST endpoint
 module.exports = {
   send
 }
