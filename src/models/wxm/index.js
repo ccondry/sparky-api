@@ -80,6 +80,7 @@ async function send (session) {
   try {
     // send REST request for WXM survey
     await fetch(url, options)
+    console.log(`${session.id} - sent WXM survey responses to survey "${demo.id}"`)
   } catch (e) {
     // log the error
     console.log(`${session.id} - failed to send WXM survey:`, e.message)
