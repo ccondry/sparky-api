@@ -56,6 +56,10 @@ function sendMessage(from, to, body, client) {
 }
 
 function onAddMessage (type, message, datetime) {
+  // ignore command messages
+  if (type === 'command') {
+    return
+  }
   console.log('creating Twilio client with SID', this.app.sid)
   // create Twilio client
   const client = new twilio(this.app.sid, this.app.token)

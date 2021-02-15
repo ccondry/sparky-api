@@ -66,6 +66,10 @@ async function sendMessage(id, message, page) {
 }
 
 function onAddMessage (type, message, datetime) {
+  // ignore command messages
+  if (type === 'command') {
+    return
+  }
   console.log('in facebook onAddMessage')
   // attach handler to send messages to facebook
   sendMessage(this.senderId, message, this.page)
