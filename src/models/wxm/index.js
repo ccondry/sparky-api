@@ -29,7 +29,8 @@ async function send (session) {
 
   // REST body
   const body = {
-    id,
+    // the static demo ID for UCCX or PCCE
+    id: demo.id,
     // this is always null
     restrictBySignature: null,
     responseDateTime: new Date(),
