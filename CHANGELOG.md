@@ -3,6 +3,14 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2021.2.15-6
+
+### Bug Fixes
+* **Facebook:** Filter out command messages that are used for web chat client.
+* **WhatsApp:** Filter out command messages that are used for web chat client.
+* **SMS:** Filter out command messages that are used for web chat client.
+
+
 # 2021.2.15-5
 
 ### Bug Fixes
