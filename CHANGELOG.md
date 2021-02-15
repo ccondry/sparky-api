@@ -3,6 +3,13 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2021.2.15-4
+
+### Bug Fixes
+* **WXM Survey:** Fix the send URL redirect command for ECE chat entry points
+that send a survey URL.
+
+
 # 2021.2.15-3
 
 ### Features
