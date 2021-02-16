@@ -3,6 +3,12 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2021.2.16-2
+
+### Bug Fixes
+* **WXM Survey:** Fix web chat WXM survey ID.
+
+
 # 2021.2.16-1
 
 ### Bug Fixes
