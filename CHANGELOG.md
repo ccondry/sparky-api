@@ -3,6 +3,12 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2021.2.16-1
+
+### Bug Fixes
+* **WXM Survey:** Fix REST request parameters for sending WXM survey data.
+
+
 # 2021.2.16
 
 ### Features
