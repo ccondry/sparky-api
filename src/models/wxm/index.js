@@ -4,7 +4,7 @@ const pcce = require('./pcce')
 
 // which entry point used to chat with bot
 const touchpoints = {
-  'sparku-ui': 'Website Chat Bot',
+  'sparky-ui': 'Website Chat Bot',
   facebook: 'Facebook Messenger Chat Bot',
   whatsapp: 'WhatsApp Chat Bot',
   twilio: 'Mobile App SMS Chat Bot'
