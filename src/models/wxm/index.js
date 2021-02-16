@@ -95,6 +95,7 @@ async function send (session) {
 
   // build fetch options
   const options = {
+    method: 'POST',
     headers: {
       Authorization: 'Basic ' + auth,
       'Content-Type': 'application/json'
