@@ -68,6 +68,31 @@ async function send (session) {
     }]
   }
 
+  // add customer ID, agent ID, and team ID if they exist in session data
+  // Customer ID
+  if (session.userId) {
+    body.responses.push({
+      questionId: demo.questionIds.customerId,
+      textInput: String(session.userId)
+    })
+  }
+  
+  // Agent ID
+  if (session.agentId) {
+    body.responses.push({
+      questionId: demo.questionIds.agentId,
+      textInput: String(session.agentId)
+    })
+  }
+
+  // Team ID
+  if (session.teamId) {
+    body.responses.push({
+      questionId: demo.questionIds.teamId,
+      textInput: String(session.teamId)
+    })
+  }
+
   // build fetch options
   const options = {
     headers: {
@@ -79,6 +104,7 @@ async function send (session) {
 
   try {
     // send REST request for WXM survey
+    console.log('sending WXM survey data:', body)
     await fetch(url, options)
     console.log(`${session.id} - sent WXM survey responses to survey "${demo.id}"`)
   } catch (e) {

@@ -1,4 +1,5 @@
 const teamsLogger = require('./models/teams-logger')
+const agentExtensions = require('./models/sm-agent-extensions')
 
 module.exports = {create}
 
@@ -23,8 +24,23 @@ function create (session) {
       console.log(session.id, 'presence event', from, status)
     },
     onPresenceJoined (from) {
+      // the "from" parameter will contain agent first name
       console.log(session.id, 'presence joined', from)
       session.addMessage('system', `${from} has joined the chat`)
+      // build list of agent first names
+      // find matching agentId
+      let agentId = agentExtensions[from]
+      if (agentId) {
+        // found matching agent name/agentId
+        if (session.isInstantDemo && session.userId) {
+          // instant demo
+          agentId += session.userId
+        } else {
+          // scheduled demo
+        }
+        // set agent ID for survey data
+        session.setAgentId(agentId)
+      }
     },
     onPresenceLeft (from) {
       console.log(session.id, 'presence left', from)

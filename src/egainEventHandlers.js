@@ -1,4 +1,5 @@
 const localization = require('./models/localization')
+const agentExtensions = require('./models/egain-agent-extensions')
 
 function create (myChat, session) {
   let myEventHandlers = myChat.GetEventHandlers()
@@ -156,6 +157,25 @@ function create (myChat, session) {
   //   myChat.SendAcceptChatAttachmentNotification(attachment.Id, attachment.Name)
   //   myChat.GetAttachment(attachment.Id)
   // };
+
+  myEventHandlers.OnAgentJoined = function(args) {
+    console.log(`${session.id} - eGain OnAgentJoined`, args)
+    // get agent username from egain event info
+    const agentName = args.AgentName || args.agentName
+    // check instant demo or scheduled demo
+    let agentId
+    if (session.isInstantDemo) {
+      // instant demo
+      agentId = agentExtensions[agentName.slice(0, 8)] + agentName.slice(-4)
+    } else {
+      // scheduled demo
+      agentId = agentExtensions[agentName]
+    }
+    if (agentId) {
+      // set agent ID on session for survey data
+      session.setAgentId(agentId)
+    }
+  }
 
   return myEventHandlers
 }

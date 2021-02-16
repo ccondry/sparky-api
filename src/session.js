@@ -144,6 +144,11 @@ class Session {
     this.app = data.app
   }
 
+  // set the agent ID who handled this chat. used for survey data.
+  setAgentId (id) {
+    this.agentId = id
+  }
+
   // get a localized string from models/localization
   getLocalizedText (id) {
     try {

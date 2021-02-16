@@ -8,7 +8,10 @@ const questionIds = {
   phone: '5ed8907032291125c80bf561',
   nps: '5e81dafdb33a2d1970935673',
   ces: '5e81dafdb33a2d1970935674',
-  touchpoint: '602a6e8c0e00e419a8ddaa64'
+  touchpoint: '602a6e8c0e00e419a8ddaa64',
+  customerId: '5e81dafdb33a2d1970935661',
+  agentId: '5e81dafdb33a2d1970935665',
+  teamId: '5e81dafdb33a2d1970935666'
 }
 
 module.exports = {
