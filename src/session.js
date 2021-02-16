@@ -40,7 +40,7 @@ class Session {
     } else {
       // new session - generate uuid
       this.id = uuidv1()
-      console.log(this.id, '- new chat session started.')
+      console.log(this.id, '- new chat session of type', type, 'started.')
     }
     this.state = data.state || 'active'
     // set timestamp
