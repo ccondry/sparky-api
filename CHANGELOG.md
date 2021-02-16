@@ -3,6 +3,12 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2021.2.16
+
+### Features
+* **WXM Survey:** Add user ID and agent ID to survey data, when available.
+
+
 # 2021.2.15-6
 
 ### Bug Fixes
