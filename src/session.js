@@ -330,7 +330,7 @@ class Session {
     } else {
       // survey not enabled - just end session
       console.log(this.id, '- survey =', this.survey, 'and botEnabled =', this.botEnabled)
-      console.log(this.id, '- not starting post-chat survye. Just end the session.')
+      console.log(this.id, '- not starting post-chat survey. Just end the session.')
       this.endSession()
     }
   }
