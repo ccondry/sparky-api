@@ -3,6 +3,12 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2021.2.17
+
+### Bug Fixes
+* **Egain Library:** Fix typo in eGain base handler.
+
+
 # 2021.2.16-2
 
 ### Bug Fixes
