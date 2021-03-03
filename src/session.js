@@ -552,8 +552,8 @@ class Session {
       this.isInstantDemo = response.instant === true || response.instant === 'true'
       console.log(`${this.id} - instant demo = ${this.isInstantDemo}`)
 
-      // if this an instant demo session, make sure we have user ID
-      if (this.isInstantDemo && !this.userId) {
+      // make sure we have user ID
+      if (!this.userId) {
         // get the instant demo customer (or register them if they are not registered)
         await this.checkInstantDemoCustomer()
         // get session info again now that we have user ID
@@ -868,15 +868,13 @@ class Session {
               if (this.isEscalating) {
                 // escalate
                 this.escalate()
-              } else if (this.isInstantDemo) {
+              } else {
+                // not escalating - check instant demo user ID
                 try {
                   this.checkInstantDemoCustomer('sparky')
                 } catch (e) {
                   console.error(this.id, '- failed to check instant demo customer', e.message)
                 }
-              } else {
-                // send instructions
-                this.processCustomerMessage('instructions')
               }
             } else {
               // try to get info from customer again
@@ -902,15 +900,13 @@ class Session {
               if (this.isEscalating) {
                 // escalate
                 this.escalate()
-              } else if (this.isInstantDemo) {
+              } else {
+                // not escalating - check that we have user ID
                 try {
                   this.checkInstantDemoCustomer('sparky')
                 } catch (e) {
                   console.error(this.id, '- failed to check instant demo customer', e.message)
                 }
-              } else {
-                // send instructions
-                this.processCustomerMessage('instructions')
               }
             } else {
               // try to get info from customer again
