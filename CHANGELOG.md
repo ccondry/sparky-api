@@ -3,6 +3,12 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2021.3.2-1
+
+### Bug Fixes
+* **Facebook:** Fix issue where bot asks the customer for their user ID twice.
+
+
 # 2021.3.2
 
 ### Features
