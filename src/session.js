@@ -550,6 +550,7 @@ class Session {
   }
 
   // check the dcloud session info using datacenter and session ID, and respond accordingly
+  // also get user ID if not found
   async checkSessionInfo () {
     console.log(`${this.id} - checking dCloud session info...`)
     if (!this.dcloudDatacenter || !this.dcloudSession) {
@@ -892,13 +893,6 @@ class Session {
               if (this.isEscalating) {
                 // escalate
                 this.escalate()
-              } else {
-                // not escalating - check instant demo user ID
-                try {
-                  this.checkInstantDemoCustomer('sparky')
-                } catch (e) {
-                  console.error(this.id, '- failed to check instant demo customer', e.message)
-                }
               }
             } else {
               // try to get info from customer again
@@ -924,13 +918,6 @@ class Session {
               if (this.isEscalating) {
                 // escalate
                 this.escalate()
-              } else {
-                // not escalating - check that we have user ID
-                try {
-                  this.checkInstantDemoCustomer('sparky')
-                } catch (e) {
-                  console.error(this.id, '- failed to check instant demo customer', e.message)
-                }
               }
             } else {
               // try to get info from customer again
