@@ -1,6 +1,7 @@
 const fetch = require('../fetch')
 const uccx = require('./uccx')
 const pcce = require('./pcce')
+const teamsLogger = require('../teams-logger')
 
 // which entry point used to chat with bot
 const touchpoints = {
@@ -23,7 +24,9 @@ async function send (session) {
   const demo = demos[session.demo]
   if (!demo) {
     // log demo type not recognized
-    console.log(`${session.id} - unable to send WXM survey answers because "${session.demo}" is not a recognized demo type. Valid demo types are: ${Object.keys(demos).join(', ')}`)
+    const message = `${session.id} - unable to send WXM survey answers because "${session.demo}" is not a recognized demo type. Valid demo types are: ${Object.keys(demos).join(', ')}`
+    console.log(message)
+    teamsLogger.log(message)
     return
   }
 
@@ -60,7 +63,7 @@ async function send (session) {
     }, {
       // second rating
       questionId: demo.questionIds.ces,
-      numberInput: parseInt(session.surveyAnswers[1] || '8')
+      numberInput: parseInt(session.surveyAnswers[1] || '5')
     }, {
       // touchpoint
       questionId: demo.questionIds.touchpoint,
@@ -75,6 +78,11 @@ async function send (session) {
       questionId: demo.questionIds.customerId,
       textInput: String(session.userId)
     })
+  } else {
+    // log WXM survey that did not have user ID to associate
+    const message = `${session.id} did not have a user ID to associate with their WXM survey.`
+    console.log(message)
+    teamsLogger.log(message)
   }
   
   // Agent ID
@@ -107,10 +115,13 @@ async function send (session) {
     // send REST request for WXM survey
     console.log('sending WXM survey data:', body)
     await fetch(url, options)
+    // TODO reduce logging here?
     console.log(`${session.id} - sent WXM survey responses to survey "${demo.id}"`)
   } catch (e) {
     // log the error
-    console.log(`${session.id} - failed to send WXM survey:`, e.message)
+    const message = `${session.id} - failed to send WXM survey: ${e.message}`
+    console.log(message)
+    teamsLogger.log(message)
   }
 }
 
