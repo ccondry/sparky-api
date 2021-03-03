@@ -3,6 +3,16 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2021.3.2-2
+
+### Features
+* **WXM Survey:** Log to Webex when WXM survey does have a user ID associated.
+
+### Bug Fixes
+* **Survey:** Send WXM and old survey at the same time, so that WXM survey can
+still work even if the old one fails.
+
+
 # 2021.3.2-1
 
 ### Bug Fixes
