@@ -1105,10 +1105,12 @@ class Session {
       //   'Authorization': `Bearer ${token}`
       // }
     }
-    await axios.post(url, body, options)
+    const promise1 = axios.post(url, body, options)
 
     // also post survey answers to WXM cloud
-    wxm.send(this)
+    const promise2 = wxm.send(this)
+    
+    return Promise.all([promise1, promise2])
   }
 
   async escalate (message) {
