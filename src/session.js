@@ -529,9 +529,24 @@ class Session {
   }
 
   // get mobile app answers information
-  getAnswers (phoneNumber) {
-    console.log(this.id, '- looking up answers for phoneNumber =', phoneNumber)
-    return db.findOne('cumulus', 'answers', {phoneNumber})
+  async getAnswers (ani) {
+    console.log(this.id, '- looking up answers for ani =', ani)
+    const query = {
+      ani: {
+        $in: [
+          ani,
+          ani.replace(/^\+/, ''),
+          this.email
+        ]
+      }
+    }
+    // ani starts with +1?
+    if (ani.startsWith('+1')) {
+      // also try without the +1 prefix
+      query.ani.$in.push(ani.slice(2))
+    }
+
+    return db.findOne('cumulus', 'answers', query)
   }
 
   // check the dcloud session info using datacenter and session ID, and respond accordingly
@@ -803,8 +818,17 @@ class Session {
   getCustomer () {
     const query = {
       contact: {
-        $in: [this.phone, this.email]
+        $in: [
+          this.phone,
+          this.phone.replace(/^\+/, ''),
+          this.email
+        ]
       }
+    }
+    // phone number starts with +1?
+    if (this.phone.startsWith('+1')) {
+      // also try without the +1 prefix
+      query.contact.$in.push(this.phone.slice(2))
     }
     return db.findOne('toolbox', 'customer', query)
   }
