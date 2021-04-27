@@ -3,6 +3,13 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2021.4.27
+
+### Fixes
+* **Facebook:** Fix missing welcome message after entering the datacenter and
+session ID when starting a Facebook chat.
+
+
 # 2021.3.2-2
 
 ### Features
