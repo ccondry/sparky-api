@@ -142,6 +142,10 @@ class Session {
     this.to = data.to
     this.from = data.from
     this.app = data.app
+    
+    // flag to know whether we have sent the initial welcome message after\
+    // getting datacenter and session info for a facebook chat session
+    this.hasSentVerticalWelcome = false
   }
 
   // set the agent ID who handled this chat. used for survey data.
@@ -402,6 +406,7 @@ class Session {
         this.userId = userId
         // send welcome message
         this.processCustomerMessage('sparky')
+        this.hasSentVerticalWelcome = true
       })
       .catch(e => {
         console.error(this.id, '- failed attempt to register instant demo phone', contact, 'with', userId, ':', e.message)
@@ -893,6 +898,10 @@ class Session {
               if (this.isEscalating) {
                 // escalate
                 this.escalate()
+              } else if (!this.hasSentVerticalWelcome) {
+                // send welcome message
+                this.processCustomerMessage('sparky')
+                this.hasSentVerticalWelcome = true
               }
             } else {
               // try to get info from customer again
@@ -918,6 +927,10 @@ class Session {
               if (this.isEscalating) {
                 // escalate
                 this.escalate()
+              } else if (!this.hasSentVerticalWelcome) {
+                // send welcome message
+                this.processCustomerMessage('sparky')
+                this.hasSentVerticalWelcome = true
               }
             } else {
               // try to get info from customer again
