@@ -445,12 +445,12 @@ class Session {
 
   processSurveyAnswer (message) {
     // process survey answers here instead of sending to the bot
-    const surveyAnswer = Number.parseInt(message)
-    if (Number.isNaN(surveyAnswer)) {
-      // re-ask question
-      this.addMessage('bot', this.surveyQuestions[this.surveyIndex])
-      return
-    }
+    // const surveyAnswer = Number.parseInt(message)
+    // if (Number.isNaN(surveyAnswer)) {
+    //   // re-ask question
+    //   this.addMessage('bot', this.surveyQuestions[this.surveyIndex])
+    //   return
+    // }
 
     // else valid answer
     this.surveyAnswers.push(surveyAnswer)
