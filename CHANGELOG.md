@@ -3,6 +3,12 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2024.11.27-1
+
+### Fixes
+* **Survey:** Fix vertical chat survey answers not saving.
+
+
 # 2024.11.27
 
 ### Features
