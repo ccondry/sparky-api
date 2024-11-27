@@ -3,6 +3,13 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2024.11.27
+
+### Features
+* **Survey:** Enable chat surveys configured in the vertical instead of 
+DialogFlow.
+
+
 # 2021.4.27
 
 ### Fixes
