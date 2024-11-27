@@ -18,6 +18,10 @@ const teamsLogger = require('./models/teams-logger')
 const teams = require('./models/teams')
 const wxm = require('./models/wxm')
 
+function sleep (ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 function getDialogFlowV2Parameters (result) {
   // get a more usable parameter JSON
   const keys = Object.keys(result.parameters.fields)
@@ -282,6 +286,7 @@ class Session {
         done = true
       } catch (e) {
         console.log(this.id, '- failed to add message to database. trying again. error message was: ', e.message)
+        await sleep(2000)
       }
     }
 
