@@ -248,59 +248,58 @@ class Session {
 
   // add new message to session
   async addMessage (type, message, data) {
-    // if message is not empty string
-    if (message && message.length) {
-      // push message to array
-      const datetime = new Date().toJSON()
-      const m = {
-        text: message,
-        type,
-        datetime,
-        data
+    // ignore empty messages
+    if (typeof message !== 'string' || message.length === 0) {
+      return
+    }
+    // push message to array
+    const datetime = new Date().toJSON()
+    const m = {
+      text: message,
+      type,
+      datetime,
+      data
+    }
+    this.messages.push(m)
+
+    // set expireAt for database record time-to-live
+    let d = new Date()
+    d.setSeconds(d.getSeconds() + Number(process.env.SESSION_TIMEOUT))
+    // update cache expireAt
+    this.expireAt = d
+
+    // push message to the database record also
+    let done = false
+    while (!done) {
+      try {
+        // push message onto array and set the expireAt to new time
+        await db.updateOne(
+          'cumulus',
+          'chat.session',
+          { id: this.id },
+          { $push: { messages: m }, $set: { expireAt: this.expireAt } }
+        )
+        done = true
+      } catch (e) {
+        console.log(this.id, '- failed to add message to database. trying again. error message was: ', e.message)
       }
-      this.messages.push(m)
+    }
 
-      // set expireAt for database record time-to-live
-      let d = new Date()
-      d.setSeconds(d.getSeconds() + Number(process.env.SESSION_TIMEOUT))
-      // update cache expireAt
-      this.expireAt = d
-
-      // push message to the database record also
-      let done = false
-      while (!done) {
+    // if this is a bot/system/agent message, send it to the customer
+    if (type !== 'customer') {
+      // match the Incoming log message format
+      console.log(this.id, '- outgoing', type, 'message:', message)
+      if (typeof this.onAddMessage === 'function') {
+        console.log(this.id, '- sending message using onAddMessage...')
         try {
-          // push message onto array and set the expireAt to new time
-          await db.updateOne(
-            'cumulus',
-            'chat.session',
-            { id: this.id },
-            { $push: { messages: m }, $set: { expireAt: this.expireAt } }
-          )
-          done = true
+          this.onAddMessage.call(this, type, message, datetime, data)
+          console.log(this.id, '- message sent using onAddMessage.')
         } catch (e) {
-          console.log(this.id, '- failed to add message to database. trying again. error message was: ', e.message)
+          console.log(this.id, '- error sending outgoing message with onAddMessage:', e.message)
         }
+      } else {
+        console.log(this.id, '- onAddMessage was not a function, so not sending the message with it. onAddMessage was', typeof this.onAddMessage)
       }
-
-      // if this is a bot/system/agent message, send it to the customer
-      if (type !== 'customer') {
-        // match the Incoming log message format
-        console.log(this.id, '- outgoing', type, 'message:', message)
-        if (typeof this.onAddMessage === 'function') {
-          console.log(this.id, '- sending message using onAddMessage...')
-          try {
-            this.onAddMessage.call(this, type, message, datetime, data)
-            console.log(this.id, '- message sent using onAddMessage.')
-          } catch (e) {
-            console.log(this.id, '- error sending outgoing message with onAddMessage:', e.message)
-          }
-        } else {
-          console.log(this.id, '- onAddMessage was not a function, so not sending the message with it. onAddMessage was', typeof this.onAddMessage)
-        }
-      }
-    } else {
-      // don't add empty messages
     }
   }
 
