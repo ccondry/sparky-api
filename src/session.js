@@ -1066,12 +1066,7 @@ class Session {
             this.endSession()
           }
           // send the survey results to the node service running in the demo
-          try {
-            await this.saveSurveyAnswers()
-            console.log(this.id, '- saved survey answers')
-          } catch (e) {
-            console.log(this.id, '- Failed to save survey answers', e.message)
-          }
+          await this.saveSurveyAnswers()
 
           break
         }
@@ -1159,26 +1154,31 @@ class Session {
 
   // save survey answers to database on the demo instance
   async saveSurveyAnswers () {
-    const url = `${this.surveyHost}`
-    // {answers: this.surveyAnswers}
-    const body = {
-      surveyId: process.env.SURVEY_ID,
-      ani: this.phone,
-      name: `${this.firstName} ${this.lastName}`,
-      q1: this.surveyAnswers[0] || '0',
-      q2: this.surveyAnswers[1] || '0'
-    }
-    const options = {
-      // headers: {
-      //   'Authorization': `Bearer ${token}`
-      // }
-    }
-    const promise1 = axios.post(url, body, options)
+    try {
+      const url = `${this.surveyHost}`
+      // {answers: this.surveyAnswers}
+      const body = {
+        surveyId: process.env.SURVEY_ID,
+        ani: this.phone,
+        name: `${this.firstName} ${this.lastName}`,
+        q1: this.surveyAnswers[0] || '0',
+        q2: this.surveyAnswers[1] || '0'
+      }
+      const options = {
+        // headers: {
+        //   'Authorization': `Bearer ${token}`
+        // }
+      }
+      const promise1 = axios.post(url, body, options)
 
-    // also post survey answers to WXM cloud
-    const promise2 = wxm.send(this)
-    
-    return Promise.all([promise1, promise2])
+      // also post survey answers to WXM cloud
+      const promise2 = wxm.send(this)
+      
+      await Promise.all([promise1, promise2])
+      console.log(this.id, '- saved survey answers')
+    } catch (e) {
+      console.log(this.id, '- failed to save survey answers:', e.message)
+    }
   }
 
   async escalate (message) {
