@@ -430,11 +430,45 @@ class Session {
       // if bot disabled, escalate directly to an agent
       console.log(`${this.id} - bot disabled. Escalating directly to agent.`)
       this.escalate(message)
+    } else if (this.inSurvey && this.useVerticalSurvey) {
+      this.processSurveyAnswer(message)
     } else {
       // console.log('getting bot response...')
       // let bot handle the response
       this.processCustomerMessage(message)
     }
+  }
+
+  processSurveyAnswer (message) {
+    // process survey answers here instead of sending to the bot
+    const surveyAnswer = Number.parseInt(message)
+    if (Number.isNaN(surveyAnswer)) {
+      // re-ask question
+      this.addMessage('bot', this.surveyQuestions[this.surveyIndex])
+      return
+    }
+
+    // else valid answer
+    this.surveyAnswers.push(surveyAnswer)
+    this.surveyIndex++
+    const surveyQuestion = this.surveyQuestions[this.surveyIndex]
+    // if next question exists
+    if (surveyQuestion) {
+      // ask next question
+      this.addMessage('bot', surveyQuestion)
+      return
+    }
+    
+    // else end of survey
+    this.inSurvey = false
+    // say survey goodbye
+    this.addMessage('bot', this.surveyGoodbye)
+    if (this.type !== 'sparky-ui') {
+      // end of survey should end the session for bots other than sparky-ui
+      this.endSession()
+    }
+    // send the survey results to the node service running in the demo
+    this.saveSurveyAnswers()
   }
 
   async sendEscalatedMessage (message) {
@@ -719,6 +753,23 @@ class Session {
       if (r2.chatBotSurveyEnabled) {
         this.survey = r2.chatBotSurveyEnabled
         console.log(this.id, '- used dCloud vertical config to update survey to', this.survey)
+      }
+      if (r2.surveys) {
+        this.survey = r2.chatBotSurveyEnabled
+        // vertical surveys configured?
+        if (r2.surveys.digital) {
+          // get survey questions
+          this.surveyQuestions = [
+            r2.surveys.digital.question1,
+            r2.surveys.digital.question2
+          ]
+          // get survey greeting and goodbye phrases
+          this.surveyGreeting = r2.surveys.digital.greeting
+          this.surveyGoodbye = r2.surveys.digital.goodBye
+          // turn on vertical survey instead of dialogflow survey
+          this.useVerticalSurvey = true
+          console.log(this.id, '- used dCloud vertical config to update survey to', this.survey)
+        }
       }
     } catch (e) {
       console.error(`${this.id} - error getting dcloud vertical config info for ${this.vertical}`, e.message)
@@ -1340,10 +1391,27 @@ class Session {
     console.log(this.id, '- starting post-chat survey by sending the chat bot the keyword "survey".')
     // egain session ended - now provide chat survey
     this.inSurvey = true
-    // start survey conversation by saying 'survey' to bot AI
-    this.processCustomerMessage('survey')
-  }
 
+    // use vertical survey questions or dialogflow?
+    if (this.useVerticalSurvey) {
+      try {
+        // send survey greeting from bot to user
+        this.addMessage('bot', this.surveyGreeting)
+        // ask first survey question
+        this.surveyIndex = 0
+        this.addMessage('bot', this.surveyQuestions[this.surveyIndex])
+        // wait for first survey response
+      } catch (e) {
+        // TODO handle this
+        console.log('error starting survey:', e)
+      }
+    } else {
+      // dialogflow survey
+      // start survey conversation by saying 'survey' to bot AI
+      this.processCustomerMessage('survey')
+    }
+
+  }
 }
 
 module.exports = Session
