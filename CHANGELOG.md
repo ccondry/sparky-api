@@ -3,6 +3,12 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2024.11.27-2
+
+### Fixes
+* **Survey:** Fix vertical chat surveys crashing the service.
+
+
 # 2024.11.27-1
 
 ### Fixes
