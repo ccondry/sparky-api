@@ -3,6 +3,12 @@
 Dates are in YYYY-MM-DD format
 
 
+# 2024.11.28
+
+### Fixes
+* **Survey:** Validate vertical chat survey answers are a number from 0 to 9.
+
+
 # 2024.11.27-2
 
 ### Fixes
