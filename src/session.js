@@ -446,10 +446,10 @@ class Session {
   processSurveyAnswer (message) {
     // process survey answers here instead of sending to the bot
     const surveyAnswer = Number.parseInt(message)
-    // validate survey answer is a number between 1 and 9
+    // validate survey answer is a number 0 to 9
     if (
       Number.isNaN(surveyAnswer) ||
-      surveyAnswer < 1 ||
+      surveyAnswer < 0 ||
       surveyAnswer > 9
     ) {
       // re-ask question
