@@ -445,7 +445,19 @@ class Session {
 
   processSurveyAnswer (message) {
     // process survey answers here instead of sending to the bot
-    this.surveyAnswers.push(message)
+    const surveyAnswer = Number.parseInt(message)
+    // validate survey answer is a number between 1 and 9
+    if (
+      Number.isNaN(surveyAnswer) ||
+      surveyAnswer < 1 ||
+      surveyAnswer > 9
+    ) {
+      // re-ask question
+      this.addMessage('bot', this.surveyQuestions[this.surveyIndex])
+      return
+    }
+
+    this.surveyAnswers.push(surveyAnswer)
     this.surveyIndex++
     const surveyQuestion = this.surveyQuestions[this.surveyIndex]
     // if next question exists
@@ -1153,8 +1165,9 @@ class Session {
         surveyId: process.env.SURVEY_ID,
         ani: this.phone,
         name: `${this.firstName} ${this.lastName}`,
-        q1: this.surveyAnswers[0] || '0',
-        q2: this.surveyAnswers[1] || '0'
+        // only string answers are valid for db insert, not numbers
+        q1: String(this.surveyAnswers[0] || '0'),
+        q2: String(this.surveyAnswers[1] || '0')
       }
       const options = {
         // headers: {
