@@ -1396,7 +1396,7 @@ class Session {
 
   }
 
-  startSurvey () {
+  async startSurvey () {
     console.log(this.id, '- starting post-chat survey by sending the chat bot the keyword "survey".')
     // egain session ended - now provide chat survey
     this.inSurvey = true
@@ -1406,6 +1406,7 @@ class Session {
       try {
         // send survey greeting from bot to user
         this.addMessage('bot', this.surveyGreeting)
+        await sleep (1000)
         // ask first survey question
         this.surveyIndex = 0
         this.addMessage('bot', this.surveyQuestions[this.surveyIndex])
