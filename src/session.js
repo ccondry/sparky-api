@@ -493,6 +493,7 @@ class Session {
           // log to Teams
           teamsLogger.log(`${this.id} - timed out error - failed to send message to UCCX agent in ${this.dcloudDatacenter} ${this.dcloudSession}: ${e.message}`)
         }
+        // TODO it crashes here?
         throw e
       }
     } else {
@@ -1311,7 +1312,7 @@ class Session {
       // this.addCustomerMessage('system', 'dcloud-finding-agent')
       // this.addMessage('system', localization[this.languageCode].welcomeMessage)
       // send the transcript as a customer message
-      this.sendEscalatedMessage(message)
+      await this.sendEscalatedMessage(message)
     } catch (e) {
       console.error('error starting UCCX chat', e)
     }
