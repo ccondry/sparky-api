@@ -542,7 +542,10 @@ class Session {
         } catch (e) {
           console.error(`${this.id} - failed again after loading default credentials:`, e.message)
           // send an error message to user
-          this.addMessage('system', `There was an error loading the JSON credentials for your DialogFlow project ID ${oldGcpId}. I tried to load the default DialogFlow credentials, but there was another error: ${e.message}`)
+          this.addMessage('system', `There was an error loading the JSON ` +
+            `credentials for your DialogFlow project ID ${oldGcpId}. I tried ` +
+            `to load the default DialogFlow credentials, but there was ` +
+            `another error: ${e.message}`)
         }
       }
     }
