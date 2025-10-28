@@ -493,7 +493,6 @@ class Session {
           // log to Teams
           teamsLogger.log(`${this.id} - timed out error - failed to send message to UCCX agent in ${this.dcloudDatacenter} ${this.dcloudSession}: ${e.message}`)
         }
-        // TODO it crashes here?
         throw e
       }
     } else {
@@ -1315,6 +1314,10 @@ class Session {
       await this.sendEscalatedMessage(message)
     } catch (e) {
       console.error('error starting UCCX chat', e)
+      // send an error message to user
+      this.addMessage('system', `There was an error connecting to UCCX ` +
+        `classic chat. It is no longer supported as of UCCX version 15. The ` +
+        `error message was: ${e.message}`)
     }
   }
 
